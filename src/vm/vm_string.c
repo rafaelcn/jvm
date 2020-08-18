@@ -13,16 +13,20 @@ int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
         return 1;
     }
 
+    if (strlen(s) != strlen(s_)) {
+        return 0;
+    }
+
     int j = n;
 
     for (unsigned int i = strlen(s)-1; i >= strlen(s)-n; i--) {
         if (s[i] != s_[j]) {
-            return 1;
+            return 0;
         }
         j--;
     }
 
-    return 0;
+    return 1;
 }
 
 char *vm_strsplit(const char *restrict s, const char *restrict delim,
