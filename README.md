@@ -1,2 +1,3 @@
-# jvm
-An implementation of (some characteristics of) the JVM in C
+# nJVM
+
+An implementation of (some characteristics of) the JVM in C.
