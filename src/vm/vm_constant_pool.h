@@ -10,43 +10,43 @@ typedef uint16_t access_flag_t;
 /**
  * @brief
  */
-struct vm_constant_pool_t {
+typedef struct vm_constant_pool_t {
 
-};
+} vm_constant_pool_t;
 
 /**
  * @brief
  */
-struct vm_constant_pool_info_t {
+typedef struct vm_constant_pool_info_t {
     uint8_t tag;
     uint8_t info[];
-};
+} vm_constant_pool_info_t;
 
 /**
  * @brief
  */
-struct vm_field_info_t {};
+typedef struct vm_field_info_t {} vm_field_info_t;
 /**
  * @brief
  */
-struct vm_method_info_t {};
+typedef struct vm_method_info_t {} vm_method_info_t;
 /**
  * @brief
  */
-struct vm_attribute_info_t {
+typedef struct vm_attribute_info_t {
 
-};
+} vm_attribute_info_t;
 
 /**
  * @brief
  */
-struct vm_class_file_t {
+typedef struct vm_class_file_t {
     uint64_t magic;
     uint16_t minor;
     uint16_t major;
 
-    vm_class_file_t* _this;
-    vm_class_file_t* _super;
+    struct vm_class_file_t* _this;
+    struct vm_class_file_t* _super;
 
     access_flag_t access_flag;
 
@@ -71,7 +71,7 @@ struct vm_class_file_t {
     uint16_t constanpool_count_t;
     // The actual size of constanpool_info_t is sizeof(constanpool_info_t/4)-1
     vm_constant_pool_info_t constant_pool_info[];
-};
+} vm_class_file_t;
 
 // ACC_PUBLIC may be accessed from outside its package.
 const access_flag_t ACC_PUBLIC = 0x0001;
