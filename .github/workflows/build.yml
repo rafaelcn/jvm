@@ -11,13 +11,13 @@ jobs:
         name: Build
         runs-on: ubuntu-latest
 
-        - name: make the code accessible to the workflow
-        uses: actions/checkout@v2
-
         steps:
-            - name: build
-              run: |
-                make
+        - name: make the code accessible to the workflow
+          uses: actions/checkout@v2
+
+        - name: build
+          run: |
+            make
     test:
         needs: build
 
