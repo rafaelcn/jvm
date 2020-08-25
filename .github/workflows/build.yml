@@ -1,0 +1,31 @@
+name: C Workflow
+
+on:
+    push:
+        branches: [ $default_branch ]
+    pull_request:
+        branches: [ $default_branch ]
+
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+
+        - name: make the code accessible to the workflow
+        uses: actions/checkout@v2
+
+        steps:
+            - name: build
+              run: |
+                make
+    test:
+        needs: build
+
+        name: Test
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: test
+              run: |
+                make test
+

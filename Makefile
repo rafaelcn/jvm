@@ -6,6 +6,8 @@ BIN = njvm.exe
 all:
 	$(CC) -std=c99 $(SRC) -o ./bin/$(BIN)
 
+test:
+
 vars:
 	@echo $(CC)
 	@echo $(SRC)
