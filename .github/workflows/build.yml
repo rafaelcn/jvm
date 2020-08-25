@@ -1,6 +1,6 @@
 name: C Workflow
 
-on: [ push ]
+on: [push, pull_request]
 
 jobs:
     build:
@@ -8,10 +8,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-        - name: make the code accessible to the current workflow
+        - name: Make the code accessible to the current workflow
           uses: actions/checkout@v2
 
-        - name: build
+        - name: Build
           run: |
             make
     test:
@@ -21,10 +21,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: make the code accessible to the current workflow
+            - name: Make the code accessible to the current workflow
             uses: actions/checkout@v2
 
-            - name: test the build
+            - name: Test the build
               run: |
                 make test
 
