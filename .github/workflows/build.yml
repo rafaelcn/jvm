@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-        - name: make the code accessible to the workflow
+        - name: make the code accessible to the current workflow
           uses: actions/checkout@v2
 
         - name: build
@@ -25,7 +25,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: test
+            - name: make the code accessible to the current workflow
+            uses: actions/checkout@v2
+
+            - name: test the build
               run: |
                 make test
 
