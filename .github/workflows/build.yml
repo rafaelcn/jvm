@@ -1,6 +1,10 @@
 name: C Workflow
 
-on: [push, pull_request]
+on:
+    push:
+        branches: [ $default_branch ]
+    pull_request:
+        types: [ opened, synchronize, edited, reopened ]
 
 jobs:
     build:
