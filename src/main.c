@@ -11,7 +11,6 @@
 #include "vm/utils/vm_errors.h"
 #include "vm/utils/vm_logger.h"
 
-
 int usage();
 
 int main(int argc, char** argv) {
@@ -33,7 +32,9 @@ int main(int argc, char** argv) {
             } else if (vm_strcmpl(arguments.flags[i].flag_name, "help")) {
                 ret = usage();
                 break;
-            } else if (vm_strcmpl(arguments.flags[i].flag_name, "filename")) {
+            } else if (vm_strcmpl(arguments.flags[i].flag_name, "execute")) {
+                filename = arguments.flags[i].flag_value;
+            } else if (vm_strcmpl(arguments.flags[i].flag_name, "inform")) {
                 filename = arguments.flags[i].flag_value;
             } else {
                 // Create a new logger to ignore __LINE__ and __FILE__
@@ -59,7 +60,8 @@ int usage() {
     printf("available commands:\n\n");
     printf("\thelp\t\t\t- show this information\n");
     printf("\tversion\t\t\t- show the version of the nJVM\n");
-    printf("\tfilename <class file>\t- executes a class file\n");
+    printf("\texecute <class file>\t- executes a class file\n");
+    printf("\tinform  <class file>\t- shows information about the class file\n");
 
     return 0;
 }
