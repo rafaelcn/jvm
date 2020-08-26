@@ -1,8 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+#include "args_parser.h"
 
 #include "vm/vm_info.h"
 #include "vm/vm_entry.h"
-#include "vm/vm_string.h"
+
+#include "vm/lib/vm_string.h"
 
 #include "vm/utils/vm_logger.h"
 
@@ -16,14 +20,14 @@ int main(int argc, char** argv) {
         // capture arguments sent through stdin
         args_t arguments = args_parse(argv);
 
-        size_t size = sizeof(args_t.arguments) / sizeof(arg_t);
+        size_t size = sizeof(arguments.flags) / sizeof(arg_t);
         for (size_t i = 0; i < size; i++) {
-            // only two arguments parsed at the moment.
-            if (vm_strcmpl(args_t.arguments[i], "version")) {
+            // only two arguments are parsed at the moment.
+            if (vm_strcmpl(arguments.flags[i].flag_name, "version")) {
                 printf("%s\n", VM_VERSION);
                 break;
-            } else if (vm_strcmpl(args_t.arguments[i], "filename")) {
-                filename = args_t.arguments[i].value;
+            } else if (vm_strcmpl(arguments.flags[i].flag_name, "filename")) {
+                filename = arguments.flags[i].flag_value;
             } else {
                 // Create a new logger to ignore __LINE__ and __FILE__
                 // parameters.

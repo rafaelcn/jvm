@@ -4,17 +4,18 @@
 /**
  * @brief Holds values for the flag name and the flag value.
  */
-struct arg_t {
+typedef struct arg_t {
     const char *flag_name;
     const char *flag_value;
-};
+} arg_t;
 
 /**
  * @brief A list of arguments
  */
-struct args_t {
-    arg_t arguments[2];
-};
+typedef struct args_t {
+    // array of parsed flags, filled after the args_parse is executed
+    arg_t flags[2];
+} args_t;
 
 /**
  * @brief Parses the arguments send to the CLI when calling the software.

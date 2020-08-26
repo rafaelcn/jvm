@@ -1,6 +1,9 @@
 #include "vm_string.h"
-#include "utils/vm_errors.h"
 
+#include "../utils/vm_errors.h"
+#include "../utils/vm_logger.h"
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,8 +39,8 @@ char *vm_strsplit(const char *restrict s, const char *restrict delim,
     size_t ssize = strlen(s);
 
     if (pos <= 0 || pos > (int)ssize) {
-        vm_pferror(stderr, "Given index is out of bounds", __LINE__,
-                    __FILE__, BFS_STR_ERROR);
+        vm_log(stderr, "given index is out of bounds", __LINE__,
+                    __FILE__, VM_LOG_ERROR);
         return "";
     }
 
