@@ -8,13 +8,17 @@
 
 #include "vm/lib/vm_string.h"
 
+#include "vm/utils/vm_errors.h"
 #include "vm/utils/vm_logger.h"
+
+
+int usage();
 
 int main(int argc, char** argv) {
     int ret = 0;
 
     if (argc < 2) {
-        // TODO: log warning becuse of a missing filename.
+        ret = usage();
     } else {
         const char *filename;
         // capture arguments sent through stdin
@@ -26,12 +30,19 @@ int main(int argc, char** argv) {
             if (vm_strcmpl(arguments.flags[i].flag_name, "version")) {
                 printf("%s\n", VM_VERSION);
                 break;
+            } else if (vm_strcmpl(arguments.flags[i].flag_name, "help")) {
+                ret = usage();
+                break;
             } else if (vm_strcmpl(arguments.flags[i].flag_name, "filename")) {
                 filename = arguments.flags[i].flag_value;
             } else {
                 // Create a new logger to ignore __LINE__ and __FILE__
                 // parameters.
-                //vm_log(stdout, "unknown argument", ...)
+                vm_log(stdout, "unknown argument", __LINE__, __FILE__,
+                    VM_LOG_INFO);
+
+                ret = usage();
+                break;
             }
         }
 
@@ -41,3 +52,14 @@ int main(int argc, char** argv) {
     return ret;
 }
 
+int usage() {
+    printf("%s\n\n", VM_VERSION);
+    printf("usage:\n\t");
+    printf("./nvjm.exe -filename <hello.class>\n\n");
+    printf("available commands:\n\n");
+    printf("\thelp\t\t\t- show this information\n");
+    printf("\tversion\t\t\t- show the version of the nJVM\n");
+    printf("\tfilename <class file>\t- executes a class file\n");
+
+    return 0;
+}
