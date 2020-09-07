@@ -39,18 +39,19 @@ static char* vm_strncmpl_params[] = {
     (char*) "0, 03, one, nne",
     (char*) "1, 02, one, nne",
     (char*) "1, 01, one, nne",
-    (char*) "1, 08, democracia liberal, patocracia liberal",
+    (char*) "1, 07, liberal, patocracia liberal",
+    (char*) "1, 07, democracia liberal, liberal",
     (char*) "1, 14, democracia liberal, patocracia liberal",
     (char*) "0, 16, democracia liberal, patocracia liberal",
     (char*) "0, 20, democracia liberal, patocracia liberal",
     NULL
 };
 
-
-static MunitParameterEnum test_params[] = {
+static MunitParameterEnum test_vm_strncmpl_params[] = {
     { (char*) "vm_strncmpl_params", vm_strncmpl_params },
     { NULL, NULL },
 };
+
 
 static MunitResult
 test_vm_strncmpl(const MunitParameter params[], void* user_data) {
@@ -72,7 +73,7 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     num_characters_to_count = atoi(num_characters_to_count_string);
 
     last_comma_position = 6;
-    for(int i = 6; i < strlen(vm_strncmpl_params); i++)
+    for(int i = last_comma_position; i < strlen(vm_strncmpl_params); i++)
     {
         if (vm_strncmpl_params[i] == ',')
         {
@@ -98,9 +99,68 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     return MUNIT_OK;
 }
 
+static char* vm_strcmpl_params[] = {
+    /* Expected result, left string, right string */
+    (char*) "1, one, one",
+    (char*) "1, pato, pato",
+    (char*) "0, one, nne",
+    (char*) "0, democracia liberal, patocracia liberal",
+    NULL
+};
 
+static MunitParameterEnum test_vm_strcmpl_params[] = {
+    { (char*) "vm_strcmpl_params", vm_strcmpl_params },
+    { NULL, NULL },
+};
+
+static MunitResult
+test_vm_strcmpl(const MunitParameter params[], void* user_data) {
+    const char* vm_strcmpl_params;
+    char* left_string;
+    char* right_string;
+    int parameters_length, last_comma_position;
+    int expected_result, predicted_result;
+    (void) user_data;
+
+    vm_strcmpl_params = munit_parameters_get(params, "vm_strcmpl_params");
+    // Let's first parse the params
+    parameters_length = strlen(vm_strcmpl_params);
+
+    expected_result = atoi(&vm_strcmpl_params[0]);
+
+    last_comma_position = 1;
+    for(int i = last_comma_position; i < strlen(vm_strcmpl_params); i++)
+    {
+        if (vm_strcmpl_params[i] == ',')
+        {
+            left_string = string_substring(
+                vm_strcmpl_params, last_comma_position+2, i);
+            last_comma_position = i;
+            i = strlen(vm_strcmpl_params);
+        }
+    }
+
+    right_string = string_substring(
+        vm_strcmpl_params, last_comma_position+2, strlen(vm_strcmpl_params));
+
+    // Now we have parsed the arguments, let's test our function
+    predicted_result = vm_strcmpl(
+        left_string, right_string);
+
+    assert_int(expected_result, ==, predicted_result);
+
+    free(left_string);
+    free(right_string);
+    return MUNIT_OK;
+}
+
+// Test Suite, aggregate test cases and params
 static MunitTest test_suite_tests[] = {
-  { (char*) "Testing vm_strncmpl", test_vm_strncmpl, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+  { (char*) "Testing vm_strncmpl", test_vm_strncmpl,
+        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strncmpl_params },
+  { (char*) "Testing vm_strcmpl", test_vm_strcmpl,
+        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strcmpl_params },
+
   { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
