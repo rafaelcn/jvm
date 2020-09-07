@@ -39,6 +39,10 @@ static char* vm_strncmpl_params[] = {
     (char*) "0, 03, one, nne",
     (char*) "1, 02, one, nne",
     (char*) "1, 01, one, nne",
+    (char*) "1, 08, democracia liberal, patocracia liberal",
+    (char*) "1, 14, democracia liberal, patocracia liberal",
+    (char*) "0, 16, democracia liberal, patocracia liberal",
+    (char*) "0, 20, democracia liberal, patocracia liberal",
     NULL
 };
 

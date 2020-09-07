@@ -17,17 +17,16 @@ int vm_strcmpl(const char *restrict s, const char *restrict s_) {
 }
 
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
-    unsigned int length_s = strlen(s);
-    unsigned int length_s_ = strlen(s_);
-    unsigned int j = length_s_-1;
-    unsigned int i = length_s-1;
-    bool are_valid_indexes = i >= length_s-n && j >= length_s_-n
-            && i > 0 && j > 0;
+    int length_s = strlen(s);
+    int length_s_ = strlen(s_);
+    int i = length_s-1;
+    int j = length_s_-1;
+    bool are_valid_indexes = i >= length_s-n+1 && j >= length_s_-n+1
+            && i >= 0 && j >= 0;
 
     if (&s == &s_) {
         return 1;
-    } else if (!(length_s && length_s_)) {
-        return 0;
+    
     }
 
     for (; are_valid_indexes; i--, j--) {
@@ -35,7 +34,7 @@ int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
             return 0;
         }
         are_valid_indexes = i >= length_s-n+1 && j >= length_s_-n+1
-                && i > 0 && j > 0;
+                && i >= 0 && j >= 0;
     }
 
     return 1;
