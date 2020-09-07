@@ -30,6 +30,8 @@ char* string_substring(const char str[], int start, int end) {
 static char* vm_strncmpl_params[] = {
     /* Expected result, number of interegers to count, left string, right string */
     (char*) "1, 03, one, one",
+    (char*) "1, 02, one, one",
+    (char*) "1, 01, one, one",
     (char*) "1, 04, pato, pato",
     (char*) "0, 03, one, oen",
     NULL
@@ -77,7 +79,8 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
 
     predicted_result = vm_strncmpl(
         left_string, right_string, num_characters_to_count);
-        
+    
+
     assert_int(expected_result, ==, predicted_result);
 
     free(left_string);
