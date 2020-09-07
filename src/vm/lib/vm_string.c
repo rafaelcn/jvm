@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 int vm_strcmpl(const char *restrict s, const char *restrict s_) {
     if (strlen(s) != strlen(s_)) {
@@ -16,17 +17,25 @@ int vm_strcmpl(const char *restrict s, const char *restrict s_) {
 }
 
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
+    unsigned int length_s = strlen(s);
+    unsigned int length_s_ = strlen(s_);
+    unsigned int j = length_s_-1;
+    unsigned int i = length_s-1;
+    bool are_valid_indexes = i >= length_s-n && j >= length_s_-n
+            && i > 0 && j > 0;
+
     if (&s == &s_) {
         return 1;
+    } else if (!(length_s && length_s_)) {
+        return 0;
     }
 
-    int j = n;
-
-    for (unsigned int i = strlen(s)-1; i >= strlen(s)-n; i--) {
+    for (; are_valid_indexes; i--, j--) {
         if (s[i] != s_[j]) {
             return 0;
         }
-        j--;
+        are_valid_indexes = i >= length_s-n+1 && j >= length_s_-n+1
+                && i > 0 && j > 0;
     }
 
     return 1;

@@ -33,7 +33,12 @@ static char* vm_strncmpl_params[] = {
     (char*) "1, 02, one, one",
     (char*) "1, 01, one, one",
     (char*) "1, 04, pato, pato",
-    (char*) "0, 03, one, oen",
+    (char*) "1, 03, pato, pato",
+    (char*) "1, 02, pato, pato",
+    (char*) "1, 01, pato, pato",
+    (char*) "0, 03, one, nne",
+    (char*) "1, 02, one, nne",
+    (char*) "1, 01, one, nne",
     NULL
 };
 
@@ -77,9 +82,9 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     right_string = string_substring(
         vm_strncmpl_params, last_comma_position+2, strlen(vm_strncmpl_params));
 
+    // Now we have parsed the arguments, let's test our function
     predicted_result = vm_strncmpl(
         left_string, right_string, num_characters_to_count);
-    
 
     assert_int(expected_result, ==, predicted_result);
 
