@@ -155,12 +155,97 @@ test_vm_strcmpl(const MunitParameter params[], void* user_data) {
     return MUNIT_OK;
 }
 
+static char* vm_strsplit_params[] = {
+    /*Expected result/ Input String/ Delimiter / position */
+    (char*) "Gosto de pão/ Gosto de pão, queijo e margarina./ ,/ 1",
+    (char*) "Gosto de pão/ Gosto de pão, presunto, queijo e margarina./ ,/ 1",
+    (char*) " presunto/ Gosto de pão, presunto, queijo e margarina./ ,/ 2",
+    (char*) " queijo e margarina./ Gosto de pão, presunto, queijo e margarina./ ,/ 3",
+
+
+    NULL
+};
+
+static MunitParameterEnum test_vm_strsplit_params[] = {
+    { (char*) "vm_strsplit_params", vm_strsplit_params },
+    { NULL, NULL },
+};
+
+static MunitResult
+test_vm_strsplit(const MunitParameter params[], void* user_data) {
+    const char* vm_strsplit_params;
+    char* delimiter;
+    char* input_string;
+    char* expected_result, *predicted_result;
+    int parameters_length, last_slash_position;
+    char* position_string;
+    int position;
+    (void) user_data;
+
+    vm_strsplit_params = munit_parameters_get(params, "vm_strsplit_params");
+    // Let's first parse the params
+    parameters_length = strlen(vm_strsplit_params);
+    last_slash_position = 0;
+    for(int i = last_slash_position; i < strlen(vm_strsplit_params); i++)
+    {
+        if (vm_strsplit_params[i] == '/')
+        {
+            expected_result = string_substring(
+                vm_strsplit_params, last_slash_position, i);
+            last_slash_position = i;
+            i = strlen(vm_strsplit_params);
+        }
+    }
+
+    for(int i = last_slash_position + 1; i < strlen(vm_strsplit_params); i++)
+    {
+        if (vm_strsplit_params[i] == '/')
+        {   
+            input_string = string_substring(
+                vm_strsplit_params, last_slash_position + 2, i);
+            last_slash_position = i;
+            i = strlen(vm_strsplit_params);
+        }
+    }
+
+    for(int i = last_slash_position + 1; i < strlen(vm_strsplit_params); i++)
+    {
+        if (vm_strsplit_params[i] == '/')
+        {
+            delimiter = string_substring(
+                vm_strsplit_params, last_slash_position+2, i);
+            last_slash_position = i;
+            i = strlen(vm_strsplit_params);
+        }
+    }
+
+    position_string = string_substring(
+        vm_strsplit_params, last_slash_position+2, strlen(vm_strsplit_params));
+    position = atoi(position_string);
+    // Now we have parsed the arguments, let's test our function
+
+    predicted_result = vm_strsplit(
+        input_string, delimiter, position);
+
+    assert_string_equal(expected_result, predicted_result);
+
+
+    free(input_string);
+    free(expected_result);
+    free(predicted_result);
+    free(delimiter);
+    free(position_string);
+    return MUNIT_OK;
+}
+
 // Test Suite, aggregate test cases and params
 static MunitTest test_suite_tests[] = {
   { (char*) "Testing vm_strncmpl", test_vm_strncmpl,
         NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strncmpl_params },
   { (char*) "Testing vm_strcmpl", test_vm_strcmpl,
         NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strcmpl_params },
+  { (char*) "Testing vm_strsplit", test_vm_strsplit,
+        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strsplit_params },
 
   { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
