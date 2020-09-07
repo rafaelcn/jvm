@@ -9,11 +9,13 @@
 #include <stdbool.h>
 
 int vm_strcmpl(const char *restrict s, const char *restrict s_) {
-    if (strlen(s) != strlen(s_)) {
+    int length_s = strlen(s);
+    int length_s_ = strlen(s_);
+
+    if (length_s != length_s_) {
         return 0;
     }
-
-    return vm_strncmpl(s, s_, strlen(s));
+    return vm_strncmpl(s, s_, length_s);
 }
 
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {

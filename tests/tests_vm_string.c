@@ -85,7 +85,8 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     }
 
     right_string = string_substring(
-        vm_strncmpl_params, last_comma_position+2, strlen(vm_strncmpl_params));
+        vm_strncmpl_params, last_comma_position+2,
+        strlen(vm_strncmpl_params));
 
     // Now we have parsed the arguments, let's test our function
     predicted_result = vm_strncmpl(
@@ -128,13 +129,13 @@ test_vm_strcmpl(const MunitParameter params[], void* user_data) {
 
     expected_result = atoi(&vm_strcmpl_params[0]);
 
-    last_comma_position = 1;
-    for(int i = last_comma_position; i < strlen(vm_strcmpl_params); i++)
+    last_comma_position = 2;
+    for(int i = last_comma_position + 1; i < strlen(vm_strcmpl_params); i++)
     {
         if (vm_strcmpl_params[i] == ',')
         {
             left_string = string_substring(
-                vm_strcmpl_params, last_comma_position+2, i);
+                vm_strcmpl_params, last_comma_position+1, i);
             last_comma_position = i;
             i = strlen(vm_strcmpl_params);
         }
