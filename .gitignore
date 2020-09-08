@@ -54,3 +54,6 @@ dkms.conf
 # Custom files
 
 *.class
+
+# VS Code configuration files
+.vscode
