@@ -27,6 +27,55 @@ char* string_substring(const char str[], int start, int end) {
     return sub;
 }
 
+/**
+ * @author Vinicius Gomes de Souza - 150047941
+ * @brief Receives an argument string and parses it into an array of substrings.
+ * @param input_string The string to be split in substrings.
+ * @param separator The character that is going to be used as a delimiter in the
+ * splitting process.
+ * @returns An array containing the substrings, without the separator character,
+ * of the input string.
+ */
+char** arg_str_to_array_of_str(const char* input_string, const char separator) {
+    int array_index = 0;
+    int separator_position = 0;
+    char* substr_before_separator;
+    char** array_of_substrs = NULL;
+
+    for(int i = 0; i <= strlen(input_string); i++)
+    {
+        if (input_string[i] == '/')
+        {
+            substr_before_separator = string_substring(
+                input_string, separator_position, i);
+
+            array_index = array_index + 1;
+            array_of_substrs = (char**) realloc(
+                array_of_substrs,
+                (sizeof(char*) * (array_index)));
+
+            array_of_substrs[array_index-1] = substr_before_separator;
+
+            separator_position = i + 2;
+        }
+
+        else if (i == strlen(input_string))
+        {
+            substr_before_separator = string_substring(
+                input_string, separator_position, i);
+            array_index++;
+            array_of_substrs = (char**) realloc(
+                array_of_substrs,
+                (sizeof(char*) * (array_index)));
+
+            array_of_substrs[array_index-1] = substr_before_separator;
+        }
+    }
+
+    return array_of_substrs;
+}
+
+
 static char* vm_strncmpl_params[] = {
     /*
     Expected result/ number of interegers to count/ left string/ right string
@@ -116,56 +165,6 @@ static MunitParameterEnum test_vm_strcmpl_params[] = {
     { NULL, NULL },
 };
 
-/**
- * @author Vinicius Gomes de Souza - 150047941
- * @brief Receives an argument string and parses it into an array of substrings.
- * @param input_string The string to be split in substrings.
- * @param separator The character that is going to be used as a delimiter in the
- * splitting process.
- * @returns An array containing the substrings, without the separator character,
- * of the input string.
- */
-char** arg_str_to_array_of_str(const char* input_string, const char separator) {
-    int array_index = 0;
-    int separator_position = 0;
-    char* substr_before_separator;
-    char** array_of_substrs = NULL;
-
-    for(int i = 0; i <= strlen(input_string); i++)
-    {
-        if (input_string[i] == '/')
-        {
-            substr_before_separator = string_substring(
-                input_string, separator_position, i);
-
-            array_of_substrs = (char**) realloc(
-                array_of_substrs,
-                sizeof(array_of_substrs) +
-                (sizeof(char) * (i - separator_position + 1)));
-
-            array_of_substrs[array_index] = substr_before_separator;
-
-            array_index = array_index + 1;
-            separator_position = i + 2;
-        }
-
-        else if (i == strlen(input_string))
-        {
-            substr_before_separator = string_substring(
-                input_string, separator_position, i);
-
-            array_of_substrs = (char**) realloc(
-                array_of_substrs,
-                sizeof(array_of_substrs) +
-                (sizeof(char) * (i - separator_position + 1)));
-
-            array_of_substrs[array_index] = substr_before_separator;
-        }
-    }
-
-    return array_of_substrs;
-}
-
 static MunitResult
 test_vm_strcmpl(const MunitParameter params[], void* user_data) {
     const char* vm_strcmpl_params;
@@ -192,6 +191,8 @@ test_vm_strcmpl(const MunitParameter params[], void* user_data) {
 
     assert_int(expected_result, ==, predicted_result);
 
+    free(parsed_args[0]);
+    free(parsed_args);
     free(left_string);
     free(right_string);
     return MUNIT_OK;
