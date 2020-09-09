@@ -4,77 +4,71 @@
 #include "munit/munit.h"
 #include "vm/lib/vm_string.h"
 
-char* string_substring(const char str[], int start, int end) {
+/**
+ * @authors Vinicius Gomes de Souza - 150047941
+ *          Thiago Luis Rodrigues Pinho - 15/0065205
+ * @brief Receives an argument string and slices it from start(inclusive) to end
+ *        (exclusive)
+ * @param input_string The string to be slliced
+ * @param start 0 started index to start to slice from.
+ * @param end 0 started index to end the slice. The end position will not be
+ *              included in the returned string.
+ * @returns Dynamically allocated new string containing an slice of the original
+ * string. 
+ */
+char* string_substring(const char input_string[], int start, int end) {
     int i, j;
-    char *sub;
+    char *slice_string;
 
     // Verifies if the start and end positions are valid
-    if(start >= end || end > strlen(str)) {
+    if(start >= end || end > strlen(input_string)) {
         return NULL;
     }
 
-    // Allocate necessary memory for substring
-    sub = (char *) malloc(sizeof(char) * (end - start + 1));
+    // Allocate necessary memory for the new slice string
+    slice_string = (char *) malloc(sizeof(char) * (end - start + 1));
 
     // Copy values from original string to new one
     for(i = start, j = 0; i < end; i++, j++) {
-        sub[j] = str[i];
+        slice_string[j] = input_string[i];
     }
 
     // String terminator
-    sub[j] = '\0';
+    slice_string[j] = '\0';
 
-    return sub;
+    return slice_string;
 }
 
 /**
- * @author Vinicius Gomes de Souza - 150047941
+ * @authors Vinicius Gomes de Souza - 150047941
+ *          Thiago Luis Rodrigues Pinho - 15/0065205
  * @brief Receives an argument string and parses it into an array of substrings.
  * @param input_string The string to be split in substrings.
- * @param separator The character that is going to be used as a delimiter in the
+ * @param delimiter The character that is going to be used as a delimiter in the
  * splitting process.
- * @returns An array containing the substrings, without the separator character,
- * of the input string.
+ * @returns A dynamic array containing the dynamic sized substrings, without the
+ *           delimiter character, of the input string. 
  */
-char** arg_str_to_array_of_str(const char* input_string, const char separator) {
-    int array_index = 0;
-    int separator_position = 0;
-    char* substr_before_separator;
+char** arg_str_to_array_of_str(const char* input_string, const char delimiter) {
+    int array_index = 0; // Array index shall be the number of elements - 1.
+    int last_delimiter_position = 0; 
+    const int string_length = strlen(input_string);
     char** array_of_substrs = NULL;
 
-    for(int i = 0; i <= strlen(input_string); i++)
+    for(int i = 0; i <= string_length; i++)
     {
-        if (input_string[i] == '/')
-        {
-            substr_before_separator = string_substring(
-                input_string, separator_position, i);
-
-            array_index = array_index + 1;
+        if (input_string[i] == delimiter || i == string_length)
+        {   
             array_of_substrs = (char**) realloc(
                 array_of_substrs,
-                (sizeof(char*) * (array_index)));
-
-            array_of_substrs[array_index-1] = substr_before_separator;
-
-            separator_position = i + 2;
-        }
-
-        else if (i == strlen(input_string))
-        {
-            substr_before_separator = string_substring(
-                input_string, separator_position, i);
-            array_index++;
-            array_of_substrs = (char**) realloc(
-                array_of_substrs,
-                (sizeof(char*) * (array_index)));
-
-            array_of_substrs[array_index-1] = substr_before_separator;
+                (sizeof(char*) * (array_index+1)));
+            array_of_substrs[array_index++] = string_substring(
+                input_string, last_delimiter_position, i);
+            last_delimiter_position = i + 2;
         }
     }
-
     return array_of_substrs;
 }
-
 
 static char* vm_strncmpl_params[] = {
     /*
@@ -107,9 +101,9 @@ static MunitParameterEnum test_vm_strncmpl_params[] = {
 static MunitResult
 test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     const char* vm_strncmpl_params;
-    char* num_characters_to_count_string;
     char* left_string;
     char* right_string;
+    char** parsed_args;
     int num_characters_to_count, parameters_length, last_comma_position;
     int expected_result, predicted_result;
     (void) user_data;
@@ -118,26 +112,12 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     // Let's first parse the params
     parameters_length = strlen(vm_strncmpl_params);
 
-    expected_result = atoi(&vm_strncmpl_params[0]);
+    parsed_args = arg_str_to_array_of_str(vm_strncmpl_params, '/');
 
-    num_characters_to_count_string = string_substring(vm_strncmpl_params, 2, 5);
-    num_characters_to_count = atoi(num_characters_to_count_string);
-
-    last_comma_position = 6;
-    for(int i = last_comma_position; i < strlen(vm_strncmpl_params); i++)
-    {
-        if (vm_strncmpl_params[i] == '/')
-        {
-            left_string = string_substring(
-                vm_strncmpl_params, last_comma_position+1, i);
-            last_comma_position = i;
-            i = strlen(vm_strncmpl_params);
-        }
-    }
-
-    right_string = string_substring(
-        vm_strncmpl_params, last_comma_position+2,
-        strlen(vm_strncmpl_params));
+    expected_result = atoi(parsed_args[0]);
+    num_characters_to_count = atoi(parsed_args[1]);
+    left_string = parsed_args[2];
+    right_string = parsed_args[3];
 
     // Now we have parsed the arguments, let's test our function
     predicted_result = vm_strncmpl(
@@ -147,7 +127,9 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
 
     free(left_string);
     free(right_string);
-    free(num_characters_to_count_string);
+    free(parsed_args[1]);
+    free(parsed_args[0]);
+    free(parsed_args);
     return MUNIT_OK;
 }
 
@@ -221,50 +203,20 @@ test_vm_strsplit(const MunitParameter params[], void* user_data) {
     char* input_string;
     char* expected_result, *predicted_result;
     int parameters_length, last_slash_position;
-    char* position_string;
+    char** parsed_args;
     int position;
     (void) user_data;
 
     vm_strsplit_params = munit_parameters_get(params, "vm_strsplit_params");
     // Let's first parse the params
     parameters_length = strlen(vm_strsplit_params);
-    last_slash_position = 0;
-    for(int i = last_slash_position; i < strlen(vm_strsplit_params); i++)
-    {
-        if (vm_strsplit_params[i] == '/')
-        {
-            expected_result = string_substring(
-                vm_strsplit_params, last_slash_position, i);
-            last_slash_position = i;
-            i = strlen(vm_strsplit_params);
-        }
-    }
+    parsed_args = arg_str_to_array_of_str(vm_strsplit_params, '/');
 
-    for(int i = last_slash_position + 1; i < strlen(vm_strsplit_params); i++)
-    {
-        if (vm_strsplit_params[i] == '/')
-        {
-            input_string = string_substring(
-                vm_strsplit_params, last_slash_position + 2, i);
-            last_slash_position = i;
-            i = strlen(vm_strsplit_params);
-        }
-    }
+    expected_result = parsed_args[0];
+    input_string = parsed_args[1];
+    delimiter = parsed_args[2];
+    position = atoi(parsed_args[3]);
 
-    for(int i = last_slash_position + 1; i < strlen(vm_strsplit_params); i++)
-    {
-        if (vm_strsplit_params[i] == '/')
-        {
-            delimiter = string_substring(
-                vm_strsplit_params, last_slash_position+2, i);
-            last_slash_position = i;
-            i = strlen(vm_strsplit_params);
-        }
-    }
-
-    position_string = string_substring(
-        vm_strsplit_params, last_slash_position+2, strlen(vm_strsplit_params));
-    position = atoi(position_string);
     // Now we have parsed the arguments, let's test our function
 
     predicted_result = vm_strsplit(
@@ -277,7 +229,7 @@ test_vm_strsplit(const MunitParameter params[], void* user_data) {
     free(expected_result);
     free(predicted_result);
     free(delimiter);
-    free(position_string);
+    free(parsed_args);
     return MUNIT_OK;
 }
 
