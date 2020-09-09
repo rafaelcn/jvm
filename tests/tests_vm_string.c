@@ -3,72 +3,7 @@
 #include <stdio.h>
 #include "munit/munit.h"
 #include "vm/lib/vm_string.h"
-
-/**
- * @authors Vinicius Gomes de Souza - 150047941
- *          Thiago Luis Rodrigues Pinho - 15/0065205
- * @brief Receives an argument string and slices it from start(inclusive) to end
- *        (exclusive)
- * @param input_string The string to be slliced
- * @param start 0 started index to start to slice from.
- * @param end 0 started index to end the slice. The end position will not be
- *              included in the returned string.
- * @returns Dynamically allocated new string containing an slice of the original
- * string. 
- */
-char* string_substring(const char input_string[], int start, int end) {
-    int i, j;
-    char *slice_string;
-
-    // Verifies if the start and end positions are valid
-    if(start >= end || end > strlen(input_string)) {
-        return NULL;
-    }
-
-    // Allocate necessary memory for the new slice string
-    slice_string = (char *) malloc(sizeof(char) * (end - start + 1));
-
-    // Copy values from original string to new one
-    for(i = start, j = 0; i < end; i++, j++) {
-        slice_string[j] = input_string[i];
-    }
-
-    // String terminator
-    slice_string[j] = '\0';
-
-    return slice_string;
-}
-
-/**
- * @authors Vinicius Gomes de Souza - 150047941
- *          Thiago Luis Rodrigues Pinho - 15/0065205
- * @brief Receives an argument string and parses it into an array of substrings.
- * @param input_string The string to be split in substrings.
- * @param delimiter The character that is going to be used as a delimiter in the
- * splitting process.
- * @returns A dynamic array containing the dynamic sized substrings, without the
- *           delimiter character, of the input string. 
- */
-char** arg_str_to_array_of_str(const char* input_string, const char delimiter) {
-    int array_index = 0; // Array index shall be the number of elements - 1.
-    int last_delimiter_position = 0; 
-    const int string_length = strlen(input_string);
-    char** array_of_substrs = NULL;
-
-    for(int i = 0; i <= string_length; i++)
-    {
-        if (input_string[i] == delimiter || i == string_length)
-        {   
-            array_of_substrs = (char**) realloc(
-                array_of_substrs,
-                (sizeof(char*) * (array_index+1)));
-            array_of_substrs[array_index++] = string_substring(
-                input_string, last_delimiter_position, i);
-            last_delimiter_position = i + 2;
-        }
-    }
-    return array_of_substrs;
-}
+#include "vm/lib/tests_helper.h"
 
 static char* vm_strncmpl_params[] = {
     /*
