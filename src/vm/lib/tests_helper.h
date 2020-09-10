@@ -13,7 +13,8 @@
  * @returns Dynamically allocated new string containing an slice of the original
  * string. 
  */
-char* string_substring(const char input_string[], int start, int end);
+char* string_slice(const char input_string[], int start, int end);
+
 
 /**
  * @authors Vinicius Gomes de Souza - 150047941

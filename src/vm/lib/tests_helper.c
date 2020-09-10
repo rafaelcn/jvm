@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 
-char* string_substring(const char input_string[], int start, int end) {
+char* string_slice(const char input_string[], int start, int end) {
     int i, j;
     char *slice_string;
 
@@ -41,7 +41,7 @@ char** arg_str_to_array_of_str(const char* input_string, const char delimiter) {
             array_of_substrs = (char**) realloc(
                 array_of_substrs,
                 (sizeof(char*) * (array_index+1)));
-            array_of_substrs[array_index++] = string_substring(
+            array_of_substrs[array_index++] = string_slice(
                 input_string, last_delimiter_position, i);
             last_delimiter_position = i + 2;
         }
