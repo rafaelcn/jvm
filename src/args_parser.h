@@ -20,6 +20,6 @@ typedef struct args_t {
 /**
  * @brief Parses the arguments send to the CLI when calling the software.
  */
-args_t args_parse(char **argv);
+args_t args_parse(int argc, char **argv);
 
 #endif /* ARGS_PARSER_H */

@@ -30,7 +30,7 @@ char* string_slice(const char input_string[], int start, int end) {
 
 char** arg_str_to_array_of_str(const char* input_string, const char delimiter) {
     int array_index = 0; // Array index shall be the number of elements - 1.
-    int last_delimiter_position = 0; 
+    int last_delimiter_position = 0;
     const int string_length = strlen(input_string);
     char** array_of_substrs = NULL;
 

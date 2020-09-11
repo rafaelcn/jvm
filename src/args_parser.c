@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-args_t args_parse(char **argv) {
+args_t args_parse(int argc, char **argv) {
     args_t parsed;
 
     
