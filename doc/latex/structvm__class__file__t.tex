@@ -1,0 +1,149 @@
+\hypertarget{structvm__class__file__t}{}\section{Referência da Estrutura vm\+\_\+class\+\_\+file\+\_\+t}
+\label{structvm__class__file__t}\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+
+
+{\ttfamily \#include $<$vm\+\_\+constant\+\_\+pool.\+h$>$}
+
+
+
+Diagrama de colaboração para vm\+\_\+class\+\_\+file\+\_\+t\+:
+% FIG 0
+\subsection*{Campos de Dados}
+\begin{DoxyCompactItemize}
+\item 
+uint64\+\_\+t \hyperlink{structvm__class__file__t_abbd697aa46868a5c5ab51e2a9a784851}{magic}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_a9f280ce3ae5b6cd9346fd7a09ff29168}{minor}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_a600930655b7237315b72223c48327ea8}{major}
+\item 
+struct \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t} $\ast$ \hyperlink{structvm__class__file__t_a4b74ed82375e295745f93be94c0ee844}{\+\_\+this}
+\item 
+struct \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t} $\ast$ \hyperlink{structvm__class__file__t_a0b23f45633db2488ed97706fecc53d79}{\+\_\+super}
+\item 
+\hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{structvm__class__file__t_a0ed46c37e2835f9d7d37ed57ce0cef23}{access\+\_\+flag}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_af1e09bc61f7c64d6520042f6e3a8f820}{interfaces\+\_\+count}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_a86362273e30ead60a806fdb4269c57af}{interfaces} \mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_a64d70d8410fc00bd6b5037c68c74f877}{fields\+\_\+count}
+\item 
+\hyperlink{structvm__field__info__t}{vm\+\_\+field\+\_\+info\+\_\+t} \hyperlink{structvm__class__file__t_a73f2c59fa919290d36f17254b0dc167b}{fields\+\_\+info} \mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_acf3d618060eb10392a8629829bc0f2f9}{methods\+\_\+count}
+\item 
+\hyperlink{structvm__method__info__t}{vm\+\_\+method\+\_\+info\+\_\+t} \hyperlink{structvm__class__file__t_a8474c1b1810c571af9c48b7bf25130d6}{methods\+\_\+info} \mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_abc7a986c0709f9444a0d162221d9a4d3}{attributes\+\_\+count}
+\item 
+\hyperlink{structvm__attribute__info__t}{vm\+\_\+attribute\+\_\+info\+\_\+t} \hyperlink{structvm__class__file__t_a027b4cde5400024c492106a95d085c31}{attributes\+\_\+info} \mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}
+\item 
+uint16\+\_\+t \hyperlink{structvm__class__file__t_a3e1c80fc4c5e5c5318bd4ae7f9eda777}{constant\+\_\+pool\+\_\+count\+\_\+t}
+\item 
+\hyperlink{structvm__cp__info__t}{vm\+\_\+cp\+\_\+info\+\_\+t} \hyperlink{structvm__class__file__t_a6e73a5057141aa12094442839bb23e57}{constant\+\_\+pool\+\_\+info} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Campos}
+\mbox{\Hypertarget{structvm__class__file__t_a0b23f45633db2488ed97706fecc53d79}\label{structvm__class__file__t_a0b23f45633db2488ed97706fecc53d79}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!\+\_\+super@{\+\_\+super}}
+\index{\+\_\+super@{\+\_\+super}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{\+\_\+super}{\_super}}
+{\footnotesize\ttfamily struct \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t}$\ast$ \+\_\+super}
+
+\mbox{\Hypertarget{structvm__class__file__t_a4b74ed82375e295745f93be94c0ee844}\label{structvm__class__file__t_a4b74ed82375e295745f93be94c0ee844}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!\+\_\+this@{\+\_\+this}}
+\index{\+\_\+this@{\+\_\+this}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{\+\_\+this}{\_this}}
+{\footnotesize\ttfamily struct \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t}$\ast$ \+\_\+this}
+
+\mbox{\Hypertarget{structvm__class__file__t_a0ed46c37e2835f9d7d37ed57ce0cef23}\label{structvm__class__file__t_a0ed46c37e2835f9d7d37ed57ce0cef23}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!access\+\_\+flag@{access\+\_\+flag}}
+\index{access\+\_\+flag@{access\+\_\+flag}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{access\+\_\+flag}{access\_flag}}
+{\footnotesize\ttfamily \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} access\+\_\+flag}
+
+\mbox{\Hypertarget{structvm__class__file__t_abc7a986c0709f9444a0d162221d9a4d3}\label{structvm__class__file__t_abc7a986c0709f9444a0d162221d9a4d3}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!attributes\+\_\+count@{attributes\+\_\+count}}
+\index{attributes\+\_\+count@{attributes\+\_\+count}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{attributes\+\_\+count}{attributes\_count}}
+{\footnotesize\ttfamily uint16\+\_\+t attributes\+\_\+count}
+
+\mbox{\Hypertarget{structvm__class__file__t_a027b4cde5400024c492106a95d085c31}\label{structvm__class__file__t_a027b4cde5400024c492106a95d085c31}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!attributes\+\_\+info@{attributes\+\_\+info}}
+\index{attributes\+\_\+info@{attributes\+\_\+info}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{attributes\+\_\+info}{attributes\_info}}
+{\footnotesize\ttfamily \hyperlink{structvm__attribute__info__t}{vm\+\_\+attribute\+\_\+info\+\_\+t} attributes\+\_\+info\mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}}
+
+\mbox{\Hypertarget{structvm__class__file__t_a3e1c80fc4c5e5c5318bd4ae7f9eda777}\label{structvm__class__file__t_a3e1c80fc4c5e5c5318bd4ae7f9eda777}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!constant\+\_\+pool\+\_\+count\+\_\+t@{constant\+\_\+pool\+\_\+count\+\_\+t}}
+\index{constant\+\_\+pool\+\_\+count\+\_\+t@{constant\+\_\+pool\+\_\+count\+\_\+t}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{constant\+\_\+pool\+\_\+count\+\_\+t}{constant\_pool\_count\_t}}
+{\footnotesize\ttfamily uint16\+\_\+t constant\+\_\+pool\+\_\+count\+\_\+t}
+
+\mbox{\Hypertarget{structvm__class__file__t_a6e73a5057141aa12094442839bb23e57}\label{structvm__class__file__t_a6e73a5057141aa12094442839bb23e57}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!constant\+\_\+pool\+\_\+info@{constant\+\_\+pool\+\_\+info}}
+\index{constant\+\_\+pool\+\_\+info@{constant\+\_\+pool\+\_\+info}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{constant\+\_\+pool\+\_\+info}{constant\_pool\_info}}
+{\footnotesize\ttfamily \hyperlink{structvm__cp__info__t}{vm\+\_\+cp\+\_\+info\+\_\+t} constant\+\_\+pool\+\_\+info\mbox{[}$\,$\mbox{]}}
+
+\mbox{\Hypertarget{structvm__class__file__t_a64d70d8410fc00bd6b5037c68c74f877}\label{structvm__class__file__t_a64d70d8410fc00bd6b5037c68c74f877}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!fields\+\_\+count@{fields\+\_\+count}}
+\index{fields\+\_\+count@{fields\+\_\+count}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{fields\+\_\+count}{fields\_count}}
+{\footnotesize\ttfamily uint16\+\_\+t fields\+\_\+count}
+
+\mbox{\Hypertarget{structvm__class__file__t_a73f2c59fa919290d36f17254b0dc167b}\label{structvm__class__file__t_a73f2c59fa919290d36f17254b0dc167b}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!fields\+\_\+info@{fields\+\_\+info}}
+\index{fields\+\_\+info@{fields\+\_\+info}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{fields\+\_\+info}{fields\_info}}
+{\footnotesize\ttfamily \hyperlink{structvm__field__info__t}{vm\+\_\+field\+\_\+info\+\_\+t} fields\+\_\+info\mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}}
+
+\mbox{\Hypertarget{structvm__class__file__t_a86362273e30ead60a806fdb4269c57af}\label{structvm__class__file__t_a86362273e30ead60a806fdb4269c57af}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!interfaces@{interfaces}}
+\index{interfaces@{interfaces}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{interfaces}{interfaces}}
+{\footnotesize\ttfamily uint16\+\_\+t interfaces\mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}}
+
+\mbox{\Hypertarget{structvm__class__file__t_af1e09bc61f7c64d6520042f6e3a8f820}\label{structvm__class__file__t_af1e09bc61f7c64d6520042f6e3a8f820}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!interfaces\+\_\+count@{interfaces\+\_\+count}}
+\index{interfaces\+\_\+count@{interfaces\+\_\+count}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{interfaces\+\_\+count}{interfaces\_count}}
+{\footnotesize\ttfamily uint16\+\_\+t interfaces\+\_\+count}
+
+At this point I can\textquotesingle{}t evaluate if this implementation is correct because of the size it can take in R\+AM. I could use a pointer to a linked list of type T to implement interfaces, fields\+\_\+info, methods\+\_\+info etc. \mbox{\Hypertarget{structvm__class__file__t_abbd697aa46868a5c5ab51e2a9a784851}\label{structvm__class__file__t_abbd697aa46868a5c5ab51e2a9a784851}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!magic@{magic}}
+\index{magic@{magic}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{magic}{magic}}
+{\footnotesize\ttfamily uint64\+\_\+t magic}
+
+\mbox{\Hypertarget{structvm__class__file__t_a600930655b7237315b72223c48327ea8}\label{structvm__class__file__t_a600930655b7237315b72223c48327ea8}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!major@{major}}
+\index{major@{major}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{major}{major}}
+{\footnotesize\ttfamily uint16\+\_\+t major}
+
+\mbox{\Hypertarget{structvm__class__file__t_acf3d618060eb10392a8629829bc0f2f9}\label{structvm__class__file__t_acf3d618060eb10392a8629829bc0f2f9}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!methods\+\_\+count@{methods\+\_\+count}}
+\index{methods\+\_\+count@{methods\+\_\+count}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{methods\+\_\+count}{methods\_count}}
+{\footnotesize\ttfamily uint16\+\_\+t methods\+\_\+count}
+
+\mbox{\Hypertarget{structvm__class__file__t_a8474c1b1810c571af9c48b7bf25130d6}\label{structvm__class__file__t_a8474c1b1810c571af9c48b7bf25130d6}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!methods\+\_\+info@{methods\+\_\+info}}
+\index{methods\+\_\+info@{methods\+\_\+info}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{methods\+\_\+info}{methods\_info}}
+{\footnotesize\ttfamily \hyperlink{structvm__method__info__t}{vm\+\_\+method\+\_\+info\+\_\+t} methods\+\_\+info\mbox{[}U\+I\+N\+T16\+\_\+\+M\+AX\mbox{]}}
+
+\mbox{\Hypertarget{structvm__class__file__t_a9f280ce3ae5b6cd9346fd7a09ff29168}\label{structvm__class__file__t_a9f280ce3ae5b6cd9346fd7a09ff29168}} 
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!minor@{minor}}
+\index{minor@{minor}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\subsubsection{\texorpdfstring{minor}{minor}}
+{\footnotesize\ttfamily uint16\+\_\+t minor}
+
+
+
+A documentação para esta estrutura foi gerada a partir do seguinte arquivo\+:\begin{DoxyCompactItemize}
+\item 
+src/vm/\hyperlink{vm__constant__pool_8h}{vm\+\_\+constant\+\_\+pool.\+h}\end{DoxyCompactItemize}

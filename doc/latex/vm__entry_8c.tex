@@ -1,0 +1,32 @@
+\hypertarget{vm__entry_8c}{}\section{Referência do Arquivo src/vm/vm\+\_\+entry.c}
+\label{vm__entry_8c}\index{src/vm/vm\+\_\+entry.\+c@{src/vm/vm\+\_\+entry.\+c}}
+{\ttfamily \#include \char`\"{}vm\+\_\+entry.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}utils/vm\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/vm\+\_\+logger.\+h\char`\"{}}\newline
+Gráfico de dependência de inclusões para vm\+\_\+entry.\+c\+:
+% FIG 0
+\subsection*{Funções}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{vm__entry_8c_a9b457f9868ea6663a29ed3c950ae0f79}{vm\+\_\+init} (const char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em The entry function of the java virtual machine. This method initializes the java virtual machine internal structures. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Funções}
+\mbox{\Hypertarget{vm__entry_8c_a9b457f9868ea6663a29ed3c950ae0f79}\label{vm__entry_8c_a9b457f9868ea6663a29ed3c950ae0f79}} 
+\index{vm\+\_\+entry.\+c@{vm\+\_\+entry.\+c}!vm\+\_\+init@{vm\+\_\+init}}
+\index{vm\+\_\+init@{vm\+\_\+init}!vm\+\_\+entry.\+c@{vm\+\_\+entry.\+c}}
+\subsubsection{\texorpdfstring{vm\+\_\+init()}{vm\_init()}}
+{\footnotesize\ttfamily int vm\+\_\+init (\begin{DoxyParamCaption}\item[{const char $\ast$}]{filename }\end{DoxyParamCaption})}
+
+
+
+The entry function of the java virtual machine. This method initializes the java virtual machine internal structures. 
+
+
+\begin{DoxyParams}{Parâmetros}
+{\em filename} & Is a filepath string pointing to a filename that contains a valid .class file. \\
+\hline
+\end{DoxyParams}
