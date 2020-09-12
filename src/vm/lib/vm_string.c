@@ -8,16 +8,16 @@
 #include <string.h>
 
 int vm_strcmpl(const char *restrict s, const char *restrict s_) {
+    if (strlen(s) != strlen(s_)) {
+        return 0;
+    }
+
     return vm_strncmpl(s, s_, strlen(s));
 }
 
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
     if (&s == &s_) {
         return 1;
-    }
-
-    if (strlen(s) != strlen(s_)) {
-        return 0;
     }
 
     int j = n;
@@ -44,7 +44,7 @@ char *vm_strsplit(const char *restrict s, const char *restrict delim,
         return "";
     }
 
-    //Working only with delimiters that with 1 char of size.
+    //Working only with delimiters that have 1 char in size.
     unsigned int index = 0;
     pos -= 1;
 
@@ -83,6 +83,9 @@ char *vm_strsplit(const char *restrict s, const char *restrict delim,
 
             index++;
         }
+    } else {
+        vm_log(stderr, "vm_strsplit doesn't work with len(delimiter) > 1",
+            __LINE__, __FILE__, VM_LOG_ERROR);
     }
 
     return token;

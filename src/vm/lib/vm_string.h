@@ -4,14 +4,16 @@
 #include <wchar.h>
 
 /**
- * @brief Compares two strings.
+ * @brief Compares two strings, returning 1 if both strings are equal and 0
+ * otherwise.
  * @param s The first string to use in the comparison.
  * @param s_ The second string to use in the comparison.
  */
 int vm_strcmpl(const char *restrict s, const char *restrict s_);
 
 /**
- * @brief Compares n chars from the back of the string.
+ * @brief Compares n chars from the back of the string, returning 1 if both
+ * strings are equal and 0 otherwise.
  * @param s The first string to use in the comparison.
  * @param s_ The second string to use in the comparison.
  * @param n How many characters to compare both strings.

@@ -4,37 +4,52 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-// acess_flag_t is a number representing the state of a class (?)
-typedef uint16_t access_flag_t;
+typedef uint16_t class_flags_t;
+typedef uint16_t method_flags_t;
 
 /**
  * @brief
  */
-typedef struct vm_constant_pool_t {
+typedef struct vm_cp_t {
 
-} vm_constant_pool_t;
+} vm_cp_t;
 
 /**
  * @brief
  */
-typedef struct vm_constant_pool_info_t {
+typedef struct vm_cp_info_t {
     uint8_t tag;
     uint8_t info[];
-} vm_constant_pool_info_t;
+} vm_cp_info_t;
 
 /**
  * @brief
  */
-typedef struct vm_field_info_t {} vm_field_info_t;
+typedef struct vm_field_info_t {
+    class_flags_t access_flag;
+
+} vm_field_info_t;
+
 /**
  * @brief
  */
-typedef struct vm_method_info_t {} vm_method_info_t;
+typedef struct vm_method_info_t {
+    method_flags_t access_flag;
+    uint16_t name_index;
+    uint16_t descriptor_index;
+    // array of size
+    uint16_t attributes_count[];
+
+} vm_method_info_t;
+
 /**
  * @brief
  */
 typedef struct vm_attribute_info_t {
-
+    uint16_t attribute_name_index;
+    uint32_t attribute_length;
+    // array of size
+    uint8_t info[];
 } vm_attribute_info_t;
 
 /**
@@ -48,7 +63,7 @@ typedef struct vm_class_file_t {
     struct vm_class_file_t* _this;
     struct vm_class_file_t* _super;
 
-    access_flag_t access_flag;
+    class_flags_t access_flag;
 
     /**
      * At this point I can't evaluate if this implementation is correct because
@@ -68,26 +83,29 @@ typedef struct vm_class_file_t {
     uint16_t attributes_count;
     vm_attribute_info_t attributes_info[UINT16_MAX];
 
-    uint16_t constanpool_count_t;
-    // The actual size of constanpool_info_t is sizeof(constanpool_info_t/4)-1
-    vm_constant_pool_info_t constant_pool_info[];
+    uint16_t constant_pool_count_t;
+    // The actual size of constant_pool_info_t is
+    // sizeof(constant_pool_info_t/4)-1
+    vm_cp_info_t constant_pool_info[];
 } vm_class_file_t;
 
 // ACC_PUBLIC may be accessed from outside its package.
-const access_flag_t ACC_PUBLIC = 0x0001;
+const class_flags_t CLASS_PUBLIC = 0x0001;
 // ACC_FINAL implies that no subclasses are allowed.
-const access_flag_t ACC_FINAL  = 0x0010;
+const class_flags_t CLASS_FINAL  = 0x0010;
 // ACC_INTERFACE implies that the defined file is an interface instead of a
 // class. If this flag is not defined then the given file is a class.
-const access_flag_t ACC_INTERFACE = 0x0200;
+const class_flags_t CLASS_INTERFACE = 0x0200;
 // ACC_ABSTRACT implies that the class won't allow instantiation
-const access_flag_t ACC_ABSTRACT  = 0x0400;
+const class_flags_t CLASS_ABSTRACT  = 0x0400;
 // ACC_SYNTHETIC implies that the class is not present in the source code,
 // meaning it is an anonymous class.
-const access_flag_t ACC_SYNTHETIC  = 0x1000;
+const class_flags_t CLASS_SYNTHETIC  = 0x1000;
 // ACC_ANNOTATION implies annotation type.
-const access_flag_t ACC_ANNOTATION  = 0x2000;
+const class_flags_t CLASS_ANNOTATION  = 0x2000;
 // ACC_ENUM implies it has enum type.
-const access_flag_t ACC_ENUM  = 0x4000;
+const class_flags_t CLASS_ENUM  = 0x4000;
+
+const method_flags_t METHOD_PUBLIC = 0x0001;
 
 #endif /* VM_CONSTANT_POOL_H */
