@@ -8,14 +8,14 @@
  * the file.
  */
 typedef struct file_t {
-    // The name of the .class file
+    /// The name of the .class file
     const char* filename;
-    // Pointer to the first byte read of the java .class file
+    /// Pointer to the first byte read of the java .class file
     const char* data;
-    // size of the java .class file in bytes
+    /// size of the java .class file in bytes
     size_t size;
-    // Read bytes of the file. Used whenever you want to seek n bytes to the
-    // beginning of the file.
+    /// Read bytes of the file. Used whenever you want to seek n bytes to the
+    /// beginning of the file.
     size_t read;
 } file_t;
 
