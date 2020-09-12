@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>nJVM: Legenda do Grafo</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">nJVM
+   &#160;<span id="projectnumber">0.1.0</span>
+   </div>
+   <div id="projectbrief">An implementation of a piece of the JVM</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Gerado por Doxygen 1.8.13 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Busca');
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Busca');
+  $(document).ready(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">Legenda do Grafo</div>  </div>
+</div><!--header-->
+<div class="contents">
+<p>Esta página explica como interpretar os grafos gerados pelo doxygen.</p>
+<p>Considere o seguinte exemplo: </p><div class="fragment"><div class="line">/*! Invisible class because of truncation */</div><div class="line">class Invisible { };</div><div class="line"></div><div class="line">/*! Truncated class, inheritance relation is hidden */</div><div class="line">class Truncated : public Invisible { };</div><div class="line"></div><div class="line">/* Class not documented with doxygen comments */</div><div class="line">class Undocumented { };</div><div class="line"></div><div class="line">/*! Class that is inherited using public inheritance */</div><div class="line">class PublicBase : public Truncated { };</div><div class="line"></div><div class="line">/*! A template class */</div><div class="line">template&lt;class T&gt; class Templ { };</div><div class="line"></div><div class="line">/*! Class that is inherited using protected inheritance */</div><div class="line">class ProtectedBase { };</div><div class="line"></div><div class="line">/*! Class that is inherited using private inheritance */</div><div class="line">class PrivateBase { };</div><div class="line"></div><div class="line">/*! Class that is used by the Inherited class */</div><div class="line">class Used { };</div><div class="line"></div><div class="line">/*! Super class that inherits a number of other classes */</div><div class="line">class Inherited : public PublicBase,</div><div class="line">                  protected ProtectedBase,</div><div class="line">                  private PrivateBase,</div><div class="line">                  public Undocumented,</div><div class="line">                  public Templ&lt;int&gt;</div><div class="line">{</div><div class="line">  private:</div><div class="line">    Used *m_usedClass;</div><div class="line">};</div></div><!-- fragment --><p> Isto irá gerar o seguinte gráfo:</p>
+<center><div class="image">
+<img src="graph_legend.png"/>
+</div>
+</center> <p>As caixas no grafo acima tem as seguintes interpretações: </p><ul>
+<li>
+Uma caixa inteiramente preta representa a estrutura ou a classe para qual o grafo foi gerado. </li>
+<li>
+Uma caixa com bordas pretas denota uma estrutura ou classe documentada. </li>
+<li>
+Uma caixa com bordas cinzas denota uma estrutura ou classe não documentada. </li>
+<li>
+Uma caixa com bordas vermelhas denota uma estrutura ou classe documentada para a qual nem todas as heranças ou componentes são mostradas no grafo. Um grafo é truncado quando este é maior que o tamanho especificado.</li>
+</ul>
+<p>As setas tem os seguintes significados: </p><ul>
+<li>
+Uma seta azul escura é utilizada para denotar uma relação de herança pública entre duas classes. </li>
+<li>
+Uma seta verde escura é utilizada para denotar uma herança protegida. </li>
+<li>
+Uma seta vermelho escura é utilizada para denotar uma herança privada. </li>
+<li>
+Uma seta púrpura pontilhada é usada se uma classe está contida ou é utilizadapor outra classe. A seta é marcada com a(s) variável(eis) através das quais a classe ou estrutura apontada está acessível. </li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Gerado por &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.13
+</small></address>
+</body>
+</html>

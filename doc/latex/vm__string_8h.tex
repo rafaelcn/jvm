@@ -1,0 +1,96 @@
+\hypertarget{vm__string_8h}{}\section{Referência do Arquivo src/vm/lib/vm\+\_\+string.h}
+\label{vm__string_8h}\index{src/vm/lib/vm\+\_\+string.\+h@{src/vm/lib/vm\+\_\+string.\+h}}
+{\ttfamily \#include $<$wchar.\+h$>$}\newline
+Gráfico de dependência de inclusões para vm\+\_\+string.\+h\+:
+% FIG 0
+Este grafo mostra quais arquivos estão direta ou indiretamente relacionados com este arquivo\+:
+% FIG 1
+\subsection*{Funções}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{vm__string_8h_a3da97b8ae1ed7b513d0e3967680d6913}{vm\+\_\+strcmpl} (const char $\ast$restrict s, const char $\ast$restrict s\+\_\+)
+\begin{DoxyCompactList}\small\item\em Compares two strings, returning 1 if both strings are equal and 0 otherwise. \end{DoxyCompactList}\item 
+int \hyperlink{vm__string_8h_ae2c3fe644bdaa8b101ffc6ad16b0365d}{vm\+\_\+strncmpl} (const char $\ast$restrict s, const char $\ast$restrict s\+\_\+, int n)
+\begin{DoxyCompactList}\small\item\em Compares n chars from the back of the string, returning 1 if both strings are equal and 0 otherwise. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{vm__string_8h_a3272b0614922b57229b4abaccfd39bd1}{vm\+\_\+strsplit} (const char $\ast$restrict s, const char $\ast$restrict delim, int i)
+\begin{DoxyCompactList}\small\item\em Splits a string s by a delimiter and returns the i-\/th string. \end{DoxyCompactList}\item 
+int \hyperlink{vm__string_8h_a25bbef3a3dcab1f8ec9b4f70c6375507}{vm\+\_\+strchr} (const char $\ast$s, const char c)
+\begin{DoxyCompactList}\small\item\em Searches for the first c character inside the string s. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Funções}
+\mbox{\Hypertarget{vm__string_8h_a25bbef3a3dcab1f8ec9b4f70c6375507}\label{vm__string_8h_a25bbef3a3dcab1f8ec9b4f70c6375507}} 
+\index{vm\+\_\+string.\+h@{vm\+\_\+string.\+h}!vm\+\_\+strchr@{vm\+\_\+strchr}}
+\index{vm\+\_\+strchr@{vm\+\_\+strchr}!vm\+\_\+string.\+h@{vm\+\_\+string.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+strchr()}{vm\_strchr()}}
+{\footnotesize\ttfamily int vm\+\_\+strchr (\begin{DoxyParamCaption}\item[{const char $\ast$}]{s,  }\item[{const char}]{c }\end{DoxyParamCaption})}
+
+
+
+Searches for the first c character inside the string s. 
+
+
+\begin{DoxyParams}{Parâmetros}
+{\em s} & The string used to search the character. \\
+\hline
+{\em c} & The character to be searched in the string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Retorna}
+An integer representing the position of the first character c in the string s or, -\/1 if the character c could not be found. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{vm__string_8h_a3da97b8ae1ed7b513d0e3967680d6913}\label{vm__string_8h_a3da97b8ae1ed7b513d0e3967680d6913}} 
+\index{vm\+\_\+string.\+h@{vm\+\_\+string.\+h}!vm\+\_\+strcmpl@{vm\+\_\+strcmpl}}
+\index{vm\+\_\+strcmpl@{vm\+\_\+strcmpl}!vm\+\_\+string.\+h@{vm\+\_\+string.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+strcmpl()}{vm\_strcmpl()}}
+{\footnotesize\ttfamily int vm\+\_\+strcmpl (\begin{DoxyParamCaption}\item[{const char $\ast$restrict}]{s,  }\item[{const char $\ast$restrict}]{s\+\_\+ }\end{DoxyParamCaption})}
+
+
+
+Compares two strings, returning 1 if both strings are equal and 0 otherwise. 
+
+
+\begin{DoxyParams}{Parâmetros}
+{\em s} & The first string to use in the comparison. \\
+\hline
+{\em s\+\_\+} & The second string to use in the comparison. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{vm__string_8h_ae2c3fe644bdaa8b101ffc6ad16b0365d}\label{vm__string_8h_ae2c3fe644bdaa8b101ffc6ad16b0365d}} 
+\index{vm\+\_\+string.\+h@{vm\+\_\+string.\+h}!vm\+\_\+strncmpl@{vm\+\_\+strncmpl}}
+\index{vm\+\_\+strncmpl@{vm\+\_\+strncmpl}!vm\+\_\+string.\+h@{vm\+\_\+string.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+strncmpl()}{vm\_strncmpl()}}
+{\footnotesize\ttfamily int vm\+\_\+strncmpl (\begin{DoxyParamCaption}\item[{const char $\ast$restrict}]{s,  }\item[{const char $\ast$restrict}]{s\+\_\+,  }\item[{int}]{n }\end{DoxyParamCaption})}
+
+
+
+Compares n chars from the back of the string, returning 1 if both strings are equal and 0 otherwise. 
+
+
+\begin{DoxyParams}{Parâmetros}
+{\em s} & The first string to use in the comparison. \\
+\hline
+{\em s\+\_\+} & The second string to use in the comparison. \\
+\hline
+{\em n} & How many characters to compare both strings. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{vm__string_8h_a3272b0614922b57229b4abaccfd39bd1}\label{vm__string_8h_a3272b0614922b57229b4abaccfd39bd1}} 
+\index{vm\+\_\+string.\+h@{vm\+\_\+string.\+h}!vm\+\_\+strsplit@{vm\+\_\+strsplit}}
+\index{vm\+\_\+strsplit@{vm\+\_\+strsplit}!vm\+\_\+string.\+h@{vm\+\_\+string.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+strsplit()}{vm\_strsplit()}}
+{\footnotesize\ttfamily char$\ast$ vm\+\_\+strsplit (\begin{DoxyParamCaption}\item[{const char $\ast$restrict}]{s,  }\item[{const char $\ast$restrict}]{delim,  }\item[{int}]{i }\end{DoxyParamCaption})}
+
+
+
+Splits a string s by a delimiter and returns the i-\/th string. 
+
+
+\begin{DoxyParams}{Parâmetros}
+{\em s} & The string to be split. \\
+\hline
+{\em delim} & The delimiter used to split the string. \\
+\hline
+{\em i} & The i-\/th token in the string s. \\
+\hline
+\end{DoxyParams}

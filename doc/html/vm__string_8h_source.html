@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>nJVM: Código-Fonte de src/vm/lib/vm_string.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">nJVM
+   &#160;<span id="projectnumber">0.1.0</span>
+   </div>
+   <div id="projectbrief">An implementation of a piece of the JVM</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Gerado por Doxygen 1.8.13 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Busca');
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Busca');
+  $(document).ready(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_f56a3a135a8a10a38ba6cf6e5eb74c45.html">vm</a></li><li class="navelem"><a class="el" href="dir_e26e1b85aab5ff9956145541ff902bb7.html">lib</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">vm_string.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="vm__string_8h.html">Vá para a documentação deste arquivo.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef VM_STRING_H</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define VM_STRING_H</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;wchar.h&gt;</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keywordtype">int</span> <a class="code" href="vm__string_8h.html#a3da97b8ae1ed7b513d0e3967680d6913">vm_strcmpl</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *restrict s, <span class="keyword">const</span> <span class="keywordtype">char</span> *restrict s_);</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">int</span> <a class="code" href="vm__string_8h.html#ae2c3fe644bdaa8b101ffc6ad16b0365d">vm_strncmpl</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *restrict s, <span class="keyword">const</span> <span class="keywordtype">char</span> *restrict s_, <span class="keywordtype">int</span> n);</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="vm__string_8h.html#a3272b0614922b57229b4abaccfd39bd1">vm_strsplit</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *restrict s, <span class="keyword">const</span> <span class="keywordtype">char</span> *restrict delim, <span class="keywordtype">int</span> i);</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keywordtype">int</span> <a class="code" href="vm__string_8h.html#a25bbef3a3dcab1f8ec9b4f70c6375507">vm_strchr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s, <span class="keyword">const</span> <span class="keywordtype">char</span> c);</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* VM_STRING_H */</span><span class="preprocessor"></span></div><div class="ttc" id="vm__string_8h_html_a3272b0614922b57229b4abaccfd39bd1"><div class="ttname"><a href="vm__string_8h.html#a3272b0614922b57229b4abaccfd39bd1">vm_strsplit</a></div><div class="ttdeci">char * vm_strsplit(const char *restrict s, const char *restrict delim, int i)</div><div class="ttdoc">Splits a string s by a delimiter and returns the i-th string. </div><div class="ttdef"><b>Definition:</b> vm_string.c:35</div></div>
+<div class="ttc" id="vm__string_8h_html_ae2c3fe644bdaa8b101ffc6ad16b0365d"><div class="ttname"><a href="vm__string_8h.html#ae2c3fe644bdaa8b101ffc6ad16b0365d">vm_strncmpl</a></div><div class="ttdeci">int vm_strncmpl(const char *restrict s, const char *restrict s_, int n)</div><div class="ttdoc">Compares n chars from the back of the string, returning 1 if both strings are equal and 0 otherwise...</div><div class="ttdef"><b>Definition:</b> vm_string.c:18</div></div>
+<div class="ttc" id="vm__string_8h_html_a25bbef3a3dcab1f8ec9b4f70c6375507"><div class="ttname"><a href="vm__string_8h.html#a25bbef3a3dcab1f8ec9b4f70c6375507">vm_strchr</a></div><div class="ttdeci">int vm_strchr(const char *s, const char c)</div><div class="ttdoc">Searches for the first c character inside the string s. </div><div class="ttdef"><b>Definition:</b> vm_string.c:94</div></div>
+<div class="ttc" id="vm__string_8h_html_a3da97b8ae1ed7b513d0e3967680d6913"><div class="ttname"><a href="vm__string_8h.html#a3da97b8ae1ed7b513d0e3967680d6913">vm_strcmpl</a></div><div class="ttdeci">int vm_strcmpl(const char *restrict s, const char *restrict s_)</div><div class="ttdoc">Compares two strings, returning 1 if both strings are equal and 0 otherwise. </div><div class="ttdef"><b>Definition:</b> vm_string.c:10</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Gerado por &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.13
+</small></address>
+</body>
+</html>

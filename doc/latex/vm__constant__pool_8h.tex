@@ -1,0 +1,163 @@
+\hypertarget{vm__constant__pool_8h}{}\section{Referência do Arquivo src/vm/vm\+\_\+constant\+\_\+pool.h}
+\label{vm__constant__pool_8h}\index{src/vm/vm\+\_\+constant\+\_\+pool.\+h@{src/vm/vm\+\_\+constant\+\_\+pool.\+h}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Gráfico de dependência de inclusões para vm\+\_\+constant\+\_\+pool.\+h\+:
+% FIG 0
+Este grafo mostra quais arquivos estão direta ou indiretamente relacionados com este arquivo\+:
+% FIG 1
+\subsection*{Estruturas de Dados}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structvm__cp__t}{vm\+\_\+cp\+\_\+t}
+\item 
+struct \hyperlink{structvm__cp__info__t}{vm\+\_\+cp\+\_\+info\+\_\+t}
+\item 
+struct \hyperlink{structvm__field__info__t}{vm\+\_\+field\+\_\+info\+\_\+t}
+\item 
+struct \hyperlink{structvm__method__info__t}{vm\+\_\+method\+\_\+info\+\_\+t}
+\item 
+struct \hyperlink{structvm__attribute__info__t}{vm\+\_\+attribute\+\_\+info\+\_\+t}
+\item 
+struct \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Definições de Tipos}
+\begin{DoxyCompactItemize}
+\item 
+typedef uint16\+\_\+t \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t}
+\item 
+typedef uint16\+\_\+t \hyperlink{vm__constant__pool_8h_a35028690ed5f5a4d636d9b211b0f0f75}{method\+\_\+flags\+\_\+t}
+\item 
+typedef struct \hyperlink{structvm__cp__t}{vm\+\_\+cp\+\_\+t} \hyperlink{vm__constant__pool_8h_a93ec18c6c14d0a86ae8e34cebbdb0260}{vm\+\_\+cp\+\_\+t}
+\item 
+typedef struct \hyperlink{structvm__cp__info__t}{vm\+\_\+cp\+\_\+info\+\_\+t} \hyperlink{vm__constant__pool_8h_af27febb3dde073761614a84b861a8ade}{vm\+\_\+cp\+\_\+info\+\_\+t}
+\item 
+typedef struct \hyperlink{structvm__field__info__t}{vm\+\_\+field\+\_\+info\+\_\+t} \hyperlink{vm__constant__pool_8h_a25784c5b272a99d4e0996fdfdcdec306}{vm\+\_\+field\+\_\+info\+\_\+t}
+\item 
+typedef struct \hyperlink{structvm__method__info__t}{vm\+\_\+method\+\_\+info\+\_\+t} \hyperlink{vm__constant__pool_8h_ab39baa703f3be033961569860d9aa763}{vm\+\_\+method\+\_\+info\+\_\+t}
+\item 
+typedef struct \hyperlink{structvm__attribute__info__t}{vm\+\_\+attribute\+\_\+info\+\_\+t} \hyperlink{vm__constant__pool_8h_a209ab7b98d7f62d4a33e21cbeb035e65}{vm\+\_\+attribute\+\_\+info\+\_\+t}
+\item 
+typedef struct \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t} \hyperlink{vm__constant__pool_8h_a033c45f10d7dfe27fb3b10397fd2d8c5}{vm\+\_\+class\+\_\+file\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Variáveis}
+\begin{DoxyCompactItemize}
+\item 
+const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_af6ef7a511e877c4719f638b2df5173b7}{C\+L\+A\+S\+S\+\_\+\+P\+U\+B\+L\+IC} = 0x0001
+\item 
+const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_a94048567278521b783178b141eaa962b}{C\+L\+A\+S\+S\+\_\+\+F\+I\+N\+AL} = 0x0010
+\item 
+const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_a9ae98022c4615cc8a220402c41e60c70}{C\+L\+A\+S\+S\+\_\+\+I\+N\+T\+E\+R\+F\+A\+CE} = 0x0200
+\item 
+const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_a86962645062fc94eea386c88ea9926fe}{C\+L\+A\+S\+S\+\_\+\+A\+B\+S\+T\+R\+A\+CT} = 0x0400
+\item 
+const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_a77f1abff21098615f973c3088f2b6e20}{C\+L\+A\+S\+S\+\_\+\+S\+Y\+N\+T\+H\+E\+T\+IC} = 0x1000
+\item 
+const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_a4111eecf38f32535bd5ae965fbf98e41}{C\+L\+A\+S\+S\+\_\+\+A\+N\+N\+O\+T\+A\+T\+I\+ON} = 0x2000
+\item 
+const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_a9b32065bf007cc966955b730326068d7}{C\+L\+A\+S\+S\+\_\+\+E\+N\+UM} = 0x4000
+\item 
+const \hyperlink{vm__constant__pool_8h_a35028690ed5f5a4d636d9b211b0f0f75}{method\+\_\+flags\+\_\+t} \hyperlink{vm__constant__pool_8h_abce17491ee4c5834d8123aefb0aaf0c7}{M\+E\+T\+H\+O\+D\+\_\+\+P\+U\+B\+L\+IC} = 0x0001
+\end{DoxyCompactItemize}
+
+
+\subsection{Definições dos tipos}
+\mbox{\Hypertarget{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}\label{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!class\+\_\+flags\+\_\+t@{class\+\_\+flags\+\_\+t}}
+\index{class\+\_\+flags\+\_\+t@{class\+\_\+flags\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{class\+\_\+flags\+\_\+t}{class\_flags\_t}}
+{\footnotesize\ttfamily typedef uint16\+\_\+t \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t}}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a35028690ed5f5a4d636d9b211b0f0f75}\label{vm__constant__pool_8h_a35028690ed5f5a4d636d9b211b0f0f75}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!method\+\_\+flags\+\_\+t@{method\+\_\+flags\+\_\+t}}
+\index{method\+\_\+flags\+\_\+t@{method\+\_\+flags\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{method\+\_\+flags\+\_\+t}{method\_flags\_t}}
+{\footnotesize\ttfamily typedef uint16\+\_\+t \hyperlink{vm__constant__pool_8h_a35028690ed5f5a4d636d9b211b0f0f75}{method\+\_\+flags\+\_\+t}}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a209ab7b98d7f62d4a33e21cbeb035e65}\label{vm__constant__pool_8h_a209ab7b98d7f62d4a33e21cbeb035e65}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!vm\+\_\+attribute\+\_\+info\+\_\+t@{vm\+\_\+attribute\+\_\+info\+\_\+t}}
+\index{vm\+\_\+attribute\+\_\+info\+\_\+t@{vm\+\_\+attribute\+\_\+info\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+attribute\+\_\+info\+\_\+t}{vm\_attribute\_info\_t}}
+{\footnotesize\ttfamily typedef struct \hyperlink{structvm__attribute__info__t}{vm\+\_\+attribute\+\_\+info\+\_\+t}  \hyperlink{structvm__attribute__info__t}{vm\+\_\+attribute\+\_\+info\+\_\+t}}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a033c45f10d7dfe27fb3b10397fd2d8c5}\label{vm__constant__pool_8h_a033c45f10d7dfe27fb3b10397fd2d8c5}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}}
+\index{vm\+\_\+class\+\_\+file\+\_\+t@{vm\+\_\+class\+\_\+file\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+class\+\_\+file\+\_\+t}{vm\_class\_file\_t}}
+{\footnotesize\ttfamily typedef struct \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t}  \hyperlink{structvm__class__file__t}{vm\+\_\+class\+\_\+file\+\_\+t}}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_af27febb3dde073761614a84b861a8ade}\label{vm__constant__pool_8h_af27febb3dde073761614a84b861a8ade}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!vm\+\_\+cp\+\_\+info\+\_\+t@{vm\+\_\+cp\+\_\+info\+\_\+t}}
+\index{vm\+\_\+cp\+\_\+info\+\_\+t@{vm\+\_\+cp\+\_\+info\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+cp\+\_\+info\+\_\+t}{vm\_cp\_info\_t}}
+{\footnotesize\ttfamily typedef struct \hyperlink{structvm__cp__info__t}{vm\+\_\+cp\+\_\+info\+\_\+t}  \hyperlink{structvm__cp__info__t}{vm\+\_\+cp\+\_\+info\+\_\+t}}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a93ec18c6c14d0a86ae8e34cebbdb0260}\label{vm__constant__pool_8h_a93ec18c6c14d0a86ae8e34cebbdb0260}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!vm\+\_\+cp\+\_\+t@{vm\+\_\+cp\+\_\+t}}
+\index{vm\+\_\+cp\+\_\+t@{vm\+\_\+cp\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+cp\+\_\+t}{vm\_cp\_t}}
+{\footnotesize\ttfamily typedef struct \hyperlink{structvm__cp__t}{vm\+\_\+cp\+\_\+t}  \hyperlink{structvm__cp__t}{vm\+\_\+cp\+\_\+t}}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a25784c5b272a99d4e0996fdfdcdec306}\label{vm__constant__pool_8h_a25784c5b272a99d4e0996fdfdcdec306}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!vm\+\_\+field\+\_\+info\+\_\+t@{vm\+\_\+field\+\_\+info\+\_\+t}}
+\index{vm\+\_\+field\+\_\+info\+\_\+t@{vm\+\_\+field\+\_\+info\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+field\+\_\+info\+\_\+t}{vm\_field\_info\_t}}
+{\footnotesize\ttfamily typedef struct \hyperlink{structvm__field__info__t}{vm\+\_\+field\+\_\+info\+\_\+t}  \hyperlink{structvm__field__info__t}{vm\+\_\+field\+\_\+info\+\_\+t}}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_ab39baa703f3be033961569860d9aa763}\label{vm__constant__pool_8h_ab39baa703f3be033961569860d9aa763}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!vm\+\_\+method\+\_\+info\+\_\+t@{vm\+\_\+method\+\_\+info\+\_\+t}}
+\index{vm\+\_\+method\+\_\+info\+\_\+t@{vm\+\_\+method\+\_\+info\+\_\+t}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{vm\+\_\+method\+\_\+info\+\_\+t}{vm\_method\_info\_t}}
+{\footnotesize\ttfamily typedef struct \hyperlink{structvm__method__info__t}{vm\+\_\+method\+\_\+info\+\_\+t}  \hyperlink{structvm__method__info__t}{vm\+\_\+method\+\_\+info\+\_\+t}}
+
+
+
+\subsection{Variáveis}
+\mbox{\Hypertarget{vm__constant__pool_8h_a86962645062fc94eea386c88ea9926fe}\label{vm__constant__pool_8h_a86962645062fc94eea386c88ea9926fe}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!C\+L\+A\+S\+S\+\_\+\+A\+B\+S\+T\+R\+A\+CT@{C\+L\+A\+S\+S\+\_\+\+A\+B\+S\+T\+R\+A\+CT}}
+\index{C\+L\+A\+S\+S\+\_\+\+A\+B\+S\+T\+R\+A\+CT@{C\+L\+A\+S\+S\+\_\+\+A\+B\+S\+T\+R\+A\+CT}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{C\+L\+A\+S\+S\+\_\+\+A\+B\+S\+T\+R\+A\+CT}{CLASS\_ABSTRACT}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} C\+L\+A\+S\+S\+\_\+\+A\+B\+S\+T\+R\+A\+CT = 0x0400}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a4111eecf38f32535bd5ae965fbf98e41}\label{vm__constant__pool_8h_a4111eecf38f32535bd5ae965fbf98e41}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!C\+L\+A\+S\+S\+\_\+\+A\+N\+N\+O\+T\+A\+T\+I\+ON@{C\+L\+A\+S\+S\+\_\+\+A\+N\+N\+O\+T\+A\+T\+I\+ON}}
+\index{C\+L\+A\+S\+S\+\_\+\+A\+N\+N\+O\+T\+A\+T\+I\+ON@{C\+L\+A\+S\+S\+\_\+\+A\+N\+N\+O\+T\+A\+T\+I\+ON}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{C\+L\+A\+S\+S\+\_\+\+A\+N\+N\+O\+T\+A\+T\+I\+ON}{CLASS\_ANNOTATION}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} C\+L\+A\+S\+S\+\_\+\+A\+N\+N\+O\+T\+A\+T\+I\+ON = 0x2000}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a9b32065bf007cc966955b730326068d7}\label{vm__constant__pool_8h_a9b32065bf007cc966955b730326068d7}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!C\+L\+A\+S\+S\+\_\+\+E\+N\+UM@{C\+L\+A\+S\+S\+\_\+\+E\+N\+UM}}
+\index{C\+L\+A\+S\+S\+\_\+\+E\+N\+UM@{C\+L\+A\+S\+S\+\_\+\+E\+N\+UM}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{C\+L\+A\+S\+S\+\_\+\+E\+N\+UM}{CLASS\_ENUM}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} C\+L\+A\+S\+S\+\_\+\+E\+N\+UM = 0x4000}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a94048567278521b783178b141eaa962b}\label{vm__constant__pool_8h_a94048567278521b783178b141eaa962b}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!C\+L\+A\+S\+S\+\_\+\+F\+I\+N\+AL@{C\+L\+A\+S\+S\+\_\+\+F\+I\+N\+AL}}
+\index{C\+L\+A\+S\+S\+\_\+\+F\+I\+N\+AL@{C\+L\+A\+S\+S\+\_\+\+F\+I\+N\+AL}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{C\+L\+A\+S\+S\+\_\+\+F\+I\+N\+AL}{CLASS\_FINAL}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} C\+L\+A\+S\+S\+\_\+\+F\+I\+N\+AL = 0x0010}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a9ae98022c4615cc8a220402c41e60c70}\label{vm__constant__pool_8h_a9ae98022c4615cc8a220402c41e60c70}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!C\+L\+A\+S\+S\+\_\+\+I\+N\+T\+E\+R\+F\+A\+CE@{C\+L\+A\+S\+S\+\_\+\+I\+N\+T\+E\+R\+F\+A\+CE}}
+\index{C\+L\+A\+S\+S\+\_\+\+I\+N\+T\+E\+R\+F\+A\+CE@{C\+L\+A\+S\+S\+\_\+\+I\+N\+T\+E\+R\+F\+A\+CE}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{C\+L\+A\+S\+S\+\_\+\+I\+N\+T\+E\+R\+F\+A\+CE}{CLASS\_INTERFACE}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} C\+L\+A\+S\+S\+\_\+\+I\+N\+T\+E\+R\+F\+A\+CE = 0x0200}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_af6ef7a511e877c4719f638b2df5173b7}\label{vm__constant__pool_8h_af6ef7a511e877c4719f638b2df5173b7}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!C\+L\+A\+S\+S\+\_\+\+P\+U\+B\+L\+IC@{C\+L\+A\+S\+S\+\_\+\+P\+U\+B\+L\+IC}}
+\index{C\+L\+A\+S\+S\+\_\+\+P\+U\+B\+L\+IC@{C\+L\+A\+S\+S\+\_\+\+P\+U\+B\+L\+IC}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{C\+L\+A\+S\+S\+\_\+\+P\+U\+B\+L\+IC}{CLASS\_PUBLIC}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} C\+L\+A\+S\+S\+\_\+\+P\+U\+B\+L\+IC = 0x0001}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_a77f1abff21098615f973c3088f2b6e20}\label{vm__constant__pool_8h_a77f1abff21098615f973c3088f2b6e20}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!C\+L\+A\+S\+S\+\_\+\+S\+Y\+N\+T\+H\+E\+T\+IC@{C\+L\+A\+S\+S\+\_\+\+S\+Y\+N\+T\+H\+E\+T\+IC}}
+\index{C\+L\+A\+S\+S\+\_\+\+S\+Y\+N\+T\+H\+E\+T\+IC@{C\+L\+A\+S\+S\+\_\+\+S\+Y\+N\+T\+H\+E\+T\+IC}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{C\+L\+A\+S\+S\+\_\+\+S\+Y\+N\+T\+H\+E\+T\+IC}{CLASS\_SYNTHETIC}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a031d95f87ee8ea61a12297cc5e45b645}{class\+\_\+flags\+\_\+t} C\+L\+A\+S\+S\+\_\+\+S\+Y\+N\+T\+H\+E\+T\+IC = 0x1000}
+
+\mbox{\Hypertarget{vm__constant__pool_8h_abce17491ee4c5834d8123aefb0aaf0c7}\label{vm__constant__pool_8h_abce17491ee4c5834d8123aefb0aaf0c7}} 
+\index{vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}!M\+E\+T\+H\+O\+D\+\_\+\+P\+U\+B\+L\+IC@{M\+E\+T\+H\+O\+D\+\_\+\+P\+U\+B\+L\+IC}}
+\index{M\+E\+T\+H\+O\+D\+\_\+\+P\+U\+B\+L\+IC@{M\+E\+T\+H\+O\+D\+\_\+\+P\+U\+B\+L\+IC}!vm\+\_\+constant\+\_\+pool.\+h@{vm\+\_\+constant\+\_\+pool.\+h}}
+\subsubsection{\texorpdfstring{M\+E\+T\+H\+O\+D\+\_\+\+P\+U\+B\+L\+IC}{METHOD\_PUBLIC}}
+{\footnotesize\ttfamily const \hyperlink{vm__constant__pool_8h_a35028690ed5f5a4d636d9b211b0f0f75}{method\+\_\+flags\+\_\+t} M\+E\+T\+H\+O\+D\+\_\+\+P\+U\+B\+L\+IC = 0x0001}
+
