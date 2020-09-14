@@ -3,6 +3,7 @@
 #include "args_parser.h"
 #include "vm/lib/tests_helper.h"
 #include "vm/lib/vm_string.h"
+#include "stdio.h"
 
 
 static char* args_parse_params[] = {
@@ -33,12 +34,14 @@ test_args_parse(const MunitParameter params[], void* user_data) {
     (void) user_data;
 
     args_parse_params = munit_parameters_get(params, "args_parse_params");
+
     // Let's first parse the params
     parameters_length = strlen(args_parse_params);
     parsed_args = arg_str_to_array_of_str(args_parse_params, '/');
     input_argv = arg_str_to_array_of_str(parsed_args[1], '!');
     input_argc = atoi(parsed_args[2]);
     parsed_args_t = arg_str_to_array_of_str(parsed_args[0], '!');
+    printf("\n%s\n%s Paicareca \n %d\n", input_argv[0], input_argv[1], input_argc);
     expected_result.flags->flag_name = parsed_args_t[0];
     expected_result.flags->flag_value = parsed_args_t[1];
     // Now we have parsed the arguments, let's test our function
