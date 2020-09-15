@@ -7,12 +7,13 @@
 
 
 static char* args_parse_params[] = {
-    /* Flag Name-Flag Value/
+    /* Flag Name! Flag Value(ARGC/2 TIMES)/
         Input Argv/ Input Argc */
-    (char*) "filename! programa_legal/ -filename! programa_legal/ 2/",
-    (char*) "help! no_value/ -help/ 1",
-    (char*) "execute! programa_legal/ -execute! programa_legal/ 2",
-    (char*) "inform! programa_legal/ -inform! programa_legal/ 2",
+    (char*) "filename! programa_legal/ filename! programa_legal/ 2/",
+    (char*) "help! / help/ 1",
+    (char*) "version! / version/ 1",
+    (char*) "execute! programa_legal/ execute! programa_legal/ 2",
+    (char*) "inform! programa_legal/ inform! programa_legal/ 2",
     NULL
 };
 
@@ -41,7 +42,6 @@ test_args_parse(const MunitParameter params[], void* user_data) {
     input_argv = arg_str_to_array_of_str(parsed_args[1], '!');
     input_argc = atoi(parsed_args[2]);
     parsed_args_t = arg_str_to_array_of_str(parsed_args[0], '!');
-    printf("\n%s\n%s Paicareca \n %d\n", input_argv[0], input_argv[1], input_argc);
     expected_result.flags->flag_name = parsed_args_t[0];
     expected_result.flags->flag_value = parsed_args_t[1];
     // Now we have parsed the arguments, let's test our function
@@ -52,7 +52,7 @@ test_args_parse(const MunitParameter params[], void* user_data) {
     assert_string_equal(
         expected_result.flags->flag_name,
         predicted_result.flags->flag_name);
-    if(vm_strcmpl(predicted_result.flags->flag_name, "no_value"))
+    if(vm_strcmpl(predicted_result.flags->flag_name, ""))
     assert_string_equal(
         expected_result.flags->flag_value,
         predicted_result.flags->flag_value);
