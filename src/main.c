@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     } else {
         const char *filename;
         // capture arguments sent through stdin
-        args_t arguments = args_parse(argv);
+        args_t arguments = args_parse(argc, argv);
 
         size_t size = sizeof(arguments.flags) / sizeof(arg_t);
         for (size_t i = 0; i < size; i++) {
