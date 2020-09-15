@@ -9,11 +9,11 @@
 static char* args_parse_params[] = {
     /* Flag Name! Flag Value(ARGC/2 TIMES)/
         Input Argv/ Input Argc */
-    (char*) "filename! programa_legal/ filename! programa_legal/ 2/",
-    (char*) "help! / help/ 1",
-    (char*) "version! / version/ 1",
-    (char*) "execute! programa_legal/ execute! programa_legal/ 2",
-    (char*) "inform! programa_legal/ inform! programa_legal/ 2",
+    (char*) "filename! programa_legal/ filename! programa_legal/ 3/",
+    (char*) "help! / help/ 2",
+    (char*) "version! / version/ 2",
+    (char*) "execute! programa_legal/ execute! programa_legal/ 3",
+    (char*) "inform! programa_legal/ inform! programa_legal/ 3",
     NULL
 };
 

@@ -10,10 +10,10 @@ args_t args_parse(int argc, char **argv) {
     parsed.flags[1].flag_value = "";
 
 
-    for(int i = 0; i < 4 && i < argc; i = i + 2)
+    for(int i = 0; i < 4 && i < argc-1; i = i + 2)
     {
         parsed.flags[i].flag_name = argv[i];
-        if(i+1 < argc)
+        if(i+1 < argc-1)
         {
             parsed.flags[i].flag_value = argv[i+1];
         }
