@@ -9,21 +9,18 @@
 #include <stdbool.h>
 
 int vm_strcmpl(const char *restrict s, const char *restrict s_) {
-    int length_s = strlen(s);
-    int length_s_ = strlen(s_);
-
-    if (length_s != length_s_) {
+    if (strlen(s) != strlen(s_)) {
         return 0;
     }
-    return vm_strncmpl(s, s_, length_s);
+    return vm_strncmpl(s, s_, strlen(s));
 }
 
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
     int length_s = strlen(s);
     int length_s_ = strlen(s_);
-    int i = length_s-1;
+    int i = strlen(s)-1;
     int j = length_s_-1;
-    bool are_valid_indexes = i >= length_s-n+1 && j >= length_s_-n+1
+    bool are_valid_indexes = i >= strlen(s)-n+1 && j >= length_s_-n+1
             && i >= 0 && j >= 0;
 
     if (&s == &s_) {
@@ -35,14 +32,14 @@ int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
         if (s[i] != s_[j]) {
             return 0;
         }
-        are_valid_indexes = i >= length_s-n+1 && j >= length_s_-n+1
+        are_valid_indexes = i >= strlen(s)-n+1 && j >= length_s_-n+1
                 && i >= 0 && j >= 0;
     }
 
     return 1;
 }
 
-char *vm_strsplit(const char *restrict s, const char *restrict delim,
+char *vm_strspliti(const char *restrict s, const char *restrict delim,
                    int pos) {
 
     char *token = NULL;
@@ -94,11 +91,33 @@ char *vm_strsplit(const char *restrict s, const char *restrict delim,
             index++;
         }
     } else {
-        vm_log(stderr, "vm_strsplit doesn't work with len(delimiter) > 1",
+        vm_log(stderr, "vm_strspliti doesn't work with len(delimiter) > 1",
             __LINE__, __FILE__, VM_LOG_ERROR);
     }
 
     return token;
+}
+
+char** vm_strsplit(const char* s, const char *restrict delim) {
+    int array_index = 0; // Array index shall be the number of elements - 1.
+    int last_delim_position = 0;
+    int splitted_str_count = 1; // If there's no delim, there'll be at 
+                                // least 1 string.
+    const int string_length = strlen(s);
+    char** array_of_substrs = NULL;
+
+    for(int i = 0; i < string_length; i++)
+    {
+        if(s[i] == delim[0]) splitted_str_count++;
+    }
+
+    array_of_substrs = (char**) calloc(splitted_str_count, (sizeof(char*)));
+    for(int i = 0; i < splitted_str_count; i++)
+    {
+        array_of_substrs[i] = vm_strspliti(s, delim, i+1);
+    }
+
+    return array_of_substrs;
 }
 
 int vm_strchr(const char *s, const char c) {
@@ -113,3 +132,4 @@ int vm_strchr(const char *s, const char c) {
 
     return -1;
 }
+

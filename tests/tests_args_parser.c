@@ -1,9 +1,12 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
-#include "munit/munit.h"
+
 #include "args_parser.h"
-#include "vm/lib/tests_helper.h"
+#include "tests_helper.h"
 #include "vm/lib/vm_string.h"
-#include "stdio.h"
+
+#include "munit/munit.h"
+
+#include <stdio.h>
 
 
 static char* args_parse_params[] = {
@@ -38,10 +41,10 @@ test_args_parse(const MunitParameter params[], void* user_data) {
 
     // Let's first parse the params
     parameters_length = strlen(args_parse_params);
-    parsed_args = arg_str_to_array_of_str(args_parse_params, '/');
-    input_argv = arg_str_to_array_of_str(parsed_args[1], '!');
+    parsed_args = test_strplit(args_parse_params, '/');
+    input_argv = test_strplit(parsed_args[1], '!');
     input_argc = atoi(parsed_args[2]);
-    parsed_args_t = arg_str_to_array_of_str(parsed_args[0], '!');
+    parsed_args_t = test_strplit(parsed_args[0], '!');
     expected_result.flags->flag_name = parsed_args_t[0];
     expected_result.flags->flag_value = parsed_args_t[1];
     // Now we have parsed the arguments, let's test our function
