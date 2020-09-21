@@ -1,9 +1,13 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
+
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "munit/munit.h"
-#include "vm/lib/vm_string.h"
+
 #include "tests_helper.h"
+#include "vm/lib/vm_string.h"
+
 
 static char* vm_strncmpl_params[] = {
     /*
@@ -64,6 +68,7 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     free(parsed_args[1]);
     free(parsed_args[0]);
     free(parsed_args);
+
     return MUNIT_OK;
 }
 
@@ -206,7 +211,7 @@ test_vm_strsplit(const MunitParameter params[], void* user_data) {
 
     predicted_result = vm_strsplit(
         input_string, delimiter);
-    
+
     for(int i = 0; i < expected_result; i++)
     {
         assert_ptr_not_null(predicted_result[i]);

@@ -1,13 +1,13 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
 
-#include "args_parser.h"
-#include "tests_helper.h"
-#include "vm/lib/vm_string.h"
+#include <stdio.h>
 
 #include "munit/munit.h"
 
-#include <stdio.h>
+#include "args_parser.h"
+#include "tests_helper.h"
 
+#include "vm/lib/vm_string.h"
 
 static char* args_parse_params[] = {
     /* Flag Name! Flag Value(ARGC/2 TIMES)/
