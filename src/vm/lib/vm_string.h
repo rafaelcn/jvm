@@ -26,7 +26,16 @@ int vm_strncmpl(const char *restrict s, const char *restrict s_, int n);
  * @param delim The delimiter used to split the string.
  * @param i The i-th token in the string s.
  */
-char *vm_strsplit(const char *restrict s, const char *restrict delim, int i);
+char *vm_strspliti(const char *restrict s, const char *restrict delim, int i);
+
+
+/**
+ * @brief Splits a string s by a delimiter and returns an array of strings.
+ * @param s The string to be split.
+ * @param delim The delimiter used to split the string.
+ * @returns array with N strings where N is the number of delimiters found + 1
+ */
+char** vm_strsplit(const char *restrict s, const char *restrict delim);
 
 
 /**
