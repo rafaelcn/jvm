@@ -52,8 +52,11 @@ Mkfile.old
 dkms.conf
 
 # Custom files
-
 *.class
+
+# Custom doc files
+doc/html/*
+doc/latex/*
 
 # VS Code configuration files
 .vscode
