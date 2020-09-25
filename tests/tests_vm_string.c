@@ -5,7 +5,8 @@
 
 #include "munit/munit.h"
 
-#include "tests_helper.h"
+#include "utils/tests_helper.h"
+
 #include "vm/lib/vm_string.h"
 
 

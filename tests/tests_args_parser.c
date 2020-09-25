@@ -4,8 +4,9 @@
 
 #include "munit/munit.h"
 
+#include "utils/tests_helper.h"
+
 #include "args_parser.h"
-#include "tests_helper.h"
 
 #include "vm/lib/vm_string.h"
 
