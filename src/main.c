@@ -22,32 +22,35 @@ int main(int argc, char** argv) {
         const char *filename;
         // capture arguments sent through stdin
         args_t arguments = args_parse(argc, argv);
-
         size_t size = sizeof(arguments.flags) / sizeof(arg_t);
+
         for (size_t i = 0; i < size; i++) {
             // only two arguments are parsed at the moment.
-            if (vm_strcmpl(arguments.flags[i].flag_name, "version")) {
+            if (vm_strcmpl(arguments.flags[i].flag_name, "--version")) {
                 printf("%s\n", VM_VERSION);
                 break;
-            } else if (vm_strcmpl(arguments.flags[i].flag_name, "help")) {
+            } else if (vm_strcmpl(arguments.flags[i].flag_name, "--help")) {
                 ret = usage();
                 break;
-            } else if (vm_strcmpl(arguments.flags[i].flag_name, "execute")) {
+            } else if (vm_strcmpl(arguments.flags[i].flag_name, "--execute")) {
                 filename = arguments.flags[i].flag_value;
-            } else if (vm_strcmpl(arguments.flags[i].flag_name, "inform")) {
+                // initializes execution of the nJVM (?)
+                int ret = vm_init(filename);
+            } else if (vm_strcmpl(arguments.flags[i].flag_name, "--inform")) {
                 filename = arguments.flags[i].flag_value;
+                // initializes the execution of nJVM (?)
+                int ret = vm_init(filename);
             } else {
-                // Create a new logger to ignore __LINE__ and __FILE__
-                // parameters.
-                vm_log(stdout, "unknown argument", __LINE__, __FILE__,
-                    VM_LOG_INFO);
+                char err[512];
+                sprintf(err, "unknown argument %s", argv[1]);
+
+                vm_log(stdout, err, __LINE__, __FILE__, VM_LOG_INFO);
+                printf("\n\n");
 
                 ret = usage();
                 break;
             }
         }
-
-        int ret = vm_init(filename);
     }
 
     return ret;
@@ -56,12 +59,12 @@ int main(int argc, char** argv) {
 int usage() {
     printf("%s\n\n", VM_VERSION);
     printf("usage:\n\t");
-    printf("./nvjm.exe -filename <hello.class>\n\n");
+    printf("./nvjm.exe --execute <hello.class>\n\n");
     printf("available commands:\n\n");
-    printf("\thelp\t\t\t- show this information\n");
-    printf("\tversion\t\t\t- show the version of the nJVM\n");
-    printf("\texecute <class file>\t- executes a class file\n");
-    printf("\tinform  <class file>\t- shows information about the class file\n");
+    printf("\t--help\t\t\t- show this information\n");
+    printf("\t--version\t\t- show the version of the nJVM\n");
+    printf("\t--execute <class file>\t- executes a class file\n");
+    printf("\t--inform  <class file>\t- shows information about the class file\n");
 
     return 0;
 }

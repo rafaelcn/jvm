@@ -1,10 +1,10 @@
 #include "tests_helper.h"
 
-#include "vm/lib/vm_string.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "vm/lib/vm_string.h"
 
 
 char* str_slice(const char input_str[], int start, int end) {
@@ -40,7 +40,7 @@ char** test_strplit(const char* input_string, const char delimiter) {
     for(int i = 0; i <= string_length; i++)
     {
         if (input_string[i] == delimiter || i == string_length)
-        {   
+        {
             array_of_substrs = (char**) realloc(
                 array_of_substrs,
                 (sizeof(char*) * (array_index+1)));

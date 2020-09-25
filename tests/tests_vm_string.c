@@ -1,9 +1,13 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
+
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "munit/munit.h"
+
+#include "utils/tests_helper.h"
+
 #include "vm/lib/vm_string.h"
-#include "tests_helper.h"
 
 static char* vm_strncmpl_params[] = {
     /*
@@ -54,8 +58,8 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     right_string = parsed_args[3];
 
     // Now we have parsed the arguments, let's test our function
-    predicted_result = vm_strncmpl(
-        left_string, right_string, num_characters_to_count);
+    predicted_result = vm_strncmpl(left_string, right_string,
+        num_characters_to_count);
 
     assert_int(expected_result, ==, predicted_result);
 
@@ -64,6 +68,7 @@ test_vm_strncmpl(const MunitParameter params[], void* user_data) {
     free(parsed_args[1]);
     free(parsed_args[0]);
     free(parsed_args);
+
     return MUNIT_OK;
 }
 
@@ -102,8 +107,7 @@ test_vm_strcmpl(const MunitParameter params[], void* user_data) {
     right_string = parsed_args[2];
 
     // Now we have parsed the arguments, let's test our function
-    predicted_result = vm_strcmpl(
-        left_string, right_string);
+    predicted_result = vm_strcmpl(left_string, right_string);
 
     assert_int(expected_result, ==, predicted_result);
 
@@ -111,6 +115,7 @@ test_vm_strcmpl(const MunitParameter params[], void* user_data) {
     free(parsed_args);
     free(left_string);
     free(right_string);
+
     return MUNIT_OK;
 }
 
@@ -120,8 +125,6 @@ static char* vm_strspliti_params[] = {
     (char*) "Gosto de pão/ Gosto de pão, presunto, queijo e margarina./ ,/ 1",
     (char*) " presunto/ Gosto de pão, presunto, queijo e margarina./ ,/ 2",
     (char*) " queijo e margarina./ Gosto de pão, presunto, queijo e margarina./ ,/ 3",
-
-
     NULL
 };
 
@@ -153,17 +156,16 @@ test_vm_strspliti(const MunitParameter params[], void* user_data) {
 
     // Now we have parsed the arguments, let's test our function
 
-    predicted_result = vm_strspliti(
-        input_string, delimiter, position);
+    predicted_result = vm_strspliti(input_string, delimiter, position);
 
     assert_string_equal(expected_result, predicted_result);
-
 
     free(input_string);
     free(expected_result);
     free(predicted_result);
     free(delimiter);
     free(parsed_args);
+
     return MUNIT_OK;
 }
 
@@ -172,8 +174,6 @@ static char* vm_strsplit_params[] = {
     (char*) "2/ Gosto de pão, queijo e margarina./ ,",
     (char*) "3/ Gosto de pão, presunto, queijo e margarina./ ,",
     (char*) "4/ Gosto de pão! Presunto! Abacate! E margarina./ !",
-
-
     NULL
 };
 
@@ -204,46 +204,44 @@ test_vm_strsplit(const MunitParameter params[], void* user_data) {
 
     // Now we have parsed the arguments, let's test our function
 
-    predicted_result = vm_strsplit(
-        input_string, delimiter);
-    
-    for(int i = 0; i < expected_result; i++)
-    {
+    predicted_result = vm_strsplit(input_string, delimiter);
+
+    for (int i = 0; i < expected_result; i++) {
         assert_ptr_not_null(predicted_result[i]);
     }
-
 
     free(input_string);
     free(parsed_args[0]);
     free(predicted_result);
     free(delimiter);
     free(parsed_args);
+
     return MUNIT_OK;
 }
 
 // Test Suite, aggregate test cases and params
 static MunitTest test_suite_tests[] = {
-  { (char*) "Testing vm_strncmpl", test_vm_strncmpl,
+    { (char*) "Testing vm_strncmpl", test_vm_strncmpl,
         NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strncmpl_params },
-  { (char*) "Testing vm_strcmpl", test_vm_strcmpl,
+    { (char*) "Testing vm_strcmpl", test_vm_strcmpl,
         NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strcmpl_params },
-  { (char*) "Testing vm_strspliti", test_vm_strspliti,
+    { (char*) "Testing vm_strspliti", test_vm_strspliti,
         NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strspliti_params },
-{ (char*) "Testing vm_strsplit", test_vm_strsplit,
+    { (char*) "Testing vm_strsplit", test_vm_strsplit,
         NULL, NULL, MUNIT_TEST_OPTION_NONE, test_vm_strsplit_params },
 
-  { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite test_suite = {
-  (char*) "",
-  /* The first parameter is the array of test suites. */
-  test_suite_tests,
-  NULL,
-  1,
-  MUNIT_SUITE_OPTION_NONE
+    (char*) "",
+    /* The first parameter is the array of test suites. */
+    test_suite_tests,
+    NULL,
+    1,
+    MUNIT_SUITE_OPTION_NONE
 };
 
 int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
-  return munit_suite_main(&test_suite, (void*) "µnit", argc, argv);
+    return munit_suite_main(&test_suite, (void*) "µnit", argc, argv);
 }

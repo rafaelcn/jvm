@@ -1,13 +1,14 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
 
-#include "args_parser.h"
-#include "tests_helper.h"
-#include "vm/lib/vm_string.h"
+#include <stdio.h>
 
 #include "munit/munit.h"
 
-#include <stdio.h>
+#include "utils/tests_helper.h"
 
+#include "args_parser.h"
+
+#include "vm/lib/vm_string.h"
 
 static char* args_parse_params[] = {
     /* Flag Name! Flag Value(ARGC/2 TIMES)/
@@ -52,15 +53,13 @@ test_args_parse(const MunitParameter params[], void* user_data) {
     predicted_result = args_parse(
         input_argc, input_argv);
 
-    assert_string_equal(
-        expected_result.flags->flag_name,
+    assert_string_equal(expected_result.flags->flag_name,
         predicted_result.flags->flag_name);
-    if(vm_strcmpl(predicted_result.flags->flag_name, ""))
-    assert_string_equal(
-        expected_result.flags->flag_value,
-        predicted_result.flags->flag_value);
 
-
+    if(vm_strcmpl(predicted_result.flags->flag_name, "")) {
+        assert_string_equal(expected_result.flags->flag_value,
+            predicted_result.flags->flag_value);
+    }
 
     free(input_argv);
     free(parsed_args[2]);
