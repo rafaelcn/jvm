@@ -22,7 +22,7 @@ all:
 	$(CC) $(CC_FLAGS) -std=c99 $(SRC) -o ./bin/$(BIN)
 
 %: %.c
-	$(CC) $(CC_FLAGS) $(L_FLAG) $(I_FLAG) $(SRC2) $(TESTS_UTI) $(MUNIT) -o $@ $<
+	$(CC) $(CC_FLAGS) $(L_FLAG) $(I_FLAG) $(SRC2) $(TESTS_UTI) $(MUNIT) -o $@.out $<
 
 test: $(TESTS_PRO)
 
