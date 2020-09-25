@@ -53,15 +53,13 @@ test_args_parse(const MunitParameter params[], void* user_data) {
     predicted_result = args_parse(
         input_argc, input_argv);
 
-    assert_string_equal(
-        expected_result.flags->flag_name,
+    assert_string_equal(expected_result.flags->flag_name,
         predicted_result.flags->flag_name);
-    if(vm_strcmpl(predicted_result.flags->flag_name, ""))
-    assert_string_equal(
-        expected_result.flags->flag_value,
-        predicted_result.flags->flag_value);
 
-
+    if(vm_strcmpl(predicted_result.flags->flag_name, "")) {
+        assert_string_equal(expected_result.flags->flag_value,
+            predicted_result.flags->flag_value);
+    }
 
     free(input_argv);
     free(parsed_args[2]);
