@@ -22,15 +22,13 @@ args_t args_parse(int argc, char **argv) {
 
         parsed.flags[i].flag_name = flag;
 
-        if (i+1 < argc-1) {
+        if (i+1 <= argc-1) {
             char *value = vm_strspliti(all_args, " ", i+1);
 
-            if (vm_strncmp(value, "--", 2)) {
+            if (!vm_strncmp(value, "--", 2)) {
                 parsed.flags[i].flag_value = value;
                 // if this is a value then skip the next check
                 ++i;
-
-                printf("%s %s\n", flag, value);
             } else {
                 parsed.flags[i].flag_value = "";
             }
