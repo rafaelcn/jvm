@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "vm_file.h"
+#include "vm_settings.h"
 #include "vm_constant_pool.h"
 
 #include "utils/vm_errors.h"
@@ -46,12 +47,14 @@ int vm_init(const char* filename) {
 
     buffer[file->size] = '\0';
 
-    for(size_t i = 0; i < file->size; i++) {
-        printf("%.2X ", file->data[i]);
-        file->read++;
-    }
+    if (__debug_t) {
+        for(size_t i = 0; i < file->size; i++) {
+            printf("%.2X ", file->data[i]);
+            file->read++;
+        }
 
-    printf("\n\n%ld in bytes size, %ld bytes read.\n", file->size, file->read);
+        printf("\n\n%ld in bytes size, %ld bytes read.\n", file->size, file->read);
+    }
 
     // reset read information to future use
     file->read = 0;
