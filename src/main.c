@@ -47,11 +47,12 @@ int main(int argc, char** argv) {
 
                     vm_log(stdout, err, __LINE__, __FILE__, VM_LOG_WARNING);
                     printf("\n\n");
-                    break;
+                } else {
+                    // initializes execution of the nJVM (?)
+                    int ret = vm_init(filename);
                 }
 
-                // initializes execution of the nJVM (?)
-                int ret = vm_init(filename);
+                break;
             } else if (vm_strcmp(arguments.flags[i].flag_name, "--inform")) {
                 filename = arguments.flags[i].flag_value;
 
@@ -61,11 +62,12 @@ int main(int argc, char** argv) {
 
                     vm_log(stdout, err, __LINE__, __FILE__, VM_LOG_WARNING);
                     printf("\n\n");
-                    break;
+                } else {
+                    // initializes the execution of nJVM (?)
+                    int ret = vm_init(filename);
                 }
 
-                // initializes the execution of nJVM (?)
-                int ret = vm_init(filename);
+                break;
             } else {
                 // this block of code would be better implemented as a hash map
                 // using program arguments as key to prevent the following dummy
