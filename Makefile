@@ -41,3 +41,4 @@ vars:
 .PHONY: clean
 clean:
 	rm -f ./bin/$(BIN)
+	rm -f ./tests/*.out
