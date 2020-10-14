@@ -57,9 +57,7 @@ int vm_init(const char* filename) {
     file->read = 0;
 
     // TODO: Pass the information for the interpreter of java bytecode
-    
-
-    vm_load_constant_pool(file, );
+    vm_load_constant_pool(file);
 
     return 0;
 }
