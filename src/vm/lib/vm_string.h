@@ -20,6 +20,26 @@ int vm_strcmpl(const char *restrict s, const char *restrict s_);
  */
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n);
 
+
+/**
+ * @brief Compares two given strings, the implementation is equal to the one in
+ * the C runtime library but differs on the return value.
+ * @param s The first string to use in the comparison.
+ * @param s_ The second string to use in the comparison.
+ * @returns 1 if both strings are equal and 0 otherwise.
+ */
+int vm_strcmp(const char *restrict s, const char *restrict s_);
+
+/**
+ * @brief Compares n chars from both given strings, the implementation is equal
+ * to the one in the C runtime library but differs on the return value.
+ * @param s The first string to use in the comparison.
+ * @param s_ The second string to use in the comparison.
+ * @param n How many characters to compare both strings.
+ * @returns 1 if both strings are equal and 0 otherwise.
+ */
+int vm_strncmp(const char *restrict s, const char *restrict s_, int n);
+
 /**
  * @brief Splits a string s by a delimiter and returns the i-th string, indexed
  * by 0.

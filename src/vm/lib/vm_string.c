@@ -14,11 +14,11 @@ int vm_strcmpl(const char *restrict s, const char *restrict s_) {
     if (strlen(s) != strlen(s_)) {
         return 0;
     }
+
     return vm_strncmpl(s, s_, strlen(s));
 }
 
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
-
     int i = strlen(s)-1;
     int j = strlen(s_)-1;
 
@@ -36,6 +36,28 @@ int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
     }
 
     return 1;
+}
+
+int vm_strcmp(const char *restrict s, const char *restrict s_) {
+    if (strlen(s) != strlen(s_)) {
+        return 0;
+    }
+
+    return vm_strncmp(s, s_, strlen(s));
+}
+
+int vm_strncmp(const char *restrict s, const char *restrict s_, int n) {
+
+    int r = strncmp(s, s_, n);
+
+    if (r == 0) {
+        // replace the returning value of the default function
+        r = 1;
+    } else {
+        r = 0;
+    }
+
+    return r;
 }
 
 char *vm_strspliti(const char *restrict s, const char *restrict delim,
