@@ -14,7 +14,7 @@ typedef struct arg_t {
  */
 typedef struct args_t {
     // array of parsed flags, filled after the args_parse is executed
-    arg_t flags[2];
+    arg_t flags[5];
 } args_t;
 
 /**

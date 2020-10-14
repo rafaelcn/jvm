@@ -10,6 +10,7 @@
 
 #include "vm/utils/vm_errors.h"
 #include "vm/utils/vm_logger.h"
+#include "vm/utils/vm_checks.h"
 
 int usage();
 
@@ -20,37 +21,69 @@ int main(int argc, char** argv) {
         ret = usage();
     } else {
         const char *filename;
+
         // capture arguments sent through stdin
         args_t arguments = args_parse(argc, argv);
         size_t size = sizeof(arguments.flags) / sizeof(arg_t);
 
         for (size_t i = 0; i < size; i++) {
-            // only two arguments are parsed at the moment.
-            if (vm_strcmpl(arguments.flags[i].flag_name, "--version")) {
+
+            if (!vm_valid_pointer((void*) arguments.flags[i].flag_name)) {
+                continue;
+            }
+
+            if (vm_strcmp(arguments.flags[i].flag_name, "--version")) {
                 printf("%s\n", VM_VERSION);
                 break;
-            } else if (vm_strcmpl(arguments.flags[i].flag_name, "--help")) {
+            } else if (vm_strcmp(arguments.flags[i].flag_name, "--help")) {
                 ret = usage();
                 break;
-            } else if (vm_strcmpl(arguments.flags[i].flag_name, "--execute")) {
+            } else if (vm_strcmp(arguments.flags[i].flag_name, "--execute")) {
                 filename = arguments.flags[i].flag_value;
+
+                if (!vm_valid_pointer((void*) filename)) {
+                    char err[512];
+                    sprintf(err, "missing argument <filename.class>");
+
+                    vm_log(stdout, err, __LINE__, __FILE__, VM_LOG_WARNING);
+                    printf("\n\n");
+                    break;
+                }
+
                 // initializes execution of the nJVM (?)
                 int ret = vm_init(filename);
-            } else if (vm_strcmpl(arguments.flags[i].flag_name, "--inform")) {
+            } else if (vm_strcmp(arguments.flags[i].flag_name, "--inform")) {
                 filename = arguments.flags[i].flag_value;
+
+                if (!vm_valid_pointer((void*) filename)) {
+                    char err[512];
+                    sprintf(err, "missing argument <filename.class>");
+
+                    vm_log(stdout, err, __LINE__, __FILE__, VM_LOG_WARNING);
+                    printf("\n\n");
+                    break;
+                }
+
                 // initializes the execution of nJVM (?)
                 int ret = vm_init(filename);
             } else {
-                char err[512];
-                sprintf(err, "unknown argument %s", argv[1]);
+                // this block of code would be better implemented as a hash map
+                // using program arguments as key to prevent the following dummy
+                // verification.
+                if (i == size - 1) {
+                    char err[512];
+                    sprintf(err, "unknown argument %s", argv[1]);
 
-                vm_log(stdout, err, __LINE__, __FILE__, VM_LOG_INFO);
-                printf("\n\n");
+                    vm_log(stdout, err, __LINE__, __FILE__, VM_LOG_INFO);
+                    printf("\n\n");
 
-                ret = usage();
-                break;
+                    ret = usage();
+                    break;
+                }
             }
         }
+
+
     }
 
     return ret;

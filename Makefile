@@ -1,5 +1,6 @@
 CC  = $(shell (which gcc))
 CC_FLAGS = -std=c99
+CC_FLAGS_D = -std=c99 -g
 
 # The entire source
 SRC  = $(shell (find src -name "*.c" -type f))
@@ -19,7 +20,10 @@ I_FLAG = -I./src/
 L_FLAG = -lm
 
 all:
-	$(CC) $(CC_FLAGS) -std=c99 $(SRC) -o ./bin/$(BIN)
+	$(CC) $(CC_FLAGS) $(SRC) -o ./bin/$(BIN)
+
+debug:
+	$(CC) $(CC_FLAGS_D) $(SRC) -o ./bin/$(BIN)
 
 %: %.c
 	$(CC) $(CC_FLAGS) $(L_FLAG) $(I_FLAG) $(SRC2) $(TESTS_UTI) $(MUNIT) -o $@.out $<

@@ -2,93 +2,101 @@
 
 #include "../utils/vm_errors.h"
 #include "../utils/vm_logger.h"
+#include "../utils/vm_checks.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 int vm_strcmpl(const char *restrict s, const char *restrict s_) {
     if (strlen(s) != strlen(s_)) {
         return 0;
     }
+
     return vm_strncmpl(s, s_, strlen(s));
 }
 
 int vm_strncmpl(const char *restrict s, const char *restrict s_, int n) {
-    int length_s = strlen(s);
-    int length_s_ = strlen(s_);
     int i = strlen(s)-1;
-    int j = length_s_-1;
-    bool are_valid_indexes = i >= strlen(s)-n+1 && j >= length_s_-n+1
-            && i >= 0 && j >= 0;
+    int j = strlen(s_)-1;
+
+    bool is_valid = i >= i-n+1 && j >= j-n+1 && i >= 0 && j >= 0;
 
     if (&s == &s_) {
         return 1;
-    
     }
 
-    for (; are_valid_indexes; i--, j--) {
+    for (; is_valid; i--, j--) {
         if (s[i] != s_[j]) {
             return 0;
         }
-        are_valid_indexes = i >= strlen(s)-n+1 && j >= length_s_-n+1
-                && i >= 0 && j >= 0;
+        is_valid = i >= i >= i-n+1 && j >= j-n+1 && i >= 0 && j >= 0;
     }
 
     return 1;
+}
+
+int vm_strcmp(const char *restrict s, const char *restrict s_) {
+    if (strlen(s) != strlen(s_)) {
+        return 0;
+    }
+
+    return vm_strncmp(s, s_, strlen(s));
+}
+
+int vm_strncmp(const char *restrict s, const char *restrict s_, int n) {
+
+    int r = strncmp(s, s_, n);
+
+    if (r == 0) {
+        // replace the returning value of the default function
+        r = 1;
+    } else {
+        r = 0;
+    }
+
+    return r;
 }
 
 char *vm_strspliti(const char *restrict s, const char *restrict delim,
                    int pos) {
 
     char *token = NULL;
-    size_t ssize = strlen(s);
+    size_t s_size = strlen(s);
 
-    if (pos <= 0 || pos > (int)ssize) {
+    if (pos < 0 || pos > (int)s_size) {
         vm_log(stderr, "given index is out of bounds", __LINE__,
                     __FILE__, VM_LOG_ERROR);
         return "";
     }
 
-    //Working only with delimiters that have 1 char in size.
-    unsigned int index = 0;
-    pos -= 1;
-
+    // Working only with delimiters that have 1 char in size.
     if (strlen(delim) == 1) {
-        while (index < strlen(s)) {
-            if (s[index] == *delim) {
-                pos--;
+        size_t delimiters_count = vm_strfreq(s, *delim);
+
+        if (pos > delimiters_count) {
+            token = "";
+        } else {
+            char *copy = calloc(sizeof(char), s_size);
+            strcpy(copy, s);
+
+            char *word = strtok(copy, delim);
+
+            size_t i = 0;
+
+            // iterate over the token
+            while (vm_valid_pointer(word) && *word) {
+                if (i == pos) {
+                    token = word;
+                    break;
+                }
+
+                word = strtok(NULL, delim);
+
+                ++i;
             }
-
-            // Found string to copy
-            if (pos == 0) {
-                if (s[index] == *delim) {
-                    index++;
-                }
-
-                int k = 0;
-                unsigned int ssize = 0;
-
-                while (s[index+1] != *delim) {
-                    index++;
-                    ssize++;
-                }
-
-                token = calloc(ssize, 1);
-
-                index -= ssize;
-
-                while (s[index] != *delim && index != index+ssize) {
-                    token[k] = s[index];
-
-                    index++;
-                    k++;
-                }
-                break;
-            }
-
-            index++;
         }
     } else {
         vm_log(stderr, "vm_strspliti doesn't work with len(delimiter) > 1",
@@ -99,29 +107,33 @@ char *vm_strspliti(const char *restrict s, const char *restrict delim,
 }
 
 char** vm_strsplit(const char* s, const char *restrict delim) {
-    int array_index = 0; // Array index shall be the number of elements - 1.
-    int last_delim_position = 0;
-    int splitted_str_count = 1; // If there's no delim, there'll be at 
-                                // least 1 string.
-    const int string_length = strlen(s);
-    char** array_of_substrs = NULL;
+    char **words;
 
-    for(int i = 0; i < string_length; i++)
-    {
-        if(s[i] == delim[0]) splitted_str_count++;
+    // calculte how many words
+    size_t words_quantity = vm_strfreq(s, ' ');
+    // it's always the number of delimiters + 1 except on 0.
+    size_t words_alloc = 0;
+
+    if (words_quantity > 0) {
+        words_alloc = words_quantity + 1;
     }
 
-    array_of_substrs = (char**) calloc(splitted_str_count, (sizeof(char*)));
-    for(int i = 0; i < splitted_str_count; i++)
-    {
-        array_of_substrs[i] = vm_strspliti(s, delim, i+1);
+    words = calloc(sizeof (char*), words_alloc);
+
+    for (size_t i = 0; i < words_alloc; i++) {
+        char *word = vm_strspliti(s, " ", i);
+
+        if (vm_valid_pointer(word)) {
+            words[i] = calloc(sizeof(char*), strlen(word));
+            strcpy(words[i], word);
+        }
     }
 
-    return array_of_substrs;
+    return words;
 }
 
 int vm_strchr(const char *s, const char c) {
-    unsigned int i = 0;
+    uint32_t i = 0;
 
     while (i < strlen(s)) {
         if (s[i] == c) {
@@ -133,3 +145,16 @@ int vm_strchr(const char *s, const char c) {
     return -1;
 }
 
+size_t vm_strfreq(const char *s, const char c) {
+    size_t i = 0;
+    size_t r = 0;
+
+    while (i < strlen(s)) {
+        if (s[i] == c) {
+            r++;
+        }
+        i++;
+    }
+
+    return r;
+}

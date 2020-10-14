@@ -13,7 +13,8 @@ void vm_log(FILE *stream, const char *s, int line, char *file, int log_level) {
 
     switch(log_level) {
     case VM_LOG_INFO:
-        sprintf(error, ">>> %s | File: %s on line %d.", s, file, line);
+        sprintf(error, "%s>>> %s | File: %s on line %d.%s",
+                ANSI_COLOR_BLUE, s, file, line, ANSI_COLOR_RESET);
         break;
     case VM_LOG_CRITICAL:
         sprintf(error, "%s>>> %s | File: %s on line %d. %s",
