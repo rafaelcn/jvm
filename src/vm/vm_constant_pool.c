@@ -96,13 +96,17 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf)
             break;
 
         case CONSTANT_Utf8:
-            cf->constant_pool[i].tag = tag;
-            cf->constant_pool[i].info.utf8_info.length = read_u2(file);
-            cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
-                cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
+            {
+                cf->constant_pool[i].tag = tag;
+                cf->constant_pool[i].info.utf8_info.length = read_u2(file);
+                cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
+                    cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
 
-            for(int j = 0; j < cf->constant_pool[i].info.utf8_info.length; j++) {
-                cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
+                uint16_t size = cf->constant_pool[i].info.utf8_info.length;
+
+                for(int j = 0; j < size; j++) {
+                    cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
+                }
             }
             break;
 
