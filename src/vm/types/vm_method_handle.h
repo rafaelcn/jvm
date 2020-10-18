@@ -1,0 +1,4 @@
+#ifndef VM_METHOD_HANDLE_H
+#define VM_METHOD_HANDLE_H
+
+#endif /* VM_METHOD_HANDLE_H */

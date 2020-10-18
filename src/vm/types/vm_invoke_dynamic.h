@@ -1,0 +1,4 @@
+#ifndef VM_INVOKE_DYNAMIC_H
+#define VM_INVOKE_DYNAMIC_H
+
+#endif /* VM_INVOKE_DYNAMIC_H */

@@ -53,7 +53,8 @@ int vm_init(const char* filename) {
             file->read++;
         }
 
-        printf("\n\n%ld in bytes size, %ld bytes read.\n", file->size, file->read);
+        printf("\n\n%ld in bytes size, %ld bytes read.\n", file->size,
+               file->read);
     }
 
     // reset read information to future use

@@ -6,6 +6,12 @@
 
 #include "vm_file.h"
 
+#include "types/vm_class.h"
+#include "types/vm_method.h"
+
+#include "types/vm_types.h"
+
+
 typedef uint16_t class_flags_t;
 typedef uint16_t method_flags_t;
 
@@ -30,37 +36,51 @@ const class_flags_t CLASS_ENUM = 0x4000;
 const method_flags_t METHOD_PUBLIC = 0x0001;
 */
 
-typedef union vm_field_info {
-
-} vm_field_info;
-
-/**
- * @brief
- */
-typedef struct vm_cp_t {
-
-} vm_cp_t;
+typedef union vm_info_t {
+    vm_class_t class_info;
+    vm_field_ref_t fieldref_info;
+    vm_method_ref_t methodref_info;
+    vm_interface_method_ref_t interfacemethodref_info;
+    vm_string_t string_info;
+    vm_integer_t integer_info;
+    vm_float_t float_info;
+    vm_long_t long_info;
+    vm_double_t double_info;
+    vm_name_and_type_t nameandtype_info;
+    vm_utf8_t utf8_info;
+} vm_field;
 
 /**
  * @brief
  */
 typedef struct vm_cp_info_t {
     uint8_t tag;
-    uint8_t info[];
+    vm_field info;
 } vm_cp_info_t;
 
 /**
- * @brief
+ * @brief cp_info structure as defined in The Java Virtual Machine
+ * Specification (Java SE 8 edition).
  */
-typedef struct vm_field_info_t {
-    class_flags_t access_flag;
-
-} vm_field_info_t;
+typedef struct cp_info
+{
+    uint8_t tag;
+    vm_field info;
+} cp_info;
 
 /**
  * @brief
  */
-typedef struct vm_method_info_t {
+typedef struct vm_cp_t {
+    uint8_t tag;
+    vm_field info;
+} vm_cp_t;
+
+
+/**
+ * @brief
+ */
+typedef struct vm_method_info {
     method_flags_t access_flag;
     uint16_t name_index;
     uint16_t descriptor_index;
@@ -72,11 +92,11 @@ typedef struct vm_method_info_t {
 /**
  * @brief
  */
-typedef struct vm_attribute_info_t {
+typedef struct vm_attribute_info {
     uint16_t attribute_name_index;
     uint32_t attribute_length;
     // array of size
-    uint8_t info[];
+    vm_field info;
 } vm_attribute_info_t;
 
 /**
@@ -84,10 +104,10 @@ typedef struct vm_attribute_info_t {
  */
 typedef struct vm_class_file_t {
     uint64_t magic;
-    uint16_t minor;
-    uint16_t major;
+    uint16_t minor_version;
+    uint16_t major_version;
 
-    uint16_t constant_pool_count_t;
+    uint16_t constant_pool_count;
     // The actual size of constant_pool_info_t is
     // sizeof(constant_pool_info_t/4)-1
     vm_cp_info_t *constant_pool;

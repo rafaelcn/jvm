@@ -7,19 +7,14 @@
 #include "utils/vm_errors.h"
 #include "utils/vm_logger.h"
 
-/*uint8_t read_u1(file_t *file) {
-    FILE *fd = fopen(file->filename, "rb");
+uint8_t read_u1(file_t *file) {
 
-    if(!vm_valid_pointer((void*) fd)) {
-        return 0;
+    uint8_t value = 0;
+
+    if (file->read < file->size) {
+        value = file->data[file->read];
+        file->read += 1;
     }
-
-    fseek(fd, file->read, SEEK_SET);
-    uint8_t value = fgetc(fd);
-
-    file->read += 1;
-
-    fclose(fd);
 
     return value;
 }
@@ -45,4 +40,4 @@ uint32_t read_u4(file_t *file)
     }
 
     return value;
-}*/
+}

@@ -25,7 +25,7 @@ typedef struct file_t {
  * @param file A
  * @returns An unsigned char representing the byte read.
  */
-//uint8_t read_u1(file_t *file);
+uint8_t read_u1(file_t *file);
 
 /**
  * @brief Reads a two-byte unsigned number (16 bits in big-endian) from the
@@ -33,7 +33,7 @@ typedef struct file_t {
  * @param file
  * @returns A unsigned short representing the two bytes read.
  */
-//uint16_t read_u2(file_t *file);
+uint16_t read_u2(file_t *file);
 
 /**
  * @brief Reads a four-byte unsigned number (32 bits in big-endian) from the
@@ -41,6 +41,6 @@ typedef struct file_t {
  * @param file
  * @returns A unsigned int representing the four bytes read.
  */
-//uint32_t read_u4(file_t *file);
+uint32_t read_u4(file_t *file);
 
 #endif /* VM_FILE_H */
