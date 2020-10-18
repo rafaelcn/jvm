@@ -11,7 +11,6 @@
 
 #include "vm_string.h"
 
-// numbers
 #include "vm_integer.h"
 #include "vm_float.h"
 #include "vm_long.h"

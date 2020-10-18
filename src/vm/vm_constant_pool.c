@@ -25,9 +25,9 @@
 
 /**
  * @brief A function dedicated to filling the constant_pool field of the
- * ClassFile structure.
- * @param file A FILE (from stdio, in rb mode) pointer to a .class file.
- * @param cf A pointer to a ClassFile structure.
+ * vm_class_file_t structure.
+ * @param file A file_t pointer that has the .class loaded.
+ * @param cf A pointer to a vm_class_file_t structure.
  */
 void constant_pool_parser(file_t *file, vm_class_file_t *cf)
 {
@@ -96,13 +96,17 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf)
             break;
 
         case CONSTANT_Utf8:
-            cf->constant_pool[i].tag = tag;
-            cf->constant_pool[i].info.utf8_info.length = read_u2(file);
-            cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
-                cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
+            {
+                cf->constant_pool[i].tag = tag;
+                cf->constant_pool[i].info.utf8_info.length = read_u2(file);
+                cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
+                    cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
 
-            for(int j = 0; j < cf->constant_pool[i].info.utf8_info.length; j++) {
-                cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
+                uint16_t size = cf->constant_pool[i].info.utf8_info.length;
+
+                for(int j = 0; j < size; j++) {
+                    cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
+                }
             }
             break;
 
@@ -136,13 +140,11 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     cf->major_version = read_u2(file);
 
     cf->constant_pool_count = read_u2(file);
-    cf->constant_pool = (vm_cp_info_t *) malloc(
-        sizeof(vm_cp_info_t) * (cf->constant_pool_count - 1));
+    cf->constant_pool = calloc(cf->constant_pool_count - 1,
+                               sizeof (vm_cp_info_t));
 
     constant_pool_parser(file, cf);
 }
-
-
 
 /**
  * @brief Prints the information contained in the ClassFile structure in a
@@ -170,11 +172,11 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
 
     printf("\n");
     printf("%s\n{\n", file->filename);
-    printf("\tMAGIC:\t\t\t   0x%04X\n", class_file.magic);
-    printf("\tMAJOR VERSION:\t\t        % 5d\n", class_file.major_version);
-    printf("\tMINOR VERSION:\t\t        % 5d \n", class_file.minor_version);
-    printf("\tJAVA TARGET:\t\t          % s\n", java_version);
-    printf("\tCONSTANT POOL COUNT:\t\t  % 5d\n",
+    printf("\tMAGIC:                %10lX\n", class_file.magic);
+    printf("\tMAJOR VERSION:        %10d\n", class_file.major_version);
+    printf("\tMINOR VERSION:        %10d\n", class_file.minor_version);
+    printf("\tJAVA TARGET:          %10s\n", java_version);
+    printf("\tCONSTANT POOL COUNT:  %10d\n",
     class_file.constant_pool_count);
     printf("}\n\n");
 
@@ -185,7 +187,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
         printf("\t|index: % 5d\t|tag: % 3d", i+1, class_file.constant_pool[i].tag);
 
         switch (class_file.constant_pool[i].tag) {
-            
+
         case CONSTANT_Class:
             printf("\t|name_index:   % 5d", class_file.constant_pool[i].info.class_info.name_index);
             printf("\t|\n");
@@ -239,7 +241,12 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
         case CONSTANT_Utf8:
             {
                 printf("\t|length:       % 5d", class_file.constant_pool[i].info.utf8_info.length);
-                uint16_t *heap = utf8_to_uint16_t(&class_file, i);
+
+                uint16_t length = class_file.constant_pool[i].info.utf8_info.length;
+                uint8_t *b = class_file.constant_pool[i].info.utf8_info.bytes;
+
+                uint16_t *heap = utf8_to_uint16_t(length, b);
+
                 printf("\t|\"");
                 for (int j = 0; j < class_file.constant_pool[i].info.utf8_info.length; j++) {
                     printf("%lc", heap[j]);

@@ -64,6 +64,7 @@ typedef struct vm_attribute_info {
     vm_attribute_content_t info;
 } vm_attribute_info_t;
 
+
 /**
  * @brief
  */
