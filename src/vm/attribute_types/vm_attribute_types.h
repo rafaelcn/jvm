@@ -1,0 +1,4 @@
+#ifndef VM_ATTRIBUTE_TYPES_H
+#define VM_ATTRIBUTE_TYPES_H
+
+#endif /* VM_ATTRIBUTE_TYPES_H */

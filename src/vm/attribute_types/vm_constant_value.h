@@ -1,0 +1,4 @@
+#ifndef VM_CONSTANT_VALUE_H
+#define VM_CONSTANT_VALUE_H
+
+#endif /* VM_CONSTANT_VALUE_H */

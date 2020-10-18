@@ -1,0 +1,4 @@
+#ifndef VM_LINE_NUMBER_TABLE_H
+#define VM_LINE_NUMBER_TABLE_H
+
+#endif /* VM_LINE_NUMBER_TABLE_H */

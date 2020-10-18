@@ -1,0 +1,4 @@
+#ifndef VM_INNER_CLASSES_H
+#define VM_INNER_CLASSES_H
+
+#endif /* VM_INNER_CLASSES_H */
