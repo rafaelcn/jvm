@@ -7,8 +7,7 @@
 /**
  * @brief
  */
-typedef struct vm_exception_table
-{
+typedef struct vm_exception_table {
     uint16_t start_pc;
     uint16_t end_pc;
     uint16_t handler_pc;
@@ -18,8 +17,7 @@ typedef struct vm_exception_table
 /**
  * @brief
  */
-typedef struct vm_code
-{
+typedef struct vm_code {
     uint16_t attribute_name_index;
     uint32_t attribute_length;
     uint16_t max_stack;
