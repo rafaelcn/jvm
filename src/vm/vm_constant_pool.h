@@ -6,11 +6,7 @@
 
 #include "vm_file.h"
 
-#include "types/vm_class.h"
-#include "types/vm_method.h"
-
 #include "types/vm_types.h"
-
 
 typedef uint16_t class_flags_t;
 typedef uint16_t method_flags_t;
@@ -98,6 +94,7 @@ typedef struct vm_attribute_info {
     // array of size
     vm_field info;
 } vm_attribute_info_t;
+
 
 /**
  * @brief

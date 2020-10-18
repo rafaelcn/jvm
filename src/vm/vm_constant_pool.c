@@ -25,9 +25,9 @@
 
 /**
  * @brief A function dedicated to filling the constant_pool field of the
- * ClassFile structure.
- * @param file A FILE (from stdio, in rb mode) pointer to a .class file.
- * @param cf A pointer to a ClassFile structure.
+ * vm_class_file_t structure.
+ * @param file A file_t pointer that has the .class loaded.
+ * @param cf A pointer to a vm_class_file_t structure.
  */
 void constant_pool_parser(file_t *file, vm_class_file_t *cf)
 {
@@ -136,8 +136,8 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     cf->major_version = read_u2(file);
 
     cf->constant_pool_count = read_u2(file);
-    cf->constant_pool = (vm_cp_info_t *) malloc(
-        sizeof(vm_cp_info_t) * (cf->constant_pool_count - 1));
+    cf->constant_pool = calloc(cf->constant_pool_count - 1,
+                               sizeof (vm_cp_info_t));
 
     constant_pool_parser(file, cf);
 }
@@ -185,7 +185,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
         printf("\t|index: % 5d\t|tag: % 3d", i+1, class_file.constant_pool[i].tag);
 
         switch (class_file.constant_pool[i].tag) {
-            
+
         case CONSTANT_Class:
             printf("\t|name_index:   % 5d", class_file.constant_pool[i].info.class_info.name_index);
             printf("\t|\n");
@@ -239,7 +239,12 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
         case CONSTANT_Utf8:
             {
                 printf("\t|length:       % 5d", class_file.constant_pool[i].info.utf8_info.length);
-                uint16_t *heap = utf8_to_uint16_t(&class_file, i);
+
+                uint16_t length = class_file.constant_pool[i].info.utf8_info.length;
+                uint8_t *b = class_file.constant_pool[i].info.utf8_info.bytes;
+
+                uint16_t *heap = utf8_to_uint16_t(length, b);
+
                 printf("\t|\"");
                 for (int j = 0; j < class_file.constant_pool[i].info.utf8_info.length; j++) {
                     printf("%lc", heap[j]);
