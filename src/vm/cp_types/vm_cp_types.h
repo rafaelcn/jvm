@@ -1,5 +1,5 @@
-#ifndef VM_TYPES_H
-#define VM_TYPES_H
+#ifndef VM_CP_TYPES_H
+#define VM_CP_TYPES_H
 
 /**
  * Include all files of types into a single file.
@@ -23,4 +23,4 @@
 #include "vm_method_type.h"
 #include "vm_invoke_dynamic.h"
 
-#endif /* VM_TYPES_H */
+#endif /* VM_CP_TYPES_H */
