@@ -1,6 +1,8 @@
 #ifndef VM_VERIFICATION_TYPE_H
 #define VM_VERIFICATION_TYPE_H
 
+#include <stdint.h>
+
 /**
  * @brief
  */

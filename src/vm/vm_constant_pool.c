@@ -172,7 +172,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
 
     printf("\n");
     printf("%s\n{\n", file->filename);
-    printf("\tMAGIC:                %10lX\n", class_file.magic);
+    printf("\tMAGIC:                %10X\n", class_file.magic);
     printf("\tMAJOR VERSION:        %10d\n", class_file.major_version);
     printf("\tMINOR VERSION:        %10d\n", class_file.minor_version);
     printf("\tJAVA TARGET:          %10s\n", java_version);
