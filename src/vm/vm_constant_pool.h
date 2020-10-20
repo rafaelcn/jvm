@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #include "vm_file.h"
-#include "cp_types/vm_cp_types.h"
+#include "types/cp_types/vm_cp_types.h"
 
 /**
  * @brief
