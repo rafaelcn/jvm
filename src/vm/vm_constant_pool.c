@@ -206,7 +206,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
     for (uint16_t i = 0; i < (class_file.constant_pool_count - 1); i++) {
 
-        printf("%3s #%d\t| %3d %3s %-15s", "", i+1,
+        printf("%3s #%d\t| %3d %3s %-10s", "", i+1,
                class_file.constant_pool[i].tag,
                tag_constants[class_file.constant_pool[i].tag], "");
 
