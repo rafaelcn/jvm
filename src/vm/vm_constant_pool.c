@@ -183,6 +183,16 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
                                sizeof (vm_cp_info_t));
 
     constant_pool_parser(file, cf);
+
+    cf->access_flags = read_u2(file);
+    cf->this_class = read_u2(file);
+    cf->super_class = read_u2(file);
+
+    cf->interfaces_count = read_u2(file);
+    cf->interfaces = calloc(cf->interfaces_count - 1,
+                               sizeof (uint16_t));
+
+    //interfaces_parser(file, cf);
 }
 
 /**
