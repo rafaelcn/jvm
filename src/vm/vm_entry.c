@@ -17,7 +17,7 @@ int vm_init(const char* filename) {
     FILE *fd = fopen(filename, "rb");
 
     if (!vm_valid_pointer((void*) fd)) {
-        char* buffer;
+        char buffer[512];
         sprintf(buffer, "failed to read filename %s", filename);
 
         vm_log(stdout, buffer, __LINE__, __FILE__,
