@@ -221,46 +221,56 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
     for (uint16_t i = 0; i < (class_file.constant_pool_count - 1); i++) {
 
-        printf("%3s #%d\t| %3d %3s %-10s", "", i+1,
-               class_file.constant_pool[i].tag,
-               tag_constants[class_file.constant_pool[i].tag], "");
+        vm_cp_info_t cp_info = class_file.constant_pool[i];
+
+        printf("%3s #%d\t| %3d %3s %-10s", "", i+1, cp_info.tag,
+            tag_constants[cp_info.tag], "");
 
         switch (class_file.constant_pool[i].tag) {
         case CONSTANT_Class:
-            printf("\t|name_index:   %5d", class_file.constant_pool[i].info.class_info.name_index);
+            printf("\t| name_index: %5d", cp_info.info.class_info.name_index);
             printf("\t|\n");
             break;
 
         case CONSTANT_Fieldref:
-            printf("\t|class_index:  %5d", class_file.constant_pool[i].info.fieldref_info.class_index);
-            printf("\t|name_and_type_index: %5d\n", class_file.constant_pool[i].info.fieldref_info.name_and_type_index);
+            printf("\t| class_index: %5d",
+                cp_info.info.fieldref_info.class_index);
+            printf("\t| name_and_type_index: %5d\n",
+                cp_info.info.fieldref_info.name_and_type_index);
             break;
 
         case CONSTANT_Methodref:
-            printf("\t|class_index:  % 5d", class_file.constant_pool[i].info.methodref_info.class_index);
-            printf("\t|name_and_type_index: % 5d\n", class_file.constant_pool[i].info.methodref_info.name_and_type_index);
+            printf("\t| class_index:  % 5d",
+                cp_info.info.methodref_info.class_index);
+            printf("\t| name_and_type_index: % 5d\n",
+                cp_info.info.methodref_info.name_and_type_index);
             break;
 
         case CONSTANT_InterfaceMethodref:
-            printf("\t|class_index:  % 5d", class_file.constant_pool[i].info.interfacemethodref_info.class_index);
-            printf("\t|name_and_type_index: % 5d\n", class_file.constant_pool[i].info.interfacemethodref_info.name_and_type_index);
+            printf("\t| class_index:  % 5d",
+                cp_info.info.interfacemethodref_info.class_index);
+            printf("\t| name_and_type_index: % 5d\n",
+                cp_info.info.interfacemethodref_info.name_and_type_index);
             break;
 
         case CONSTANT_String:
-            printf("\t|string_index: % 5d", class_file.constant_pool[i].info.string_info.string_index);
+            printf("\t| string_index: % 5d",
+                cp_info.info.string_info.string_index);
             printf("\t|\n");
             break;
 
         case CONSTANT_Integer:
-            printf("\t|bytes: %04X", class_file.constant_pool[i].info.integer_info.bytes);
-            printf("\t|\n");
+            {
+                uint32_t b = cp_info.info.integer_info.bytes;
+                int number = (int)b;
+
+                printf("\t| %d (%04X)\n", number, b);
+            }
             break;
 
         case CONSTANT_Float:
             {
-                vm_class_file_t cf = class_file;
-
-                uint32_t bytes = cf.constant_pool[i].info.float_info.bytes;
+                uint32_t bytes = cp_info.info.float_info.bytes;
                 float number = vm_itof(bytes);
 
                 printf("\t| %f (%4X)\n", number, bytes);
@@ -294,8 +304,8 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
 
         case CONSTANT_NameAndType:
-            printf("\t|name_index: %5d", class_file.constant_pool[i].info.nameandtype_info.name_index);
-            printf("\t|descriptor_index:    % 5d\n", class_file.constant_pool[i].info.nameandtype_info.descriptor_index);
+            printf("\t| name_index: %-5d", class_file.constant_pool[i].info.nameandtype_info.name_index);
+            printf("\t| descriptor_index: %-5d\n", class_file.constant_pool[i].info.nameandtype_info.descriptor_index);
             break;
 
         case CONSTANT_Utf8:
@@ -307,7 +317,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
                 uint16_t *heap = vm_utf8_to_uint16_t(length, b);
 
-                printf("\t|\"");
+                printf("\t| \"");
                 for (int j = 0; j < class_file.constant_pool[i].info.utf8_info.length; j++) {
                     printf("%lc", heap[j]);
                 }
@@ -330,6 +340,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
 
         default:
+            printf("\n");
             break;
         }
     }
