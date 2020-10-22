@@ -8,6 +8,6 @@ typedef struct vm_utf8_t {
     uint8_t *bytes;
 } vm_utf8_t;
 
-uint16_t * utf8_to_uint16_t(uint16_t length, uint8_t *bytes);
+uint16_t * vm_utf8_to_uint16_t(uint16_t length, uint8_t *bytes);
 
 #endif /* VM_UTF8_H */

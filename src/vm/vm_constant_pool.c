@@ -2,8 +2,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <math.h>
 
 #include "vm_file.h"
+
+#include "utils/vm_target.h"
 
 /**
  * @brief Constant Pool tag mapping.
@@ -22,6 +27,35 @@
 #define CONSTANT_MethodHandle       (0x0F)
 #define CONSTANT_MethodType         (0x10)
 #define CONSTANT_InvokeDynamic      (0x12)
+
+/**
+ * @brief An array containing the respective string correspondents of the
+ * constant pool tags.
+ */
+char *tag_constants[19];
+
+void vm_init_tag_map() {
+    for (size_t i = 0; i < 19; i++) {
+        // each tag_constant position can hold up to 17 chars, the exact amount
+        // is needed for the largest constant pool tag string to fit.
+        tag_constants[i] = calloc(17, sizeof(char));
+    }
+
+    strcpy(tag_constants[0x01], "UTF8");
+    strcpy(tag_constants[0x03], "Integer");
+    strcpy(tag_constants[0x04], "Float");
+    strcpy(tag_constants[0x05], "Long");
+    strcpy(tag_constants[0x06], "Double");
+    strcpy(tag_constants[0x07], "Class");
+    strcpy(tag_constants[0x08], "String");
+    strcpy(tag_constants[0x09], "Field");
+    strcpy(tag_constants[0x0A], "Method");
+    strcpy(tag_constants[0x0B], "Interface Method");
+    strcpy(tag_constants[0x0C], "Name and Type");
+    strcpy(tag_constants[0x0F], "Method Handle");
+    strcpy(tag_constants[0x10], "Method Type");
+    strcpy(tag_constants[0x12], "Invoke Dynamic");
+}
 
 /**
  * @brief A function dedicated to filling the constant_pool field of the
@@ -151,51 +185,40 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
  * formatted manner.
  * @param class_file A ClassFile structure to be printed.
  */
-void class_file_reader(vm_class_file_t class_file, file_t *file)
-{
-    const char* java_version = "";
+void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
-    switch (class_file.major_version) {
-    case 45:
-        java_version = "1.1";
-        break;
-    case 46:
-        java_version = "1.2";
-        break;
-    case 47:
-        java_version = "1.3";
-        break;
-    case 48:
-        java_version = "1.4";
-        break;
-    }
+    uint16_t cp_size = class_file.constant_pool_count;
+
+    // gets the jvm execution target
+    const char *java_version = vm_target(class_file.major_version);
 
     printf("\n");
-    printf("%s\n{\n", file->filename);
-    printf("\tMAGIC:                %10X\n", class_file.magic);
-    printf("\tMAJOR VERSION:        %10d\n", class_file.major_version);
-    printf("\tMINOR VERSION:        %10d\n", class_file.minor_version);
-    printf("\tJAVA TARGET:          %10s\n", java_version);
-    printf("\tCONSTANT POOL COUNT:  %10d\n",
-    class_file.constant_pool_count);
-    printf("}\n\n");
+    printf("%s\n\n", file->filename);
+    printf("%2sMAGIC:                %10X\n", "", class_file.magic);
+    printf("%2sMAJOR VERSION:        %10d\n", "", class_file.major_version);
+    printf("%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
+    printf("%2sJAVA TARGET:          %10s\n", "", java_version);
+    printf("%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
+    printf("\n");
 
-    printf("Constant Pool\n{\n");
+    printf("CONSTANT POOL\n");
+    printf("-------------\n\n");
 
-    for (int i = 0; i < (class_file.constant_pool_count - 1); i++) {
+    for (uint16_t i = 0; i < (class_file.constant_pool_count - 1); i++) {
 
-        printf("\t|index: % 5d\t|tag: % 3d", i+1, class_file.constant_pool[i].tag);
+        printf("%3s #%d\t| %3d %3s %-10s", "", i+1,
+               class_file.constant_pool[i].tag,
+               tag_constants[class_file.constant_pool[i].tag], "");
 
         switch (class_file.constant_pool[i].tag) {
-
         case CONSTANT_Class:
-            printf("\t|name_index:   % 5d", class_file.constant_pool[i].info.class_info.name_index);
+            printf("\t|name_index:   %5d", class_file.constant_pool[i].info.class_info.name_index);
             printf("\t|\n");
             break;
 
         case CONSTANT_Fieldref:
-            printf("\t|class_index:  % 5d", class_file.constant_pool[i].info.fieldref_info.class_index);
-            printf("\t|name_and_type_index: % 5d\n", class_file.constant_pool[i].info.fieldref_info.name_and_type_index);
+            printf("\t|class_index:  %5d", class_file.constant_pool[i].info.fieldref_info.class_index);
+            printf("\t|name_and_type_index: %5d\n", class_file.constant_pool[i].info.fieldref_info.name_and_type_index);
             break;
 
         case CONSTANT_Methodref:
@@ -219,33 +242,55 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
             break;
 
         case CONSTANT_Float:
-            printf("\t|bytes: %04X", class_file.constant_pool[i].info.float_info.bytes);
-            printf("\t|\n");
+            {
+                vm_class_file_t cf = class_file;
+
+                uint32_t bytes = cf.constant_pool[i].info.float_info.bytes;
+                float number = vm_itof(bytes);
+
+                printf("\t| %f (%4X)\n", number, bytes);
+            }
             break;
 
         case CONSTANT_Long:
-            printf("\t|bytes: %04X\t", class_file.constant_pool[i].info.long_info.high_bytes);
-            printf("\t|bytes: %04X\n", class_file.constant_pool[i].info.long_info.low_bytes);
+            {
+                vm_class_file_t cf = class_file;
+
+                uint32_t high = cf.constant_pool[i].info.long_info.high_bytes;
+                uint32_t low = cf.constant_pool[i].info.long_info.low_bytes;
+
+                long number = vm_itolf(low, high);
+
+                printf("\t| %ld (%4X) (%4X)\n", number, low, high);
+            }
             break;
 
         case CONSTANT_Double:
-            printf("\t|bytes: %04X\t", class_file.constant_pool[i].info.double_info.high_bytes);
-            printf("\t|bytes: %04X\n", class_file.constant_pool[i].info.double_info.low_bytes);
+            {
+                vm_class_file_t cf = class_file;
+
+                uint32_t high = cf.constant_pool[i].info.double_info.high_bytes;
+                uint32_t low = cf.constant_pool[i].info.double_info.low_bytes;
+
+                double number = vm_itod(low, high);
+
+                printf("\t| %lf (%4X) (%4X)\n", number, low, high);
+            }
             break;
 
         case CONSTANT_NameAndType:
-            printf("\t|name_index:   % 5d", class_file.constant_pool[i].info.nameandtype_info.name_index);
+            printf("\t|name_index: %5d", class_file.constant_pool[i].info.nameandtype_info.name_index);
             printf("\t|descriptor_index:    % 5d\n", class_file.constant_pool[i].info.nameandtype_info.descriptor_index);
             break;
 
         case CONSTANT_Utf8:
             {
-                printf("\t|length:       % 5d", class_file.constant_pool[i].info.utf8_info.length);
+                //printf("\t|length: %5d", class_file.constant_pool[i].info.utf8_info.length);
 
                 uint16_t length = class_file.constant_pool[i].info.utf8_info.length;
                 uint8_t *b = class_file.constant_pool[i].info.utf8_info.bytes;
 
-                uint16_t *heap = utf8_to_uint16_t(length, b);
+                uint16_t *heap = vm_utf8_to_uint16_t(length, b);
 
                 printf("\t|\"");
                 for (int j = 0; j < class_file.constant_pool[i].info.utf8_info.length; j++) {
@@ -273,8 +318,6 @@ void class_file_reader(vm_class_file_t class_file, file_t *file)
             break;
         }
     }
-
-    printf("}\n\n");
 }
 
 void vm_load_constant_pool(file_t *file)
@@ -282,6 +325,8 @@ void vm_load_constant_pool(file_t *file)
     vm_class_file_t class_file;
 
     file->read = 0;
+
+    vm_init_tag_map();
 
     class_file_parser(file, &class_file);
     class_file_reader(class_file, file);

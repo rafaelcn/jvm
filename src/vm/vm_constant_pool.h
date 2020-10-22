@@ -6,6 +6,7 @@
 
 #include "vm_file.h"
 #include "types/cp_types/vm_cp_types.h"
+#include "types/attribute_types/vm_attribute_types.h"
 
 /**
  * @brief
@@ -47,7 +48,7 @@ typedef struct vm_field_info {
     uint16_t name_index;
     uint16_t descriptor_index;
     uint16_t attributes_count;
-    vm_attribute_info_t *attributes;
+    //vm_attribute_info_t *attributes;
 } vm_field_info_t;
 
 /**
