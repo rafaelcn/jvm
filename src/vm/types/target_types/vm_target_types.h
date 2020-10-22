@@ -1,6 +1,9 @@
 #ifndef VM_TARGET_TYPES_H
 #define VM_TARGET_TYPES_H
 
+/**
+ * Include all files of target_types into a single file.
+ */
 #include "vm_type_parameter_target.h"
 #include "vm_supertype_target.h"
 #include "vm_type_parameter_bound_target.h"
@@ -27,6 +30,5 @@ typedef union vm_target {
     vm_offset_target_t offset_target;
     vm_type_argument_target_t type_argument_target;
 } vm_target_t;
-
 
 #endif /* VM_TARGET_TYPES_H */

@@ -17,9 +17,6 @@ typedef struct vm_classes {
  * @brief
  */
 typedef struct vm_inner_classes {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
-
     uint16_t number_of_classes;
     vm_classes_t *classes;
 } vm_inner_classes_t;

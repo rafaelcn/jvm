@@ -18,8 +18,6 @@ typedef struct vm_exception_table {
  * @brief
  */
 typedef struct vm_code {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
     uint16_t max_stack;
     uint16_t max_local;
 

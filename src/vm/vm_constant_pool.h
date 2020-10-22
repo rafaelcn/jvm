@@ -11,34 +11,19 @@
 /**
  * @brief
  */
-typedef union vm_cp_content {
-    vm_class_t class_info;
-    vm_field_ref_t fieldref_info;
-    vm_method_ref_t methodref_info;
-    vm_interface_method_ref_t interfacemethodref_info;
-    vm_string_t string_info;
-    vm_integer_t integer_info;
-    vm_float_t float_info;
-    vm_long_t long_info;
-    vm_double_t double_info;
-    vm_name_and_type_t nameandtype_info;
-    vm_utf8_t utf8_info;
-} vm_cp_content_t;
-
-/**
- * @brief
- */
-typedef union vm_attribute_content {
-} vm_attribute_content_t;
-
-
-/**
- * @brief
- */
 typedef struct vm_cp_info {
     uint8_t tag;
-    vm_cp_content_t info;
+    vm_cp_types_t info;
 } vm_cp_info_t;
+
+/**
+ * @brief
+ */
+typedef struct vm_attribute_info {
+    uint16_t attribute_name_index;
+    uint32_t attribute_length;
+    vm_attribute_types_t info;
+} vm_attribute_info_t;
 
 /**
  * @brief
@@ -48,23 +33,13 @@ typedef struct vm_field_info {
     uint16_t name_index;
     uint16_t descriptor_index;
     uint16_t attributes_count;
-    //vm_attribute_info_t *attributes;
+    vm_attribute_info_t *attributes;
 } vm_field_info_t;
 
 /**
  * @brief
  */
 typedef vm_field_info_t vm_method_info_t;
-
-/**
- * @brief
- */
-typedef struct vm_attribute_info {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
-    vm_attribute_content_t info;
-} vm_attribute_info_t;
-
 
 /**
  * @brief

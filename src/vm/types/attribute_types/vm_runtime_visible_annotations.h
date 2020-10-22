@@ -43,8 +43,6 @@ typedef struct vm_annotation {
  * @brief
  */
 typedef struct vm_runtime_visible_annotations {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
     uint16_t num_annotations;
     vm_annotation_t *annotations;
 } vm_runtime_visible_annotations_t;

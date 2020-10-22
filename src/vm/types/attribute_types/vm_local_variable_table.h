@@ -18,9 +18,6 @@ typedef struct vm_local_variable {
  * @brief
  */
 typedef struct vm_local_variable_table {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
-
     uint16_t local_variable_table_length;
     vm_local_variable_t *local_variable_table;
 } vm_local_variable_table_t;

@@ -8,8 +8,6 @@
  * @brief
  */
 typedef struct vm_stack_map_table {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
     uint16_t number_of_entries;
     vm_stack_map_frame_t *entries;
 } vm_stack_map_table_t;

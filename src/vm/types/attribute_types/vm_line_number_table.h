@@ -15,9 +15,6 @@ typedef struct vm_line_number {
  * @brief
  */
 typedef struct vm_line_number_table {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
-
     uint16_t line_number_table_length;
     vm_line_number_t *line_number_table;
 } vm_line_number_table_t;
