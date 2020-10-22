@@ -145,15 +145,20 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf)
             break;
 
         case CONSTANT_MethodHandle:
-
+            cf->constant_pool[i].tag = tag;
+            cf->constant_pool[i].info.methodhandle_info.reference_kind = read_u1(file);
+            cf->constant_pool[i].info.methodhandle_info.reference_index = read_u2(file);
             break;
 
         case CONSTANT_MethodType:
-
+            cf->constant_pool[i].tag = tag;
+            cf->constant_pool[i].info.methodtype_info.desciptor_index = read_u2(file);
             break;
 
         case CONSTANT_InvokeDynamic:
-
+            cf->constant_pool[i].tag = tag;
+            cf->constant_pool[i].info.invokedynamic_info.bootstrap_method_attr_index = read_u2(file);
+            cf->constant_pool[i].info.invokedynamic_info.name_and_type_index = read_u2(file);
             break;
 
         default:
