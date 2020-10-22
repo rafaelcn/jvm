@@ -1,8 +1,9 @@
 #include "vm_float.h"
 
+#include <math.h>
+
 float vm_itof(uint32_t bytes) {
-    // FIXME: wrong conversion
-    int bits = (int) (31 << bytes);
+    const int bits = (int)bytes;
 
     int s = ((bits >> 31) == 0) ? 1 : -1;
     int e = ((bits >> 23) & 0xff);
@@ -10,7 +11,9 @@ float vm_itof(uint32_t bytes) {
         (bits & 0x7fffff) << 1 :
         (bits & 0x7fffff) | 0x800000;
 
-    float r = s * m * 2^(e-150);
+    //printf("  | s = %d, e = %d, m = %d | ", s, e, m);
 
-    return m;
+    float r = s * m * pow(2, (e-150));
+
+    return r;
 }
