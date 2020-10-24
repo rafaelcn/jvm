@@ -304,21 +304,22 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
 
         case CONSTANT_NameAndType:
-            printf("\t| name_index: %-5d", class_file.constant_pool[i].info.nameandtype_info.name_index);
-            printf("\t| descriptor_index: %-5d\n", class_file.constant_pool[i].info.nameandtype_info.descriptor_index);
+            printf("\t| name_index: %-5d",
+                cp_info.info.nameandtype_info.name_index);
+            printf("\t| descriptor_index: %-5d\n",
+                cp_info.info.nameandtype_info.descriptor_index);
             break;
 
         case CONSTANT_Utf8:
             {
-                //printf("\t|length: %5d", class_file.constant_pool[i].info.utf8_info.length);
 
-                uint16_t length = class_file.constant_pool[i].info.utf8_info.length;
-                uint8_t *b = class_file.constant_pool[i].info.utf8_info.bytes;
+                uint16_t length = cp_info.info.utf8_info.length;
+                uint8_t *b = cp_info.info.utf8_info.bytes;
 
                 uint16_t *heap = vm_utf8_to_uint16_t(length, b);
 
                 printf("\t| \"");
-                for (int j = 0; j < class_file.constant_pool[i].info.utf8_info.length; j++) {
+                for (int j = 0; j < cp_info.info.utf8_info.length; j++) {
                     printf("%lc", heap[j]);
                 }
                 printf("\"\n");

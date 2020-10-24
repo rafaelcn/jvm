@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+
 typedef struct vm_element_value {
     uint8_t tag;
     union {
@@ -15,11 +16,20 @@ typedef struct vm_element_value {
 
         uint16_t class_info_index;
 
-        vm_annotation_t annotation_value;
+        struct vm_annotation_t {
+            uint16_t type_index;
+            uint16_t num_element_value_pairs;
+
+            struct {
+                uint16_t element_name_index;
+                struct vm_element_value *value;
+            };
+        } annotation_value;
+        //vm_annotation_t annotation_value;
 
         struct {
             uint16_t num_values;
-            vm_element_value_t *values;
+            struct vm_element_value *values;
         } array_value;
     } value;
 } vm_element_value_t;

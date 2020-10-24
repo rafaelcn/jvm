@@ -2,22 +2,23 @@
 #define VM_CODE_H
 
 #include <stdint.h>
-#include "../vm_constant_pool.h"
+
+#include "../../vm_constant_pool.h"
 
 /**
  * @brief
  */
-typedef struct vm_exception_table {
+/*typedef struct vm_exception_table {
     uint16_t start_pc;
     uint16_t end_pc;
     uint16_t handler_pc;
     uint16_t catch_type;
-} vm_exception_table_t;
+} vm_exception_table_t;*/
 
 /**
  * @brief
  */
-typedef struct vm_code {
+/*typedef struct vm_code {
     uint16_t max_stack;
     uint16_t max_local;
 
@@ -29,6 +30,6 @@ typedef struct vm_code {
 
     uint16_t attributes_count;
     vm_attribute_info_t *attributes;
-} vm_code_t;
+} vm_code_t;*/
 
 #endif /* VM_CODE_H */

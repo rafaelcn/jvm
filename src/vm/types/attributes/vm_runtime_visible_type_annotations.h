@@ -2,7 +2,7 @@
 #define VM_RUNTIME_VISIBLE_TYPE_ANNOTATIONS_H
 
 #include "vm_runtime_visible_annotations.h"
-#include "../target_types/vm_target_types.h"
+#include "../target/vm_target_types.h"
 
 /**
  * @brief
