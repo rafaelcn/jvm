@@ -26,7 +26,7 @@ debug:
 	$(CC) $(CC_FLAGS_D) $(SRC) $(L_FLAG) -o ./bin/$(BIN)
 
 %: %.c
-	$(CC) $(CC_FLAGS) $(I_FLAG) $(SRC2) $(TESTS_UTI) $(MUNIT) -o $@.out $<
+	$(CC) $(CC_FLAGS) $(I_FLAG) $(SRC2) $(TESTS_UTI) $(MUNIT) $(L_FLAG) -o $@.out $<
 
 test: $(TESTS_PRO)
 
