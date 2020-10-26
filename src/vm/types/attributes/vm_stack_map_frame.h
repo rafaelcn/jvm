@@ -2,6 +2,7 @@
 #define VM_STACK_MAP_FRAME_H
 
 #include <stdint.h>
+
 #include "vm_verification_type.h"
 
 /**

@@ -2,6 +2,7 @@
 #define VM_STACK_MAP_TABLE_H
 
 #include <stdint.h>
+
 #include "vm_stack_map_frame.h"
 
 /**
