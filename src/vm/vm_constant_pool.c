@@ -480,7 +480,12 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             break;
 
         case SourceDebugExtension:
-            attributes[i].info.sourcedebugextension_attribute.debug_extension = read_u1(file);
+            attributes[i].info.sourcedebugextension_attribute.debug_extension = calloc(
+                attributes[i].attribute_length, sizeof (uint8_t));
+
+            for (int j = 0; j < (attributes[i].attribute_length); j++) {
+                attributes[i].info.sourcedebugextension_attribute.debug_extension[j] = read_u1(file);
+            }
             break;
 
         case LineNumberTable:
