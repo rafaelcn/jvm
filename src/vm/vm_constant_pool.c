@@ -463,30 +463,70 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             break;
 
         case EnclosingMethod:
+            attributes[i].info.enclosingmethod_attribute.class_index = read_u2(file);
+            attributes[i].info.enclosingmethod_attribute.method_index = read_u2(file);
             break;
 
         case Synthetic:
+            /* Empty */
             break;
 
         case Signature:
+            attributes[i].info.signature_attribute.signature_index = read_u2(file);
             break;
 
         case SourceFile:
+            attributes[i].info.sourcefile_attribute.sourcefile_index = read_u2(file);
             break;
 
         case SourceDebugExtension:
+            attributes[i].info.sourcedebugextension_attribute.debug_extension = read_u1(file);
             break;
 
         case LineNumberTable:
+            attributes[i].info.linenumbertable_attribute.line_number_table_length = read_u2(file);
+            attributes[i].info.linenumbertable_attribute.line_number_table = calloc(
+                attributes[i].info.linenumbertable_attribute.line_number_table_length,
+                sizeof (vm_line_number_t));
+
+            for (int j = 0; j < (attributes[i].info.linenumbertable_attribute.line_number_table_length); j++) {
+                attributes[i].info.linenumbertable_attribute.line_number_table[j].start_pc = read_u2(file);
+                attributes[i].info.linenumbertable_attribute.line_number_table[j].line_number = read_u2(file);
+            }
             break;
 
         case LocalVariableTable:
+            attributes[i].info.localvariabletable_attribute.local_variable_table_length = read_u2(file);
+            attributes[i].info.localvariabletable_attribute.local_variable_table = calloc(
+                attributes[i].info.localvariabletable_attribute.local_variable_table_length,
+                sizeof (vm_local_variable_t));
+
+            for (int j = 0; j < (attributes[i].info.localvariabletable_attribute.local_variable_table_length); j++) {
+                attributes[i].info.localvariabletable_attribute.local_variable_table[j].start_pc = read_u2(file);
+                attributes[i].info.localvariabletable_attribute.local_variable_table[j].length = read_u2(file);
+                attributes[i].info.localvariabletable_attribute.local_variable_table[j].name_index = read_u2(file);
+                attributes[i].info.localvariabletable_attribute.local_variable_table[j].descriptor_index = read_u2(file);
+                attributes[i].info.localvariabletable_attribute.local_variable_table[j].index = read_u2(file);
+            }
             break;
 
         case LocalVariableTypeTable:
+            attributes[i].info.localvariabletypetable_attribute.local_variable_type_table_length = read_u2(file);
+            attributes[i].info.localvariabletypetable_attribute.local_variable_type_table = calloc(
+                attributes[i].info.localvariabletypetable_attribute.local_variable_type_table_length,
+                sizeof (vm_local_variable_type_t));
+
+            for (int j = 0; j < (attributes[i].info.localvariabletypetable_attribute.local_variable_type_table_length); j++) {
+                attributes[i].info.localvariabletypetable_attribute.local_variable_type_table[j].start_pc = read_u2(file);
+                attributes[i].info.localvariabletypetable_attribute.local_variable_type_table[j].length = read_u2(file);
+                attributes[i].info.localvariabletypetable_attribute.local_variable_type_table[j].name_index = read_u2(file);
+                attributes[i].info.localvariabletypetable_attribute.local_variable_type_table[j].signature_index = read_u2(file);
+                attributes[i].info.localvariabletypetable_attribute.local_variable_type_table[j].index = read_u2(file);
+            }
             break;
 
         case Deprecated:
+            /* Empty */
             break;
 
         case RuntimeVisibleAnnotations:
