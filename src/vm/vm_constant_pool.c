@@ -266,6 +266,114 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
 }
 
 /**
+ * @brief
+ */
+void verification_type_parser(vm_verification_type_info_t *stack, file_t *file) {
+    switch (stack->tag) {
+    case 0: // ITEM_Top
+        break;
+
+    case 1: // ITEM_Integer
+        break;
+
+    case 2: // ITEM_Float
+        break;
+
+    case 5: // ITEM_Null
+        break;
+
+    case 6: // ITEM_UninitializedThis
+        break;
+
+    case 7: // ITEM_Object
+        stack->variable.object_variable.cpool_index = read_u2(file);
+        break;
+
+    case 8: // ITEM_Uninitialized
+        stack->variable.uninitialized_variable.offset = read_u2(file);
+        break;
+
+    case 4: // ITEM_Long
+        break;
+
+    case 3: // ITEM_Double
+        break;
+
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief
+ */
+void stack_map_frame_parser(vm_stack_map_frame_t *entry, file_t *file) {
+    if (entry->frame_type >= 0 && entry->frame_type <= 63) {
+        // SAME FRAME
+    }
+    else if (entry->frame_type >= 64 && entry->frame_type <= 127) {
+        // SAME_LOCALS_1_STACK_ITEM
+        entry->frame.same_locals_1_stack_item_frame.stack.tag = read_u1(file);
+        verification_type_parser(&entry->frame.same_locals_1_stack_item_frame.stack, file);
+    }
+    else if (entry->frame_type == 247) {
+        // SAME_LOCALS_1_STACK_ITEM_EXTENDED
+        entry->frame.same_locals_1_stack_item_frame_extended.offset_delta = read_u2(file);
+        verification_type_parser(&entry->frame.same_locals_1_stack_item_frame_extended.stack, file);
+    }
+    else if (entry->frame_type >= 248 && entry->frame_type <= 250) {
+        // CHOP
+        entry->frame.chop_frame.offset_delta = read_u2(file);
+    }
+    else if (entry->frame_type == 250) {
+        // SAME_FRAME_EXTENDED
+        entry->frame.same_frame_extended.offset_delta = read_u2(file);
+    }
+    else if (entry->frame_type >= 252 && entry->frame_type <= 254) {
+        // APPEND
+        entry->frame.append_frame.offset_delta = read_u2(file);
+        entry->frame.append_frame.locals = calloc((entry->frame_type - 251),
+            sizeof (vm_verification_type_info_t));
+
+        for (int i = 0; i < (entry->frame_type - 251); i++) {
+            entry->frame.append_frame.locals[i].tag = read_u1(file);
+            verification_type_parser(&entry->frame.append_frame.locals[i], file);
+        }
+    }
+    else if (entry->frame_type == 255) {
+        // FULL_FRAME
+        entry->frame.full_frame.offset_delta = read_u2(file);
+        entry->frame.full_frame.number_of_locals = read_u2(file);
+        entry->frame.full_frame.locals = calloc(entry->frame.full_frame.number_of_locals,
+            sizeof (vm_verification_type_info_t));
+
+        for (int i = 0; i < (entry->frame.full_frame.number_of_locals); i++) {
+            entry->frame.full_frame.locals[i].tag = read_u1(file);
+            verification_type_parser(&entry->frame.full_frame.locals[i], file);
+        }
+
+        entry->frame.full_frame.number_of_stack_items = read_u2(file);
+        entry->frame.full_frame.stack = calloc(entry->frame.full_frame.number_of_stack_items,
+            sizeof (vm_verification_type_info_t));
+
+        for (int i = 0; i < (entry->frame.full_frame.number_of_stack_items); i++) {
+            entry->frame.full_frame.stack[i].tag = read_u1(file);
+            verification_type_parser(&entry->frame.full_frame.stack[i], file);
+        }
+    }
+}
+
+/**
+ * @brief
+ */
+void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file) {
+    for (int i = 0; i < (stack_map_table->number_of_entries); i++) {
+        stack_map_table->entries[i].frame_type = read_u1(file);
+        stack_map_frame_parser(&stack_map_table->entries[i], file);
+    }
+}
+
+/**
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
  * @param attributes_count
@@ -276,58 +384,82 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
 void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attributes, vm_cp_info_t *constant_pool, file_t *file) {
     vm_utf8_t utf8;
 
-    for (int j = 0; j < (attributes_count); j++) {
-        attributes[j].attribute_name_index = read_u2(file);
-        attributes[j].attribute_length = read_u4(file);
+    for (int i = 0; i < (attributes_count); i++) {
+        attributes[i].attribute_name_index = read_u2(file);
+        attributes[i].attribute_length = read_u4(file);
 
-        utf8 = constant_pool[attributes[j].attribute_name_index].info.utf8_info;
+        utf8 = constant_pool[attributes[i].attribute_name_index].info.utf8_info;
 
         switch (attribute_name_to_int(utf8.length, utf8.bytes)) {
         case ConstantValue:
-            attributes[j].info.constantvalue_attribute.constantvalue_index = read_u2(file);
+            attributes[i].info.constantvalue_attribute.constantvalue_index = read_u2(file);
             break;
 
         case Code:
-            attributes[j].info.code_attribute.max_stack = read_u2(file);
-            attributes[j].info.code_attribute.max_local = read_u2(file);
-            attributes[j].info.code_attribute.code_length = read_u4(file);
-            attributes[j].info.code_attribute.code = calloc(
-                attributes[j].info.code_attribute.code_length,
+            attributes[i].info.code_attribute.max_stack = read_u2(file);
+            attributes[i].info.code_attribute.max_local = read_u2(file);
+            attributes[i].info.code_attribute.code_length = read_u4(file);
+            attributes[i].info.code_attribute.code = calloc(
+                attributes[i].info.code_attribute.code_length,
                 sizeof (uint8_t));
 
-            for (int k = 0; k < (attributes[j].info.code_attribute.code_length); k++) {
-                attributes[j].info.code_attribute.code[k] = read_u1(file);
+            for (int j = 0; j < (attributes[i].info.code_attribute.code_length); j++) {
+                attributes[i].info.code_attribute.code[j] = read_u1(file);
             }
 
-            attributes[j].info.code_attribute.exception_table_length = read_u2(file);
-            attributes[j].info.code_attribute.exception_table = calloc(
-                attributes[j].info.code_attribute.exception_table_length,
+            attributes[i].info.code_attribute.exception_table_length = read_u2(file);
+            attributes[i].info.code_attribute.exception_table = calloc(
+                attributes[i].info.code_attribute.exception_table_length,
                 sizeof (vm_exception_table_t));
 
-            for (int k = 0; k < (attributes[j].info.code_attribute.exception_table_length); k++) {
-                attributes[j].info.code_attribute.exception_table[k].start_pc = read_u2(file);
-                attributes[j].info.code_attribute.exception_table[k].end_pc = read_u2(file);
-                attributes[j].info.code_attribute.exception_table[k].handler_pc = read_u2(file);
-                attributes[j].info.code_attribute.exception_table[k].catch_type = read_u2(file);
+            for (int j = 0; j < (attributes[i].info.code_attribute.exception_table_length); j++) {
+                attributes[i].info.code_attribute.exception_table[j].start_pc = read_u2(file);
+                attributes[i].info.code_attribute.exception_table[j].end_pc = read_u2(file);
+                attributes[i].info.code_attribute.exception_table[j].handler_pc = read_u2(file);
+                attributes[i].info.code_attribute.exception_table[j].catch_type = read_u2(file);
             }
 
-            attributes[j].info.code_attribute.attributes_count = read_u2(file);
-            attributes[j].info.code_attribute.attributes = calloc(
-                attributes[j].info.code_attribute.attributes_count,
+            attributes[i].info.code_attribute.attributes_count = read_u2(file);
+            attributes[i].info.code_attribute.attributes = calloc(
+                attributes[i].info.code_attribute.attributes_count,
                 sizeof (vm_attribute_info_t));
 
-            attributes_parser(attributes[j].info.code_attribute.attributes_count,
-                attributes[j].info.code_attribute.attributes, constant_pool, file);
+            attributes_parser(attributes[i].info.code_attribute.attributes_count,
+                attributes[i].info.code_attribute.attributes, constant_pool, file);
             break;
 
         case StackMapTable:
+            attributes[i].info.stackmaptable_attribute.number_of_entries = read_u2(file);
+            attributes[i].info.stackmaptable_attribute.entries = calloc(
+                attributes[i].info.stackmaptable_attribute.number_of_entries,
+                sizeof (vm_stack_map_frame_t));
 
+            stack_map_table_parser(&attributes[i].info.stackmaptable_attribute, file);
             break;
 
         case Exceptions:
+            attributes[i].info.exceptions_attribute.number_of_exceptions = read_u2(file);
+            attributes[i].info.exceptions_attribute.exception_index_table = calloc(
+                attributes[i].info.exceptions_attribute.number_of_exceptions,
+                sizeof (uint16_t));
+
+            for (int j = 0; j < (attributes[i].info.exceptions_attribute.number_of_exceptions); j++) {
+                attributes[i].info.exceptions_attribute.exception_index_table[j] = read_u2(file);
+            }
             break;
 
         case InnerClasses:
+            attributes[i].info.innerclasses_attribute.number_of_classes = read_u2(file);
+            attributes[i].info.innerclasses_attribute.classes = calloc(
+                attributes[i].info.innerclasses_attribute.number_of_classes,
+                sizeof (vm_classes_t));
+
+            for (int j = 0; j < (attributes[i].info.innerclasses_attribute.number_of_classes); j++) {
+                attributes[i].info.innerclasses_attribute.classes[j].inner_class_info_index = read_u2(file);
+                attributes[i].info.innerclasses_attribute.classes[j].outer_class_info_index = read_u2(file);
+                attributes[i].info.innerclasses_attribute.classes[j].inner_name_index = read_u2(file);
+                attributes[i].info.innerclasses_attribute.classes[j].inner_class_access_flags = read_u2(file);
+            }
             break;
 
         case EnclosingMethod:
