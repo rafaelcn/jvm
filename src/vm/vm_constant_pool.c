@@ -212,7 +212,7 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
     char buffer[length];
 
     for (int j = 0; j < length; j++) {
-        sprintf(buffer[j], "%lc", heap[j]);
+        sprintf(&buffer[j], "%lc", heap[j]);
     }
 
     if (buffer == "ConstantValue")
@@ -688,6 +688,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
 
         case CONSTANT_Utf8:
+            {
                 uint16_t length = cp_info.info.utf8_info.length;
                 uint8_t *bytes = cp_info.info.utf8_info.bytes;
 
@@ -699,6 +700,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 }
                 printf("\"\n");
                 break;
+            }
 
         case CONSTANT_MethodHandle:
             printf("\t|MethodHandle - Ignoring");
