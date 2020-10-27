@@ -29,6 +29,35 @@
 #define CONSTANT_InvokeDynamic      (0x12)
 
 /**
+ * @brief Attribute Types tag mapping.
+ */
+enum attribute_types_enum {
+    ConstantValue,
+    Code,
+    StackMapTable,
+    Exceptions,
+    InnerClasses,
+    EnclosingMethod,
+    Synthetic,
+    Signature,
+    SourceFile,
+    SourceDebugExtension,
+    LineNumberTable,
+    LocalVariableTable,
+    LocalVariableTypeTable,
+    Deprecated,
+    RuntimeVisibleAnnotations,
+    RuntimeInvisibleAnnotations,
+    RuntimeVisibleParameterAnnotations,
+    RuntimeInvisibleParameterAnnotations,
+    RuntimeVisibleTypeAnnotations,
+    RuntimeInvisibleTypeAnnotations,
+    AnnotationDefault,
+    BootstrapMethods,
+    MethodParameters
+} attribute_types_enum;
+
+/**
  * @brief An array containing the respective string correspondents of the
  * constant pool tags.
  */
@@ -63,16 +92,13 @@ void vm_init_tag_map() {
  * @param file A file_t pointer that has the .class loaded.
  * @param cf A pointer to a vm_class_file_t structure.
  */
-void constant_pool_parser(file_t *file, vm_class_file_t *cf)
-{
+void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
     uint8_t tag;
 
-    for (int i = 0; i < (cf->constant_pool_count - 1); i++)
-    {
+    for (int i = 0; i < (cf->constant_pool_count - 1); i++) {
         tag = read_u1(file);
 
-        switch (tag)
-        {
+        switch (tag) {
         case CONSTANT_Class:
             cf->constant_pool[i].tag = tag;
             cf->constant_pool[i].info.class_info.name_index = read_u2(file);
@@ -130,17 +156,15 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf)
             break;
 
         case CONSTANT_Utf8:
-            {
-                cf->constant_pool[i].tag = tag;
-                cf->constant_pool[i].info.utf8_info.length = read_u2(file);
-                cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
-                    cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
+            cf->constant_pool[i].tag = tag;
+            cf->constant_pool[i].info.utf8_info.length = read_u2(file);
+            cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
+                cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
 
-                uint16_t size = cf->constant_pool[i].info.utf8_info.length;
+            uint16_t size = cf->constant_pool[i].info.utf8_info.length;
 
-                for(int j = 0; j < size; j++) {
-                    cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
-                }
+            for(int j = 0; j < size; j++) {
+                cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
             }
             break;
 
@@ -168,6 +192,224 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf)
 }
 
 /**
+ * @brief A function dedicated to filling the interfaces field of the
+ * vm_class_file_t structure.
+ * @param file A file_t pointer that has the .class loaded.
+ * @param cf A pointer to a vm_class_file_t structure.
+ */
+void interfaces_parser(file_t *file, vm_class_file_t *cf) {
+    for (int i = 0; i < (cf->interfaces_count); i++) {
+        cf->interfaces[i] = read_u2(file);
+    }
+}
+
+/**
+ * @brief A function dedicated to converting a Utf8 entry at the constant pool
+ * to a int that can be used at a switch case.
+ */
+int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
+    uint16_t *heap = vm_utf8_to_uint16_t(length, bytes);
+    char buffer[length];
+
+    for (int j = 0; j < length; j++) {
+        sprintf(buffer[j], "%lc", heap[j]);
+    }
+
+    if (buffer == "ConstantValue")
+        return ConstantValue;
+    if (buffer == "Code")
+        return Code;
+    if (buffer == "StackMapTable")
+        return StackMapTable;
+    if (buffer == "Exceptions")
+        return Exceptions;
+    if (buffer == "InnerClasses")
+        return InnerClasses;
+    if (buffer == "EnclosingMethod")
+        return EnclosingMethod;
+    if (buffer == "Synthetic")
+        return Synthetic;
+    if (buffer == "Signature")
+        return Signature;
+    if (buffer == "SourceFile")
+        return SourceFile;
+    if (buffer == "SourceDebugExtension")
+        return SourceDebugExtension;
+    if (buffer == "LineNumberTable")
+        return LineNumberTable;
+    if (buffer == "LocalVariableTable")
+        return LocalVariableTable;
+    if (buffer == "LocalVariableTypeTable")
+        return LocalVariableTypeTable;
+    if (buffer == "Deprecated")
+        return Deprecated;
+    if (buffer == "RuntimeVisibleAnnotations")
+        return RuntimeVisibleAnnotations;
+    if (buffer == "RuntimeInvisibleAnnotations")
+        return RuntimeInvisibleAnnotations;
+    if (buffer == "RuntimeVisibleParameterAnnotations")
+        return RuntimeVisibleParameterAnnotations;
+    if (buffer == "RuntimeInvisibleParameterAnnotations")
+        return RuntimeInvisibleParameterAnnotations;
+    if (buffer == "RuntimeVisibleTypeAnnotations")
+        return RuntimeVisibleTypeAnnotations;
+    if (buffer == "RuntimeInvisibleTypeAnnotations")
+        return RuntimeInvisibleTypeAnnotations;
+    if (buffer == "AnnotationDefault")
+        return AnnotationDefault;
+    if (buffer == "BootstrapMethods")
+        return BootstrapMethods;
+    if (buffer == "MethodParameters")
+        return MethodParameters;
+
+    return -1;
+}
+
+/**
+ * @brief A function dedicated to filling the attributes field of the
+ * vm_class_file_t structure.
+ * @param attributes_count
+ * @param attributes
+ * @param constant_pool
+ * @param file A file_t pointer that has the .class loaded.
+ */
+void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attributes, vm_cp_info_t *constant_pool, file_t *file) {
+    vm_utf8_t utf8;
+
+    for (int j = 0; j < (attributes_count); j++) {
+        attributes[j].attribute_name_index = read_u2(file);
+        attributes[j].attribute_length = read_u4(file);
+
+        utf8 = constant_pool[attributes[j].attribute_name_index].info.utf8_info;
+
+        switch (attribute_name_to_int(utf8.length, utf8.bytes)) {
+        case ConstantValue:
+            attributes[j].info.constantvalue_attribute.constantvalue_index = read_u2(file);
+            break;
+
+        case Code:
+            attributes[j].info.code_attribute.max_stack = read_u2(file);
+            attributes[j].info.code_attribute.max_local = read_u2(file);
+            attributes[j].info.code_attribute.code_length = read_u4(file);
+            attributes[j].info.code_attribute.code = calloc(
+                attributes[j].info.code_attribute.code_length,
+                sizeof (uint8_t));
+
+            for (int k = 0; k < (attributes[j].info.code_attribute.code_length); k++) {
+                attributes[j].info.code_attribute.code[k] = read_u1(file);
+            }
+
+            attributes[j].info.code_attribute.exception_table_length = read_u2(file);
+            attributes[j].info.code_attribute.exception_table = calloc(
+                attributes[j].info.code_attribute.exception_table_length,
+                sizeof (vm_exception_table_t));
+
+            for (int k = 0; k < (attributes[j].info.code_attribute.exception_table_length); k++) {
+                attributes[j].info.code_attribute.exception_table[k].start_pc = read_u2(file);
+                attributes[j].info.code_attribute.exception_table[k].end_pc = read_u2(file);
+                attributes[j].info.code_attribute.exception_table[k].handler_pc = read_u2(file);
+                attributes[j].info.code_attribute.exception_table[k].catch_type = read_u2(file);
+            }
+
+            attributes[j].info.code_attribute.attributes_count = read_u2(file);
+            attributes[j].info.code_attribute.attributes = calloc(
+                attributes[j].info.code_attribute.attributes_count,
+                sizeof (vm_attribute_info_t));
+
+            attributes_parser(attributes[j].info.code_attribute.attributes_count,
+                attributes[j].info.code_attribute.attributes, constant_pool, file);
+            break;
+
+        case StackMapTable:
+
+            break;
+
+        case Exceptions:
+            break;
+
+        case InnerClasses:
+            break;
+
+        case EnclosingMethod:
+            break;
+
+        case Synthetic:
+            break;
+
+        case Signature:
+            break;
+
+        case SourceFile:
+            break;
+
+        case SourceDebugExtension:
+            break;
+
+        case LineNumberTable:
+            break;
+
+        case LocalVariableTable:
+            break;
+
+        case LocalVariableTypeTable:
+            break;
+
+        case Deprecated:
+            break;
+
+        case RuntimeVisibleAnnotations:
+            break;
+
+        case RuntimeInvisibleAnnotations:
+            break;
+
+        case RuntimeVisibleParameterAnnotations:
+            break;
+
+        case RuntimeInvisibleParameterAnnotations:
+            break;
+
+        case RuntimeVisibleTypeAnnotations:
+            break;
+
+        case RuntimeInvisibleTypeAnnotations:
+            break;
+
+        case AnnotationDefault:
+            break;
+
+        case BootstrapMethods:
+            break;
+
+        case MethodParameters:
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+/**
+ * @brief A function dedicated to filling the fields field of the
+ * vm_class_file_t structure.
+ * @param file A file_t pointer that has the .class loaded.
+ * @param cf A pointer to a vm_class_file_t structure.
+ */
+void fields_parser(file_t *file, vm_class_file_t *cf) {
+    for (int i = 0; i < (cf->fields_count); i++) {
+        cf->fields[i].access_flags = read_u2(file);
+        cf->fields[i].name_index = read_u2(file);
+        cf->fields[i].descriptor_index = read_u2(file);
+        cf->fields[i].attributes_count = read_u2(file);
+        cf->fields[i].attributes = calloc(cf->fields[i].attributes_count,
+            sizeof (vm_attribute_info_t));
+
+        attributes_parser(cf->fields[i].attributes_count, cf->fields[i].attributes, cf->constant_pool, file);
+    }
+}
+
+/**
  * @brief Parses the .class bytecode to a ClassFile structure.
  * @param file A FILE (from stdio, in rb mode) pointer to a .class file.
  * @param cf A pointer to a ClassFile structure.
@@ -179,8 +421,7 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     cf->major_version = read_u2(file);
 
     cf->constant_pool_count = read_u2(file);
-    cf->constant_pool = calloc(cf->constant_pool_count - 1,
-                               sizeof (vm_cp_info_t));
+    cf->constant_pool = calloc(cf->constant_pool_count - 1, sizeof (vm_cp_info_t));
 
     constant_pool_parser(file, cf);
 
@@ -189,10 +430,14 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     cf->super_class = read_u2(file);
 
     cf->interfaces_count = read_u2(file);
-    cf->interfaces = calloc(cf->interfaces_count - 1,
-                               sizeof (uint16_t));
+    cf->interfaces = calloc(cf->interfaces_count, sizeof (uint16_t));
 
-    //interfaces_parser(file, cf);
+    interfaces_parser(file, cf);
+
+    cf->fields_count = read_u2(file);
+    cf->fields = calloc(cf->fields_count, sizeof (vm_field_info_t));
+
+    fields_parser(file, cf);
 }
 
 /**
@@ -311,12 +556,10 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
 
         case CONSTANT_Utf8:
-            {
-
                 uint16_t length = cp_info.info.utf8_info.length;
-                uint8_t *b = cp_info.info.utf8_info.bytes;
+                uint8_t *bytes = cp_info.info.utf8_info.bytes;
 
-                uint16_t *heap = vm_utf8_to_uint16_t(length, b);
+                uint16_t *heap = vm_utf8_to_uint16_t(length, bytes);
 
                 printf("\t| \"");
                 for (int j = 0; j < cp_info.info.utf8_info.length; j++) {
@@ -324,7 +567,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 }
                 printf("\"\n");
                 break;
-            }
+
         case CONSTANT_MethodHandle:
             printf("\t|MethodHandle - Ignoring");
             printf("\t|\n");
@@ -347,8 +590,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
     }
 }
 
-void vm_load_constant_pool(file_t *file)
-{
+void vm_load_constant_pool(file_t *file) {
     vm_class_file_t class_file;
 
     file->read = 0;

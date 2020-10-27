@@ -33,7 +33,7 @@
  */
 typedef union vm_attribute_types {
     vm_constant_value_t constantvalue_attribute;
-    //vm_code_t code_attribute;
+    vm_code_t code_attribute;
     vm_stack_map_table_t stackmaptable_attribute;
     vm_exceptions_t exceptions_attribute;
     vm_inner_classes_t innerclasses_attribute;
