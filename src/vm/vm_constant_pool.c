@@ -535,6 +535,56 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             break;
 
         case RuntimeVisibleAnnotations:
+            attributes[i].info.runtimevisibleannotations_attribute.num_annotations = read_u2(file);
+            attributes[i].info.runtimevisibleannotations_attribute.annotations = calloc(
+                attributes[i].info.runtimevisibleannotations_attribute.num_annotations,
+                sizeof (vm_annotation_t));
+
+            for (int j = 0; j < (attributes[i].info.runtimevisibleannotations_attribute.num_annotations); j++) {
+                attributes[i].info.runtimevisibleannotations_attribute.annotations[j].type_index = read_u2(file);
+                attributes[i].info.runtimevisibleannotations_attribute.annotations[j].num_element_value_pairs = read_u2(file);
+                attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs = calloc(
+                    attributes[i].info.runtimevisibleannotations_attribute.annotations[j].num_element_value_pairs,
+                    sizeof (vm_element_value_t)
+                );
+                for(int k = 0; k < (attributes[i].info.runtimevisibleannotations_attribute.annotations[j].num_element_value_pairs); k++)
+                {
+                    attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].element_name_index = read_u2(file);
+                    attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.tag = read_u1(file);
+                    uint8_t tag = attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.tag;
+                    
+                    // As the same behavior shall happen with different tags, let's compare the tag 
+                    // with those characters 
+                    uint8_t is_constant_value_index_tag = strchr("BCDFIJSZs", tag) != NULL;
+                    if(is_constant_value_index_tag) 
+                    {
+                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.const_value_index = read_u2(file);
+                    } else if (tag == 'e')
+                    {
+                        // Enum type
+                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.enum_const_value.type_name_index = read_u2(file);
+                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.enum_const_value.const_name_index = read_u2(file);
+                    } else if (tag == 'c')
+                    {
+                        // Class
+                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.class_info_index = read_u2(file);
+                    } else if (tag == '@')
+                    {
+                        // Annotation type(This one seems messy)
+                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.annotation_value.element_name_index = read_u2(file);
+                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.annotation_value.num_element_value_pairs = read_u2(file);
+                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.annotation_value.element_value_pairs = calloc(
+                        // Need to implement, possible solution is to create a
+                        // recursive function
+                    } else if (tag == '[')
+                    {
+                        // Array type(Also messy, what were those guys
+                        // thinking?)
+                    } else {
+                        printf("RuntimeVisibleAnnotations element pairs tag not found.");
+                    }
+                }
+            }
             break;
 
         case RuntimeInvisibleAnnotations:
