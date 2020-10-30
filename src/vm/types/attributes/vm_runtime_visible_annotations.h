@@ -20,10 +20,10 @@ typedef struct vm_element_value {
             uint16_t type_index;
             uint16_t num_element_value_pairs;
 
-            struct {
+            struct vm_element_value_pairs_t {
                 uint16_t element_name_index;
                 struct vm_element_value *value;
-            };
+            } *element_value_pairs;
         } annotation_value;
         //vm_annotation_t annotation_value;
 
@@ -38,14 +38,20 @@ typedef struct vm_element_value {
 /**
  * @brief
  */
+typedef struct vm_element_value_pairs {
+                uint16_t element_name_index;
+                vm_element_value_t value;
+            } vm_element_value_pairs_t;
+
+
+/**
+ * @brief
+ */
 typedef struct vm_annotation {
     uint16_t type_index;
     uint16_t num_element_value_pairs;
 
-    struct {
-        uint16_t element_name_index;
-        vm_element_value_t value;
-    } *element_value_pairs;
+    vm_element_value_pairs_t *element_value_pairs;
 } vm_annotation_t;
 
 

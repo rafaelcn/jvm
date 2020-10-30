@@ -376,6 +376,73 @@ void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file)
 /**
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
+ * @param element_value_pairs_count
+ * @param element_value_pairs
+ * @param file A file_t pointer that has the .class loaded.
+ */
+void element_value_pairs_parser(
+    uint16_t element_value_pairs_count,
+    vm_element_value_pairs_t* element_value_pairs, file_t *file)
+{
+    for(int k = 0; k < (element_value_pairs_count); k++)
+    {
+        element_value_pairs[k].element_name_index = read_u2(file);
+        element_value_pairs[k].value.tag = read_u1(file);
+        uint8_t tag = element_value_pairs[k].value.tag;
+        
+        // As the same behavior shall happen with different tags, let's compare the tag 
+        // with those characters 
+        uint8_t is_constant_value_index_tag = strchr("BCDFIJSZs", tag) != NULL;
+        if(is_constant_value_index_tag) 
+        {
+            element_value_pairs[k].value.value.const_value_index = read_u2(file);
+        } else if (tag == 'e')
+        {
+            // Enum type
+            element_value_pairs[k].value.value.enum_const_value.type_name_index = read_u2(file);
+            element_value_pairs[k].value.value.enum_const_value.const_name_index = read_u2(file);
+        } else if (tag == 'c')
+        {
+            // Class
+            element_value_pairs[k].value.value.class_info_index = read_u2(file);
+        } else if (tag == '@')
+        {
+            // Annotation type(This one seems messy)
+            element_value_pairs[k].value.value.annotation_value.type_index = read_u2(file);
+            element_value_pairs[k].value.value.annotation_value.num_element_value_pairs = read_u2(file);
+            element_value_pairs[k].value.value.annotation_value.element_value_pairs = calloc(
+                element_value_pairs[k].value.value.annotation_value.num_element_value_pairs,
+                sizeof (vm_element_value_pairs_t));
+
+            // For some reason it was not accepting just pasing the pointer directly
+            // Also this line bellow seems to still raise a warning.
+            vm_element_value_pairs_t *temporary_pair = element_value_pairs[k].value.value.annotation_value.element_value_pairs;
+            element_value_pairs_parser(
+                element_value_pairs[k].value.value.annotation_value.num_element_value_pairs,
+                temporary_pair,
+                file);
+        } else if (tag == '[')
+        {
+            // Array type(Also messy, what were those guys
+            // thinking?)
+            element_value_pairs[k].value.value.array_value.num_values = read_u2(file);
+            element_value_pairs[k].value.value.array_value.values = calloc(
+                element_value_pairs[k].value.value.array_value.num_values,
+                sizeof (vm_element_value_t));
+            for(int l = 0;( l < element_value_pairs[k].value.value.array_value.num_values); l++)
+            {
+                element_value_pairs[k].value.value.array_value.values[l].tag = read_u1(file);
+                // Need to finish
+            }
+        } else {
+            printf("RuntimeVisibleAnnotations element pairs tag not found.");
+        }
+    }
+}
+
+/**
+ * @brief A function dedicated to filling the attributes field of the
+ * vm_class_file_t structure.
  * @param attributes_count
  * @param attributes
  * @param constant_pool
@@ -540,57 +607,57 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
                 attributes[i].info.runtimevisibleannotations_attribute.num_annotations,
                 sizeof (vm_annotation_t));
 
-            for (int j = 0; j < (attributes[i].info.runtimevisibleannotations_attribute.num_annotations); j++) {
+            for (int j = 0; j < (attributes[i].info.runtimevisibleannotations_attribute.num_annotations); j++)
+            {
                 attributes[i].info.runtimevisibleannotations_attribute.annotations[j].type_index = read_u2(file);
                 attributes[i].info.runtimevisibleannotations_attribute.annotations[j].num_element_value_pairs = read_u2(file);
                 attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs = calloc(
                     attributes[i].info.runtimevisibleannotations_attribute.annotations[j].num_element_value_pairs,
-                    sizeof (vm_element_value_t)
+                    sizeof (vm_element_value_pairs_t)
                 );
-                for(int k = 0; k < (attributes[i].info.runtimevisibleannotations_attribute.annotations[j].num_element_value_pairs); k++)
-                {
-                    attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].element_name_index = read_u2(file);
-                    attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.tag = read_u1(file);
-                    uint8_t tag = attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.tag;
-                    
-                    // As the same behavior shall happen with different tags, let's compare the tag 
-                    // with those characters 
-                    uint8_t is_constant_value_index_tag = strchr("BCDFIJSZs", tag) != NULL;
-                    if(is_constant_value_index_tag) 
-                    {
-                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.const_value_index = read_u2(file);
-                    } else if (tag == 'e')
-                    {
-                        // Enum type
-                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.enum_const_value.type_name_index = read_u2(file);
-                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.enum_const_value.const_name_index = read_u2(file);
-                    } else if (tag == 'c')
-                    {
-                        // Class
-                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.class_info_index = read_u2(file);
-                    } else if (tag == '@')
-                    {
-                        // Annotation type(This one seems messy)
-                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.annotation_value.element_name_index = read_u2(file);
-                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.annotation_value.num_element_value_pairs = read_u2(file);
-                        attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs[k].value.value.annotation_value.element_value_pairs = calloc(
-                        // Need to implement, possible solution is to create a
-                        // recursive function
-                    } else if (tag == '[')
-                    {
-                        // Array type(Also messy, what were those guys
-                        // thinking?)
-                    } else {
-                        printf("RuntimeVisibleAnnotations element pairs tag not found.");
-                    }
-                }
+                element_value_pairs_parser(
+                    attributes[i].info.runtimevisibleannotations_attribute.annotations[j].num_element_value_pairs,
+                    attributes[i].info.runtimevisibleannotations_attribute.annotations[j].element_value_pairs,
+                    file);
             }
             break;
 
         case RuntimeInvisibleAnnotations:
+        attributes[i].info.runtimeinvisibleannotations_attribute.num_annotations = read_u2(file);
+            attributes[i].info.runtimeinvisibleannotations_attribute.annotations = calloc(
+                attributes[i].info.runtimeinvisibleannotations_attribute.num_annotations,
+                sizeof (vm_annotation_t));
+
+            for (int j = 0; j < (attributes[i].info.runtimeinvisibleannotations_attribute.num_annotations); j++)
+            {
+                attributes[i].info.runtimeinvisibleannotations_attribute.annotations[j].type_index = read_u2(file);
+                attributes[i].info.runtimeinvisibleannotations_attribute.annotations[j].num_element_value_pairs = read_u2(file);
+                attributes[i].info.runtimeinvisibleannotations_attribute.annotations[j].element_value_pairs = calloc(
+                    attributes[i].info.runtimeinvisibleannotations_attribute.annotations[j].num_element_value_pairs,
+                    sizeof (vm_element_value_pairs_t)
+                );
+                element_value_pairs_parser(
+                    attributes[i].info.runtimeinvisibleannotations_attribute.annotations[j].num_element_value_pairs,
+                    attributes[i].info.runtimeinvisibleannotations_attribute.annotations[j].element_value_pairs,
+                    file);
+            }
             break;
 
         case RuntimeVisibleParameterAnnotations:
+            attributes[i].info.runtimevisibleparameterannotations_attribute.num_parameters = read_u2(file);
+            attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations = calloc(
+                attributes[i].info.runtimevisibleparameterannotations_attribute.num_parameters,
+                sizeof (vm_parameter_annotations_t));
+
+            for (int j = 0; j < (attributes[i].info.runtimevisibleparameterannotations_attribute.num_parameters); j++)
+            {
+                attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].num_annotations = read_u2(file);
+                attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].annotations = calloc(
+                    attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].num_annotations,
+                    sizeof (vm_annotation_t)
+                );
+                // TO BE CONTINUED
+            }
             break;
 
         case RuntimeInvisibleParameterAnnotations:
