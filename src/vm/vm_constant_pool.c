@@ -644,7 +644,7 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             break;
 
         case RuntimeVisibleParameterAnnotations:
-            attributes[i].info.runtimevisibleparameterannotations_attribute.num_parameters = read_u2(file);
+            attributes[i].info.runtimevisibleparameterannotations_attribute.num_parameters = read_u1(file);
             attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations = calloc(
                 attributes[i].info.runtimevisibleparameterannotations_attribute.num_parameters,
                 sizeof (vm_parameter_annotations_t));
@@ -656,26 +656,102 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
                     attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].num_annotations,
                     sizeof (vm_annotation_t)
                 );
-                // TO BE CONTINUED
+                for (int k = 0; k < (attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].num_annotations); k++)
+                {
+                    attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].type_index = read_u2(file);
+                    attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].num_element_value_pairs = read_u2(file);
+                    attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].element_value_pairs = calloc(
+                        attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].num_element_value_pairs,
+                        sizeof (vm_element_value_pairs_t)
+                    );
+                    element_value_pairs_parser(
+                        attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].num_element_value_pairs,
+                        attributes[i].info.runtimevisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].element_value_pairs,
+                        file);
+                }
             }
             break;
 
         case RuntimeInvisibleParameterAnnotations:
+            attributes[i].info.runtimeinvisibleparameterannotations_attribute.num_parameters = read_u1(file);
+            attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations = calloc(
+                attributes[i].info.runtimeinvisibleparameterannotations_attribute.num_parameters,
+                sizeof (vm_parameter_annotations_t));
+            for (int j = 0; j < (attributes[i].info.runtimeinvisibleparameterannotations_attribute.num_parameters); j++)
+            {
+                attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].num_annotations = read_u2(file);
+                attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].annotations = calloc(
+                    attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].num_annotations,
+                    sizeof (vm_annotation_t)
+                );
+                for (int k = 0; k < (attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].num_annotations); k++)
+                {
+                    attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].type_index = read_u2(file);
+                    attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].num_element_value_pairs = read_u2(file);
+                    attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].element_value_pairs = calloc(
+                        attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].num_element_value_pairs,
+                        sizeof (vm_element_value_pairs_t)
+                    );
+                    element_value_pairs_parser(
+                        attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].num_element_value_pairs,
+                        attributes[i].info.runtimeinvisibleparameterannotations_attribute.parameter_annotations[j].annotations[k].element_value_pairs,
+                        file);
+                }
+            }
             break;
 
         case RuntimeVisibleTypeAnnotations:
+            attributes[i].info.runtimevisibletypeannotations_attribute.num_annotations = read_u2(file);
+            attributes[i].info.runtimevisibletypeannotations_attribute.annotations = calloc(
+                attributes[i].info.runtimevisibletypeannotations_attribute.num_annotations,
+                sizeof (vm_type_annotation_t));
+            // TO DO: IMPLEMENTAR TYPE ANNOTATIONS PARSER(DESCRIÇÃO PÁGINA 143 da JVM)
             break;
 
         case RuntimeInvisibleTypeAnnotations:
+            attributes[i].info.runtimeinvisibletypeannotations_attribute.num_annotations = read_u2(file);
+            attributes[i].info.runtimeinvisibletypeannotations_attribute.annotations = calloc(
+                attributes[i].info.runtimeinvisibletypeannotations_attribute.num_annotations,
+                sizeof (vm_type_annotation_t));
+            // TO DO: IMPLEMENTAR TYPE ANNOTATIONS PARSER(DESCRIÇÃO PÁGINA 143 da JVM)
             break;
 
         case AnnotationDefault:
+            // TO DO: VALIDAR SE ESSA ESTRUTURA ESTÁ IMPLEMENTADA CORRETAMENTE.
             break;
 
         case BootstrapMethods:
+            attributes[i].info.bootstrapmethods_attribute.num_bootstrap_methods = read_u2(file);
+            attributes[i].info.bootstrapmethods_attribute.bootstrap_methods_table = calloc(
+                attributes[i].info.bootstrapmethods_attribute.num_bootstrap_methods,
+                sizeof (vm_bootstrap_methods_table_t)
+            );
+            for(uint16_t j = 0; j < (attributes[i].info.bootstrapmethods_attribute.num_bootstrap_methods); j++)
+            {
+                attributes[i].info.bootstrapmethods_attribute.bootstrap_methods_table[j].bootstrap_method_ref = read_u2(file);
+                attributes[i].info.bootstrapmethods_attribute.bootstrap_methods_table[j].num_bootstrap_arguments = read_u2(file);
+                attributes[i].info.bootstrapmethods_attribute.bootstrap_methods_table[j].bootstrap_arguments = calloc(
+                    attributes[i].info.bootstrapmethods_attribute.bootstrap_methods_table[j].num_bootstrap_arguments,
+                    sizeof (uint16_t)
+                );
+                for(uint16_t k = 0; k < (attributes[i].info.bootstrapmethods_attribute.bootstrap_methods_table[j].num_bootstrap_arguments); k++)
+                {
+                    attributes[i].info.bootstrapmethods_attribute.bootstrap_methods_table[j].bootstrap_arguments[k] = read_u2(file);
+                }
+            }
             break;
 
         case MethodParameters:
+            attributes[i].info.methodparameters_attribute.parameters_count = read_u1(file);
+            attributes[i].info.methodparameters_attribute.parameters = calloc(
+                attributes[i].info.methodparameters_attribute.parameters_count,
+                sizeof (vm_parameters_array_t)
+            );
+            for(uint16_t j = 0; j < (attributes[i].info.methodparameters_attribute.parameters_count); j++)
+            {
+                attributes[i].info.methodparameters_attribute.parameters[j].name_index = read_u2(file);
+                attributes[i].info.methodparameters_attribute.parameters[j].access_flags = read_u2(file);
+            }
             break;
 
         default:
