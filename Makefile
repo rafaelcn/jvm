@@ -20,13 +20,13 @@ I_FLAG = -I./src/
 L_FLAG = -lm
 
 all:
-	$(CC) $(CC_FLAGS) $(SRC) -o ./bin/$(BIN)
+	$(CC) $(CC_FLAGS) $(SRC) $(L_FLAG) -o ./bin/$(BIN)
 
 debug:
-	$(CC) $(CC_FLAGS_D) $(SRC) -o ./bin/$(BIN)
+	$(CC) $(CC_FLAGS_D) $(SRC) $(L_FLAG) -o ./bin/$(BIN)
 
 %: %.c
-	$(CC) $(CC_FLAGS) $(L_FLAG) $(I_FLAG) $(SRC2) $(TESTS_UTI) $(MUNIT) -o $@.out $<
+	$(CC) $(CC_FLAGS) $(I_FLAG) $(SRC2) $(TESTS_UTI) $(MUNIT) $(L_FLAG) -o $@.out $<
 
 test: $(TESTS_PRO)
 

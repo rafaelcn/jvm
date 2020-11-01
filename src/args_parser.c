@@ -22,7 +22,7 @@ args_t args_parse(int argc, char **argv) {
 
         parsed.flags[i].flag_name = flag;
 
-        if (i+1 <= argc-1) {
+        if (i+1 < argc-1) {
             char *value = vm_strspliti(all_args, " ", i+1);
 
             if (!vm_strncmp(value, "--", 2)) {

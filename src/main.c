@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "args_parser.h"
 
 #include "vm/vm_info.h"
 #include "vm/vm_entry.h"
+#include "vm/vm_settings.h"
 
 #include "vm/lib/vm_string.h"
 
@@ -32,7 +34,9 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if (vm_strcmp(arguments.flags[i].flag_name, "--version")) {
+            if (vm_strcmp(arguments.flags[i].flag_name, "--debug")) {
+                __debug_t = 1;
+            } else if (vm_strcmp(arguments.flags[i].flag_name, "--version")) {
                 printf("%s\n", VM_VERSION);
                 break;
             } else if (vm_strcmp(arguments.flags[i].flag_name, "--help")) {
