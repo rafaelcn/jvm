@@ -376,8 +376,7 @@ void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file)
 /**
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
- * @param element_value_pairs_count
- * @param element_value_pairs
+ * @param element_value_pt 
  * @param file A file_t pointer that has the .class loaded.
  */
 void element_value_parser(
@@ -438,17 +437,160 @@ void element_value_parser(
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
  * @param element_value_pairs_count
- * @param element_value_pairs
+ * @param element_value_pairs_pt
  * @param file A file_t pointer that has the .class loaded.
  */
 void element_value_pairs_parser(
     uint16_t element_value_pairs_count,
-    vm_element_value_pairs_t* element_value_pairs, file_t *file)
+    vm_element_value_pairs_t *element_value_pairs_pt, file_t *file)
 {
     for(int k = 0; k < (element_value_pairs_count); k++)
     {
-        element_value_pairs[k].element_name_index = read_u2(file);
-        element_value_parser(&(element_value_pairs[k].value), file);
+        element_value_pairs_pt[k].element_name_index = read_u2(file);
+        element_value_parser(&(element_value_pairs_pt[k].value), file);
+    }
+}
+
+/**
+ * @brief A function dedicated to filling the attributes field of the
+ * vm_class_file_t structure.
+ * @param type_annotation_count
+ * @param type_annotation_pt
+ * @param file A file_t pointer that has the .class loaded.
+ */
+void type_annotations_parser(
+    uint16_t type_annotation_count,
+    vm_type_annotation_t *type_annotation_pt, file_t *file)
+{
+    for(uint16_t j = 0; j < (type_annotation_count); j++)
+    {
+        type_annotation_pt[j].target_type = read_u1(file);
+        switch (type_annotation_pt[j].target_type)
+        {
+        case 0x00:
+            // type parameter declaration of generic class or interface
+            // Location: ClassFile
+            type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
+
+            break;
+        case 0x01:
+            // type parameter declaration of generic method or
+            // constructor
+            // Location: method_info
+            type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
+            break;
+        case 0x10:
+            // type in extends clause of class or interface declaration, or
+            // in implements clause of interface declaration
+            // Location: ClassFile
+            type_annotation_pt[j].target_info.supertype_target.supertype_index = read_u2(file);
+            /* code */
+            break;
+        case 0x11:
+            // type in bound of type parameter declaration of generic
+            // class or interface
+            // Location: ClassFile
+            type_annotation_pt[j].target_info.type_parameter_bound_target.type_parameter_index = read_u1(file);
+            type_annotation_pt[j].target_info.type_parameter_bound_target.bound_index = read_u1(file);
+            /* code */
+            break;
+        case 0x12:
+            // 0x12 type in bound of type parameter declaration of generic method
+            /* code */
+            type_annotation_pt[j].target_info.type_parameter_bound_target.type_parameter_index = read_u1(file);
+            type_annotation_pt[j].target_info.type_parameter_bound_target.bound_index = read_u1(file);
+            break;
+        case 0x13:
+            // 0x13 type in field declaration field_info
+            type_annotation_pt[j].target_info.empty_target;
+            /* code */
+            break;
+        case 0x14:
+            // 0x14 return type of method or constructor method_info
+            type_annotation_pt[j].target_info.empty_target;
+            /* code */
+            break;
+        case 0x15:
+            // 0x15 receiver type of method or constructor method_info
+            type_annotation_pt[j].target_info.empty_target;
+            /* code */
+            break;
+        case 0x16:
+            // 0x16 type in formal parameter declaration of method, constructor,
+            // or lambda expression method_info
+            type_annotation_pt[j].target_info.formal_parameter_target.formal_parameter_index = read_u1(file);
+            /* code */
+            break;
+        case 0x17:
+            // 0x17 type in throws clause of method or constructor method_info
+            type_annotation_pt[j].target_info.throws_target.throws_type_index = read_u2(file);
+            /* code */
+            break;
+        case 0x40:
+        case 0x41:
+            // 0x40 type in local variable declaration localvar_target
+            // 0x41 type in resource variable declaration localvar_target
+            type_annotation_pt[j].target_info.localvar_target.table_length = read_u2(file);
+            type_annotation_pt[j].target_info.localvar_target.table = calloc(
+                type_annotation_pt[j].target_info.localvar_target.table_length
+                , sizeof (vm_localvar_table_t)
+            );
+            for(uint16_t k = 0; k < (type_annotation_pt[j].target_info.localvar_target.table_length); k++)
+            {
+                type_annotation_pt[j].target_info.localvar_target.table[k].start_pc = read_u2(file);
+                type_annotation_pt[j].target_info.localvar_target.table[k].length = read_u2(file);
+                type_annotation_pt[j].target_info.localvar_target.table[k].index = read_u2(file);
+            }
+            break;
+        case 0x42:
+            // 0x42 type in exception parameter declaration catch_target
+            type_annotation_pt[j].target_info.catch_target.exception_table_index = read_u2(file);
+            break;
+        case 0x43:
+            // 0x43 type in instanceof expression offset_target
+        case 0x44:
+            // 0x44 type in new expression offset_target
+        case 0x45:
+            //0x45 type in method reference expression using ::new
+            // offset_target
+        case 0x46:
+            // 0x46 type in method reference expression using ::Identifier
+            // offset_target
+            type_annotation_pt[j].target_info.offset_target.offset = read_u2(file);
+            break;
+        case 0x47:
+            // 0x47 type in cast expression type_argument_target
+        case 0x48:
+            // 0x48 type argument for generic constructor in new
+            // expression or explicit constructor invocation statement
+            // type_argument_target
+        case 0x49:
+            // 0x49 type argument for generic method in method
+            // invocation expression
+            // type_argument_target
+        case 0x4A:
+            // 0x4A type argument for generic constructor in method
+            // reference expression using ::new type_argument_target
+        case 0x4B:
+            // 0x4B type argument for generic method in method reference 
+            // expression using ::Identifier type_argument_target
+            type_annotation_pt[j].target_info.type_argument_target.offset = read_u2(file);
+            type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
+        break;
+        default:
+            printf("[ERROR] Invalid target type inside attribute type annotations!");
+            break;
+        }
+        type_annotation_pt[j].target_path.path_length = read_u1(file);
+        type_annotation_pt[j].target_path.path = calloc(
+            type_annotation_pt[j].target_path.path_length,
+            sizeof (vm_type_path_t)
+        );
+        for(uint16_t k = 0; k < (type_annotation_pt[j].target_path.path_length); k++)
+        {
+            type_annotation_pt[j].target_path.path[k].type_path_kind = read_u1(file);
+            type_annotation_pt[j].target_path.path[k].type_argument_index = read_u1(file);
+        }
     }
 }
 
@@ -717,7 +859,10 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             attributes[i].info.runtimevisibletypeannotations_attribute.annotations = calloc(
                 attributes[i].info.runtimevisibletypeannotations_attribute.num_annotations,
                 sizeof (vm_type_annotation_t));
-            // TO DO: IMPLEMENTAR TYPE ANNOTATIONS PARSER(DESCRIÇÃO PÁGINA 143 da JVM)
+            type_annotations_parser(
+                        attributes[i].info.runtimevisibletypeannotations_attribute.num_annotations,
+                        attributes[i].info.runtimevisibletypeannotations_attribute.annotations,
+                        file);
             break;
 
         case RuntimeInvisibleTypeAnnotations:
@@ -725,7 +870,10 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             attributes[i].info.runtimeinvisibletypeannotations_attribute.annotations = calloc(
                 attributes[i].info.runtimeinvisibletypeannotations_attribute.num_annotations,
                 sizeof (vm_type_annotation_t));
-            // TO DO: IMPLEMENTAR TYPE ANNOTATIONS PARSER(DESCRIÇÃO PÁGINA 143 da JVM)
+            type_annotations_parser(
+                        attributes[i].info.runtimeinvisibletypeannotations_attribute.num_annotations,
+                        attributes[i].info.runtimeinvisibletypeannotations_attribute.annotations,
+                        file);
             break;
 
         case AnnotationDefault:

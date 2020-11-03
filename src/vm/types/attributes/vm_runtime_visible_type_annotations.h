@@ -4,15 +4,22 @@
 #include "vm_runtime_visible_annotations.h"
 #include "../target/vm_target_types.h"
 
+
+/**
+ * @brief
+ */
+typedef struct vm_type_path_table {
+        uint8_t type_path_kind;
+        uint8_t type_argument_index;
+    } vm_type_path_table_t;
+
+
 /**
  * @brief
  */
 typedef struct vm_type_path {
     uint8_t path_length;
-    struct {
-        uint8_t type_path_kind;
-        uint8_t type_argument_index;
-    } *path;
+    vm_type_path_table_t *path;
 } vm_type_path_t;
 
 /**
