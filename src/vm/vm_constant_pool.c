@@ -470,9 +470,6 @@ void type_annotations_parser(
         case 0x00:
             // type parameter declaration of generic class or interface
             // Location: ClassFile
-            type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
-
-            break;
         case 0x01:
             // type parameter declaration of generic method or
             // constructor
@@ -483,16 +480,11 @@ void type_annotations_parser(
             // type in extends clause of class or interface declaration, or
             // in implements clause of interface declaration
             // Location: ClassFile
-            type_annotation_pt[j].target_info.supertype_target.supertype_index = read_u2(file);
-            /* code */
-            break;
         case 0x11:
             // type in bound of type parameter declaration of generic
             // class or interface
             // Location: ClassFile
-            type_annotation_pt[j].target_info.type_parameter_bound_target.type_parameter_index = read_u1(file);
-            type_annotation_pt[j].target_info.type_parameter_bound_target.bound_index = read_u1(file);
-            /* code */
+            type_annotation_pt[j].target_info.supertype_target.supertype_index = read_u2(file);
             break;
         case 0x12:
             // 0x12 type in bound of type parameter declaration of generic method
@@ -502,18 +494,11 @@ void type_annotations_parser(
             break;
         case 0x13:
             // 0x13 type in field declaration field_info
-            type_annotation_pt[j].target_info.empty_target;
-            /* code */
-            break;
         case 0x14:
             // 0x14 return type of method or constructor method_info
-            type_annotation_pt[j].target_info.empty_target;
-            /* code */
-            break;
         case 0x15:
             // 0x15 receiver type of method or constructor method_info
             type_annotation_pt[j].target_info.empty_target;
-            /* code */
             break;
         case 0x16:
             // 0x16 type in formal parameter declaration of method, constructor,
@@ -527,8 +512,8 @@ void type_annotations_parser(
             /* code */
             break;
         case 0x40:
-        case 0x41:
             // 0x40 type in local variable declaration localvar_target
+        case 0x41:
             // 0x41 type in resource variable declaration localvar_target
             type_annotation_pt[j].target_info.localvar_target.table_length = read_u2(file);
             type_annotation_pt[j].target_info.localvar_target.table = calloc(
@@ -877,7 +862,8 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             break;
 
         case AnnotationDefault:
-            // TO DO: VALIDAR SE ESSA ESTRUTURA ESTÁ IMPLEMENTADA CORRETAMENTE.
+            element_value_parser(&(attributes[i].info.annotationdefault_attribute.default_value),
+                file);
             break;
 
         case BootstrapMethods:
