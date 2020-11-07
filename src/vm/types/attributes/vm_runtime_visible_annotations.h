@@ -39,9 +39,9 @@ typedef struct vm_element_value {
  * @brief
  */
 typedef struct vm_element_value_pairs {
-                uint16_t element_name_index;
-                vm_element_value_t value;
-            } vm_element_value_pairs_t;
+    uint16_t element_name_index;
+    vm_element_value_t value;
+} vm_element_value_pairs_t;
 
 
 /**

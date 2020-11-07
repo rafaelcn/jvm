@@ -376,7 +376,7 @@ void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file)
 /**
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
- * @param element_value_pt 
+ * @param element_value_pt
  * @param file A file_t pointer that has the .class loaded.
  */
 void element_value_parser(
@@ -384,11 +384,11 @@ void element_value_parser(
 {
     element_value_pt->tag = read_u1(file);
     uint8_t tag = element_value_pt->tag;
-    
-    // As the same behavior shall happen with different tags, let's compare the tag 
-    // with those characters 
+
+    // As the same behavior shall happen with different tags, let's compare the tag
+    // with those characters
     uint8_t is_constant_value_index_tag = strchr("BCDFIJSZs", tag) != NULL;
-    if(is_constant_value_index_tag) 
+    if(is_constant_value_index_tag)
     {
         element_value_pt->value.const_value_index = read_u2(file);
     } else if (tag == 'e')
@@ -488,7 +488,6 @@ void type_annotations_parser(
             break;
         case 0x12:
             // 0x12 type in bound of type parameter declaration of generic method
-            /* code */
             type_annotation_pt[j].target_info.type_parameter_bound_target.type_parameter_index = read_u1(file);
             type_annotation_pt[j].target_info.type_parameter_bound_target.bound_index = read_u1(file);
             break;
@@ -504,12 +503,10 @@ void type_annotations_parser(
             // 0x16 type in formal parameter declaration of method, constructor,
             // or lambda expression method_info
             type_annotation_pt[j].target_info.formal_parameter_target.formal_parameter_index = read_u1(file);
-            /* code */
             break;
         case 0x17:
             // 0x17 type in throws clause of method or constructor method_info
             type_annotation_pt[j].target_info.throws_target.throws_type_index = read_u2(file);
-            /* code */
             break;
         case 0x40:
             // 0x40 type in local variable declaration localvar_target
@@ -557,7 +554,7 @@ void type_annotations_parser(
             // 0x4A type argument for generic constructor in method
             // reference expression using ::new type_argument_target
         case 0x4B:
-            // 0x4B type argument for generic method in method reference 
+            // 0x4B type argument for generic method in method reference
             // expression using ::Identifier type_argument_target
             type_annotation_pt[j].target_info.type_argument_target.offset = read_u2(file);
             type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
@@ -926,6 +923,25 @@ void fields_parser(file_t *file, vm_class_file_t *cf) {
 }
 
 /**
+ * @brief A function dedicated to filling the fields field of the
+ * vm_class_file_t structure.
+ * @param file A file_t pointer that has the .class loaded.
+ * @param cf A pointer to a vm_class_file_t structure.
+ */
+void methods_parser(file_t *file, vm_class_file_t *cf) {
+    for (int i = 0; i < (cf->methods_count); i++) {
+        cf->methods[i].access_flags = read_u2(file);
+        cf->methods[i].name_index = read_u2(file);
+        cf->methods[i].descriptor_index = read_u2(file);
+        cf->methods[i].attributes_count = read_u2(file);
+        cf->methods[i].attributes = calloc(cf->methods[i].attributes_count,
+            sizeof (vm_attribute_info_t));
+
+        attributes_parser(cf->methods[i].attributes_count, cf->methods[i].attributes, cf->constant_pool, file);
+    }
+}
+
+/**
  * @brief Parses the .class bytecode to a ClassFile structure.
  * @param file A FILE (from stdio, in rb mode) pointer to a .class file.
  * @param cf A pointer to a ClassFile structure.
@@ -954,6 +970,16 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     cf->fields = calloc(cf->fields_count, sizeof (vm_field_info_t));
 
     fields_parser(file, cf);
+
+    cf->methods_count = read_u2(file);
+    cf->methods = calloc(cf->methods_count, sizeof (vm_method_info_t));
+
+    methods_parser(file, cf);
+
+    cf->attributes_count = read_u2(file);
+    cf->attributes = calloc(cf->attributes_count, sizeof (vm_attribute_info_t));
+
+    attributes_parser(cf->attributes_count, cf->attributes, cf->constant_pool, file);
 }
 
 /**
