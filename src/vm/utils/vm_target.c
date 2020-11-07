@@ -29,7 +29,7 @@ const char* vm_target(uint16_t compile_version) {
         java_version = "1.8";
         break;
     default:
-        java_version = "not implemented";
+        java_version = "Unknown";
     }
 
     return java_version;
