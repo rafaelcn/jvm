@@ -107,95 +107,201 @@ void vm_init_tag_map() {
  */
 void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
     uint8_t tag;
+    uint16_t *heap;
+    char buffer[80];
 
-    for (int i = 0; i < (cf->constant_pool_count - 1); i++) {
+    for (int i = 1; i < cf->constant_pool_count; i++) {
         tag = read_u1(file);
 
         switch (tag) {
         case CONSTANT_Class:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Class", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.class_info.name_index = read_u2(file);
+            sprintf(buffer, "\t| Name Index: 0x%04X\n", cf->constant_pool[i].info.class_info.name_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Fieldref:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Fieldref", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.fieldref_info.class_index = read_u2(file);
+            sprintf(buffer, "\t| Class Index: 0x%04X", cf->constant_pool[i].info.fieldref_info.class_index);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.fieldref_info.name_and_type_index = read_u2(file);
+            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.fieldref_info.name_and_type_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Methodref:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Methodref", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.methodref_info.class_index = read_u2(file);
+            sprintf(buffer, "\t| Class Index: 0x%04X", cf->constant_pool[i].info.methodref_info.class_index);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.methodref_info.name_and_type_index = read_u2(file);
+            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.methodref_info.name_and_type_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_InterfaceMethodref:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: InterfaceMethodref", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.interfacemethodref_info.class_index = read_u2(file);
+            sprintf(buffer, "\t| Class Index: 0x%04X", cf->constant_pool[i].info.interfacemethodref_info.class_index);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.interfacemethodref_info.name_and_type_index = read_u2(file);
+            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.interfacemethodref_info.name_and_type_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_String:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: String", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.string_info.string_index = read_u2(file);
+            sprintf(buffer, "\t| String Index: 0x%04X\n", cf->constant_pool[i].info.string_info.string_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Integer:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Integer", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.integer_info.bytes = read_u4(file);
+            sprintf(buffer, "\t| Bytes: 0x%08X\n", cf->constant_pool[i].info.integer_info.bytes);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Float:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Float", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.float_info.bytes = read_u4(file);
+            sprintf(buffer, "\t| Bytes: 0x%08X\n", cf->constant_pool[i].info.float_info.bytes);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Long:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Long", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.long_info.high_bytes = read_u4(file);
+            sprintf(buffer, "\t| High Bytes: 0x%08X", cf->constant_pool[i].info.long_info.high_bytes);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.long_info.low_bytes = read_u4(file);
+            sprintf(buffer, "\t| Low Bytes: 0x%08X\n", cf->constant_pool[i].info.long_info.low_bytes);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Double:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Double", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.double_info.high_bytes = read_u4(file);
+            sprintf(buffer, "\t| Low Bytes: 0x%08X", cf->constant_pool[i].info.double_info.high_bytes);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.double_info.low_bytes = read_u4(file);
+            sprintf(buffer, "\t| Low Bytes: 0x%08X\n", cf->constant_pool[i].info.double_info.low_bytes);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_NameAndType:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: NameAndType", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.nameandtype_info.name_index = read_u2(file);
+            sprintf(buffer, "\t| Name Index: 0x%04X", cf->constant_pool[i].info.nameandtype_info.name_index);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.nameandtype_info.descriptor_index = read_u2(file);
+            sprintf(buffer, "\t| Descriptor Index: 0x%04X\n", cf->constant_pool[i].info.nameandtype_info.descriptor_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Utf8:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: Utf8", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.utf8_info.length = read_u2(file);
+            sprintf(buffer, "\t| Length: 0x%04X", cf->constant_pool[i].info.utf8_info.length);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
                 cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
 
-            uint16_t size = cf->constant_pool[i].info.utf8_info.length;
-
-            for(int j = 0; j < size; j++) {
+            for(int j = 0; j < cf->constant_pool[i].info.utf8_info.length; j++) {
                 cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
             }
+
+            heap = vm_utf8_to_uint16_t(cf->constant_pool[i].info.utf8_info.length, cf->constant_pool[i].info.utf8_info.bytes);
+
+            vm_error_log_caralho("\t| \"");
+
+            for (int j = 0; j < cf->constant_pool[i].info.utf8_info.length; j++) {
+                sprintf(&buffer[j], "%lc", heap[j]);
+            }
+
+            vm_error_log_caralho(buffer);
+            vm_error_log_caralho("\"\n");
             break;
 
         case CONSTANT_MethodHandle:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: MethodHandle", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.methodhandle_info.reference_kind = read_u1(file);
+            sprintf(buffer, "\t| Reference Kind: 0x%02X", cf->constant_pool[i].info.methodhandle_info.reference_kind);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.methodhandle_info.reference_index = read_u2(file);
+            sprintf(buffer, "\t| Reference Index: 0x%04X\n", cf->constant_pool[i].info.methodhandle_info.reference_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_MethodType:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: MethodType", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.methodtype_info.desciptor_index = read_u2(file);
+            sprintf(buffer, "\t| Descriptor Index: 0x%04X\n", cf->constant_pool[i].info.methodtype_info.desciptor_index);
+            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_InvokeDynamic:
             cf->constant_pool[i].tag = tag;
+            sprintf(buffer, "\tCP[%02i] | Tag: InvokeDynamic", i, cf->constant_pool[i].tag);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.invokedynamic_info.bootstrap_method_attr_index = read_u2(file);
+            sprintf(buffer, "\t| Bootstrap Method Attribute Index: 0x%04X", cf->constant_pool[i].info.invokedynamic_info.bootstrap_method_attr_index);
+            vm_error_log_caralho(buffer);
+
             cf->constant_pool[i].info.invokedynamic_info.name_and_type_index = read_u2(file);
+            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.invokedynamic_info.name_and_type_index);
+            vm_error_log_caralho(buffer);
             break;
 
         default:
@@ -1030,7 +1136,7 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     sprintf(buffer, "Constant Pool Count: 0x%04X\n\n", cf->constant_pool_count);
     vm_error_log_caralho(buffer);
 
-    cf->constant_pool = calloc(cf->constant_pool_count - 1, sizeof (vm_cp_info_t));
+    cf->constant_pool = calloc(cf->constant_pool_count, sizeof (vm_cp_info_t));
 
     vm_error_log_caralho("Constant Pool - Start!\n");
     constant_pool_parser(file, cf);
