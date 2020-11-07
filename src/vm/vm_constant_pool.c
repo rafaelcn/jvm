@@ -718,11 +718,11 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
 
     for (int i = 0; i < (attributes_count); i++) {
         attributes[i].attribute_name_index = read_u2(file);
-        sprintf(buffer, "\tAttribute Name Index: 0x%04X\n", attributes[i].attribute_name_index);
+        sprintf(buffer, "\t\tAttribute Name Index: 0x%04X\n", attributes[i].attribute_name_index);
         vm_error_log_caralho(buffer);
 
         attributes[i].attribute_length = read_u4(file);
-        sprintf(buffer, "\tAttribute Length: 0x%08X\n", attributes[i].attribute_length);
+        sprintf(buffer, "\t\tAttribute Length: 0x%08X\n", attributes[i].attribute_length);
         vm_error_log_caralho(buffer);
 
         utf8 = constant_pool[attributes[i].attribute_name_index].info.utf8_info;
@@ -1129,11 +1129,11 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     vm_error_log_caralho(buffer);
 
     cf->major_version = read_u2(file);
-    sprintf(buffer, "Major Version: 0x%04X\n", cf->major_version);
+    sprintf(buffer, "Major Version: 0x%04X\n\n", cf->major_version);
     vm_error_log_caralho(buffer);
 
     cf->constant_pool_count = read_u2(file);
-    sprintf(buffer, "Constant Pool Count: 0x%04X\n\n", cf->constant_pool_count);
+    sprintf(buffer, "Constant Pool Count: 0x%04X\n", cf->constant_pool_count);
     vm_error_log_caralho(buffer);
 
     cf->constant_pool = calloc(cf->constant_pool_count, sizeof (vm_cp_info_t));
@@ -1151,11 +1151,11 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     vm_error_log_caralho(buffer);
 
     cf->super_class = read_u2(file);
-    sprintf(buffer, "Super Class: 0x%04X\n", cf->super_class);
+    sprintf(buffer, "Super Class: 0x%04X\n\n", cf->super_class);
     vm_error_log_caralho(buffer);
 
     cf->interfaces_count = read_u2(file);
-    sprintf(buffer, "Interfaces Count: 0x%04X\n\n", cf->interfaces_count);
+    sprintf(buffer, "Interfaces Count: 0x%04X\n", cf->interfaces_count);
     vm_error_log_caralho(buffer);
 
     cf->interfaces = calloc(cf->interfaces_count, sizeof (uint16_t));
@@ -1165,7 +1165,7 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     vm_error_log_caralho("Interfaces - Success!\n\n");
 
     cf->fields_count = read_u2(file);
-    sprintf(buffer, "Fields Count: 0x%04X\n\n", cf->fields_count);
+    sprintf(buffer, "Fields Count: 0x%04X\n", cf->fields_count);
     vm_error_log_caralho(buffer);
 
     cf->fields = calloc(cf->fields_count, sizeof (vm_field_info_t));
@@ -1175,7 +1175,7 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     vm_error_log_caralho("Fields - Success!\n\n");
 
     cf->methods_count = read_u2(file);
-    sprintf(buffer, "Methods Count: 0x%04X\n\n", cf->methods_count);
+    sprintf(buffer, "Methods Count: 0x%04X\n", cf->methods_count);
     vm_error_log_caralho(buffer);
 
     cf->methods = calloc(cf->methods_count, sizeof (vm_method_info_t));
@@ -1185,7 +1185,7 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     vm_error_log_caralho("Methods - Success!\n\n");
 
     cf->attributes_count = read_u2(file);
-    sprintf(buffer, "Attributes Count: 0x%04X\n\n", cf->attributes_count);
+    sprintf(buffer, "Attributes Count: 0x%04X\n", cf->attributes_count);
     vm_error_log_caralho(buffer);
 
     cf->attributes = calloc(cf->attributes_count, sizeof (vm_attribute_info_t));
@@ -1219,11 +1219,11 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
     printf("CONSTANT POOL\n");
     printf("-------------\n\n");
 
-    for (uint16_t i = 0; i < (class_file.constant_pool_count - 1); i++) {
+    for (uint16_t i = 1; i < class_file.constant_pool_count; i++) {
 
         vm_cp_info_t cp_info = class_file.constant_pool[i];
 
-        printf("%3s #%d\t| %3d %3s %-10s", "", i+1, cp_info.tag,
+        printf("%3s #%d\t| %3d %3s %-10s", "", i, cp_info.tag,
             tag_constants[cp_info.tag], "");
 
         switch (class_file.constant_pool[i].tag) {
