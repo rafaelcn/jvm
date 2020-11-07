@@ -75,20 +75,20 @@ void vm_init_tag_map() {
         tag_constants[i] = calloc(17, sizeof(char));
     }
 
-    strcpy(tag_constants[0x01], "UTF8            ");
-    strcpy(tag_constants[0x03], "Integer         ");
-    strcpy(tag_constants[0x04], "Float           ");
-    strcpy(tag_constants[0x05], "Long            ");
-    strcpy(tag_constants[0x06], "Double          ");
-    strcpy(tag_constants[0x07], "Class           ");
-    strcpy(tag_constants[0x08], "String          ");
-    strcpy(tag_constants[0x09], "Field           ");
-    strcpy(tag_constants[0x0A], "Method          ");
+    strcpy(tag_constants[0x01], "UTF8");
+    strcpy(tag_constants[0x03], "Integer");
+    strcpy(tag_constants[0x04], "Float");
+    strcpy(tag_constants[0x05], "Long");
+    strcpy(tag_constants[0x06], "Double");
+    strcpy(tag_constants[0x07], "Class");
+    strcpy(tag_constants[0x08], "String");
+    strcpy(tag_constants[0x09], "Field");
+    strcpy(tag_constants[0x0A], "Method");
     strcpy(tag_constants[0x0B], "Interface Method");
-    strcpy(tag_constants[0x0C], "Name and Type   ");
-    strcpy(tag_constants[0x0F], "Method Handle   ");
-    strcpy(tag_constants[0x10], "Method Type     ");
-    strcpy(tag_constants[0x12], "Invoke Dynamic  ");
+    strcpy(tag_constants[0x0C], "Name and Type");
+    strcpy(tag_constants[0x0F], "Method Handle");
+    strcpy(tag_constants[0x10], "Method Type");
+    strcpy(tag_constants[0x12], "Invoke Dynamic");
 }
 
 /**
@@ -1029,9 +1029,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
         vm_cp_info_t cp_info = class_file.constant_pool[i];
 
-        if ((cp_info.tag != 0x01) && (cp_info.tag != 0x0C)) {
-            fprintf(VM_LOG_FILE, "#%02d | %s", i, tag_constants[cp_info.tag]);
-        }
+        fprintf(VM_LOG_FILE, "#% 03d | %-16s", i, tag_constants[cp_info.tag]);
 
         switch (class_file.constant_pool[i].tag) {
         case CONSTANT_Class:
@@ -1128,7 +1126,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.length;
                 uint8_t *bytes = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " | ");
+                fprintf(VM_LOG_FILE, " | String: ");
                 utf8_helper(length, bytes);
                 fprintf(VM_LOG_FILE, "\n");
             }
@@ -1179,7 +1177,32 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
 
         case CONSTANT_NameAndType:
+            {
+                uint16_t length = class_file.constant_pool[cp_info.info.nameandtype_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[cp_info.info.nameandtype_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[cp_info.info.nameandtype_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[cp_info.info.nameandtype_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
+            break;
+
         case CONSTANT_Utf8:
+            {
+                uint16_t length = cp_info.info.utf8_info.length;
+                uint8_t *bytes = cp_info.info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_MethodHandle:
