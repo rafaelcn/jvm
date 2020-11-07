@@ -31,7 +31,7 @@
 /**
  * @brief
  */
-FILE * PAI_CARECA_CACETE;
+FILE * VM_LOG_FILE;
 
 /**
  * @brief Attribute Types tag mapping.
@@ -68,14 +68,6 @@ enum attribute_types_enum {
  */
 char *tag_constants[19];
 
-void vm_error_log_caralho(const char * message) {
-    PAI_CARECA_CACETE = fopen("vm_log.txt", "a");
-
-    fprintf(PAI_CARECA_CACETE, message);
-
-    fclose(PAI_CARECA_CACETE);
-}
-
 void vm_init_tag_map() {
     for (size_t i = 0; i < 19; i++) {
         // each tag_constant position can hold up to 17 chars, the exact amount
@@ -83,20 +75,20 @@ void vm_init_tag_map() {
         tag_constants[i] = calloc(17, sizeof(char));
     }
 
-    strcpy(tag_constants[0x01], "UTF8");
-    strcpy(tag_constants[0x03], "Integer");
-    strcpy(tag_constants[0x04], "Float");
-    strcpy(tag_constants[0x05], "Long");
-    strcpy(tag_constants[0x06], "Double");
-    strcpy(tag_constants[0x07], "Class");
-    strcpy(tag_constants[0x08], "String");
-    strcpy(tag_constants[0x09], "Field");
-    strcpy(tag_constants[0x0A], "Method");
+    strcpy(tag_constants[0x01], "UTF8            ");
+    strcpy(tag_constants[0x03], "Integer         ");
+    strcpy(tag_constants[0x04], "Float           ");
+    strcpy(tag_constants[0x05], "Long            ");
+    strcpy(tag_constants[0x06], "Double          ");
+    strcpy(tag_constants[0x07], "Class           ");
+    strcpy(tag_constants[0x08], "String          ");
+    strcpy(tag_constants[0x09], "Field           ");
+    strcpy(tag_constants[0x0A], "Method          ");
     strcpy(tag_constants[0x0B], "Interface Method");
-    strcpy(tag_constants[0x0C], "Name and Type");
-    strcpy(tag_constants[0x0F], "Method Handle");
-    strcpy(tag_constants[0x10], "Method Type");
-    strcpy(tag_constants[0x12], "Invoke Dynamic");
+    strcpy(tag_constants[0x0C], "Name and Type   ");
+    strcpy(tag_constants[0x0F], "Method Handle   ");
+    strcpy(tag_constants[0x10], "Method Type     ");
+    strcpy(tag_constants[0x12], "Invoke Dynamic  ");
 }
 
 /**
@@ -107,8 +99,6 @@ void vm_init_tag_map() {
  */
 void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
     uint8_t tag;
-    uint16_t *heap;
-    char buffer[80];
 
     for (int i = 1; i < cf->constant_pool_count; i++) {
         tag = read_u1(file);
@@ -116,192 +106,86 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
         switch (tag) {
         case CONSTANT_Class:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Class", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.class_info.name_index = read_u2(file);
-            sprintf(buffer, "\t| Name Index: 0x%04X\n", cf->constant_pool[i].info.class_info.name_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Fieldref:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Fieldref", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.fieldref_info.class_index = read_u2(file);
-            sprintf(buffer, "\t| Class Index: 0x%04X", cf->constant_pool[i].info.fieldref_info.class_index);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.fieldref_info.name_and_type_index = read_u2(file);
-            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.fieldref_info.name_and_type_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Methodref:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Methodref", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.methodref_info.class_index = read_u2(file);
-            sprintf(buffer, "\t| Class Index: 0x%04X", cf->constant_pool[i].info.methodref_info.class_index);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.methodref_info.name_and_type_index = read_u2(file);
-            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.methodref_info.name_and_type_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_InterfaceMethodref:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: InterfaceMethodref", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.interfacemethodref_info.class_index = read_u2(file);
-            sprintf(buffer, "\t| Class Index: 0x%04X", cf->constant_pool[i].info.interfacemethodref_info.class_index);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.interfacemethodref_info.name_and_type_index = read_u2(file);
-            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.interfacemethodref_info.name_and_type_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_String:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: String", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.string_info.string_index = read_u2(file);
-            sprintf(buffer, "\t| String Index: 0x%04X\n", cf->constant_pool[i].info.string_info.string_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Integer:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Integer", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.integer_info.bytes = read_u4(file);
-            sprintf(buffer, "\t| Bytes: 0x%08X\n", cf->constant_pool[i].info.integer_info.bytes);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Float:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Float", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.float_info.bytes = read_u4(file);
-            sprintf(buffer, "\t| Bytes: 0x%08X\n", cf->constant_pool[i].info.float_info.bytes);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Long:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Long", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.long_info.high_bytes = read_u4(file);
-            sprintf(buffer, "\t| High Bytes: 0x%08X", cf->constant_pool[i].info.long_info.high_bytes);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.long_info.low_bytes = read_u4(file);
-            sprintf(buffer, "\t| Low Bytes: 0x%08X\n", cf->constant_pool[i].info.long_info.low_bytes);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Double:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Double", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.double_info.high_bytes = read_u4(file);
-            sprintf(buffer, "\t| Low Bytes: 0x%08X", cf->constant_pool[i].info.double_info.high_bytes);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.double_info.low_bytes = read_u4(file);
-            sprintf(buffer, "\t| Low Bytes: 0x%08X\n", cf->constant_pool[i].info.double_info.low_bytes);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_NameAndType:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: NameAndType", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.nameandtype_info.name_index = read_u2(file);
-            sprintf(buffer, "\t| Name Index: 0x%04X", cf->constant_pool[i].info.nameandtype_info.name_index);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.nameandtype_info.descriptor_index = read_u2(file);
-            sprintf(buffer, "\t| Descriptor Index: 0x%04X\n", cf->constant_pool[i].info.nameandtype_info.descriptor_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_Utf8:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: Utf8", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.utf8_info.length = read_u2(file);
-            sprintf(buffer, "\t| Length: 0x%04X", cf->constant_pool[i].info.utf8_info.length);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
                 cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
 
             for(int j = 0; j < cf->constant_pool[i].info.utf8_info.length; j++) {
                 cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
             }
-
-            heap = vm_utf8_to_uint16_t(cf->constant_pool[i].info.utf8_info.length, cf->constant_pool[i].info.utf8_info.bytes);
-
-            vm_error_log_caralho("\t| \"");
-
-            for (int j = 0; j < cf->constant_pool[i].info.utf8_info.length; j++) {
-                sprintf(&buffer[j], "%lc", heap[j]);
-            }
-
-            vm_error_log_caralho(buffer);
-            vm_error_log_caralho("\"\n");
             break;
 
         case CONSTANT_MethodHandle:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: MethodHandle", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.methodhandle_info.reference_kind = read_u1(file);
-            sprintf(buffer, "\t| Reference Kind: 0x%02X", cf->constant_pool[i].info.methodhandle_info.reference_kind);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.methodhandle_info.reference_index = read_u2(file);
-            sprintf(buffer, "\t| Reference Index: 0x%04X\n", cf->constant_pool[i].info.methodhandle_info.reference_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_MethodType:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: MethodType", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.methodtype_info.desciptor_index = read_u2(file);
-            sprintf(buffer, "\t| Descriptor Index: 0x%04X\n", cf->constant_pool[i].info.methodtype_info.desciptor_index);
-            vm_error_log_caralho(buffer);
             break;
 
         case CONSTANT_InvokeDynamic:
             cf->constant_pool[i].tag = tag;
-            sprintf(buffer, "\tCP[%02i] | Tag: InvokeDynamic", i, cf->constant_pool[i].tag);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.invokedynamic_info.bootstrap_method_attr_index = read_u2(file);
-            sprintf(buffer, "\t| Bootstrap Method Attribute Index: 0x%04X", cf->constant_pool[i].info.invokedynamic_info.bootstrap_method_attr_index);
-            vm_error_log_caralho(buffer);
-
             cf->constant_pool[i].info.invokedynamic_info.name_and_type_index = read_u2(file);
-            sprintf(buffer, "\t| Name and Type Index: 0x%04X\n", cf->constant_pool[i].info.invokedynamic_info.name_and_type_index);
-            vm_error_log_caralho(buffer);
             break;
 
         default:
@@ -317,12 +201,8 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
  * @param cf A pointer to a vm_class_file_t structure.
  */
 void interfaces_parser(file_t *file, vm_class_file_t *cf) {
-    char buffer[80];
-
     for (int i = 0; i < (cf->interfaces_count); i++) {
         cf->interfaces[i] = read_u2(file);
-        sprintf(buffer, "\tInterfaces[%i]: 0x%04X\n", i, cf->interfaces[i]);
-        vm_error_log_caralho(buffer);
     }
 }
 
@@ -338,9 +218,6 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
         sprintf(&buffer[j], "%lc", heap[j]);
     }
 
-    // vm_error_log_caralho("\tAttribute Name: ");
-    // vm_error_log_caralho(buffer);
-    // vm_error_log_caralho("\n");
 
     if (vm_strcmp(buffer, "ConstantValue"))
         return ConstantValue;
@@ -718,12 +595,7 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
 
     for (int i = 0; i < (attributes_count); i++) {
         attributes[i].attribute_name_index = read_u2(file);
-        sprintf(buffer, "\t\tAttribute Name Index: 0x%04X\n", attributes[i].attribute_name_index);
-        vm_error_log_caralho(buffer);
-
         attributes[i].attribute_length = read_u4(file);
-        sprintf(buffer, "\t\tAttribute Length: 0x%08X\n", attributes[i].attribute_length);
-        vm_error_log_caralho(buffer);
 
         utf8 = constant_pool[attributes[i].attribute_name_index].info.utf8_info;
 
@@ -827,21 +699,13 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
 
         case LineNumberTable:
             attributes[i].info.linenumbertable_attribute.line_number_table_length = read_u2(file);
-            sprintf(buffer, "\tLNT Length: 0x%04X\n", attributes[i].info.linenumbertable_attribute.line_number_table_length);
-            vm_error_log_caralho(buffer);
-
             attributes[i].info.linenumbertable_attribute.line_number_table = calloc(
                 attributes[i].info.linenumbertable_attribute.line_number_table_length,
                 sizeof (vm_line_number_t));
 
             for (int j = 0; j < (attributes[i].info.linenumbertable_attribute.line_number_table_length); j++) {
                 attributes[i].info.linenumbertable_attribute.line_number_table[j].start_pc = read_u2(file);
-                sprintf(buffer, "\tStart PC: 0x%04X\n", attributes[i].info.linenumbertable_attribute.line_number_table[j].start_pc);
-                vm_error_log_caralho(buffer);
-
                 attributes[i].info.linenumbertable_attribute.line_number_table[j].line_number = read_u2(file);
-                sprintf(buffer, "\tLine Number: 0x%04X\n", attributes[i].info.linenumbertable_attribute.line_number_table[j].line_number);
-                vm_error_log_caralho(buffer);
             }
             break;
 
@@ -1056,21 +920,9 @@ void fields_parser(file_t *file, vm_class_file_t *cf) {
 
     for (int i = 0; i < (cf->fields_count); i++) {
         cf->fields[i].access_flags = read_u2(file);
-        sprintf(buffer, "\tAccess Flags: 0x%04X\n", cf->fields[i].access_flags);
-        vm_error_log_caralho(buffer);
-
         cf->fields[i].name_index = read_u2(file);
-        sprintf(buffer, "\tName Index: 0x%04X\n", cf->fields[i].name_index);
-        vm_error_log_caralho(buffer);
-
         cf->fields[i].descriptor_index = read_u2(file);
-        sprintf(buffer, "\tDescriptor Index: 0x%04X\n", cf->fields[i].descriptor_index);
-        vm_error_log_caralho(buffer);
-
         cf->fields[i].attributes_count = read_u2(file);
-        sprintf(buffer, "\tAttributes Count: 0x%04X\n", cf->fields[i].attributes_count);
-        vm_error_log_caralho(buffer);
-
         cf->fields[i].attributes = calloc(cf->fields[i].attributes_count,
             sizeof (vm_attribute_info_t));
 
@@ -1089,21 +941,9 @@ void methods_parser(file_t *file, vm_class_file_t *cf) {
 
     for (uint16_t i = 0; i < (cf->methods_count); i++) {
         cf->methods[i].access_flags = read_u2(file);
-        sprintf(buffer, "\tAccess Flags: 0x%04X\n", cf->methods[i].access_flags);
-        vm_error_log_caralho(buffer);
-
         cf->methods[i].name_index = read_u2(file);
-        sprintf(buffer, "\tName Index: 0x%04X\n", cf->methods[i].name_index);
-        vm_error_log_caralho(buffer);
-
         cf->methods[i].descriptor_index = read_u2(file);
-        sprintf(buffer, "\tDescriptor Index: 0x%04X\n", cf->methods[i].descriptor_index);
-        vm_error_log_caralho(buffer);
-
         cf->methods[i].attributes_count = read_u2(file);
-        sprintf(buffer, "\tAttributes Count: 0x%04X\n", cf->methods[i].attributes_count);
-        vm_error_log_caralho(buffer);
-
         cf->methods[i].attributes = calloc(cf->methods[i].attributes_count,
             sizeof (vm_attribute_info_t));
 
@@ -1121,78 +961,43 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     char buffer[80];
 
     cf->magic = read_u4(file);
-    sprintf(buffer, "MAGIC: 0x%08X\n", cf->magic);
-    vm_error_log_caralho(buffer);
-
     cf->minor_version = read_u2(file);
-    sprintf(buffer, "Minor Version: 0x%04X\n", cf->minor_version);
-    vm_error_log_caralho(buffer);
-
     cf->major_version = read_u2(file);
-    sprintf(buffer, "Major Version: 0x%04X\n\n", cf->major_version);
-    vm_error_log_caralho(buffer);
 
     cf->constant_pool_count = read_u2(file);
-    sprintf(buffer, "Constant Pool Count: 0x%04X\n", cf->constant_pool_count);
-    vm_error_log_caralho(buffer);
-
     cf->constant_pool = calloc(cf->constant_pool_count, sizeof (vm_cp_info_t));
-
-    vm_error_log_caralho("Constant Pool - Start!\n");
     constant_pool_parser(file, cf);
-    vm_error_log_caralho("Constant Pool - Success!\n\n");
 
     cf->access_flags = read_u2(file);
-    sprintf(buffer, "Access Flags: 0x%04X\n", cf->access_flags);
-    vm_error_log_caralho(buffer);
-
     cf->this_class = read_u2(file);
-    sprintf(buffer, "This Class: 0x%04X\n", cf->this_class);
-    vm_error_log_caralho(buffer);
-
     cf->super_class = read_u2(file);
-    sprintf(buffer, "Super Class: 0x%04X\n\n", cf->super_class);
-    vm_error_log_caralho(buffer);
 
     cf->interfaces_count = read_u2(file);
-    sprintf(buffer, "Interfaces Count: 0x%04X\n", cf->interfaces_count);
-    vm_error_log_caralho(buffer);
-
     cf->interfaces = calloc(cf->interfaces_count, sizeof (uint16_t));
-
-    vm_error_log_caralho("Interfaces - Start!\n");
     interfaces_parser(file, cf);
-    vm_error_log_caralho("Interfaces - Success!\n\n");
 
     cf->fields_count = read_u2(file);
-    sprintf(buffer, "Fields Count: 0x%04X\n", cf->fields_count);
-    vm_error_log_caralho(buffer);
-
     cf->fields = calloc(cf->fields_count, sizeof (vm_field_info_t));
-
-    vm_error_log_caralho("Fields - Start!\n");
     fields_parser(file, cf);
-    vm_error_log_caralho("Fields - Success!\n\n");
 
     cf->methods_count = read_u2(file);
-    sprintf(buffer, "Methods Count: 0x%04X\n", cf->methods_count);
-    vm_error_log_caralho(buffer);
-
     cf->methods = calloc(cf->methods_count, sizeof (vm_method_info_t));
-
-    vm_error_log_caralho("Methods - Start!\n");
     methods_parser(file, cf);
-    vm_error_log_caralho("Methods - Success!\n\n");
 
     cf->attributes_count = read_u2(file);
-    sprintf(buffer, "Attributes Count: 0x%04X\n", cf->attributes_count);
-    vm_error_log_caralho(buffer);
-
     cf->attributes = calloc(cf->attributes_count, sizeof (vm_attribute_info_t));
-
-    vm_error_log_caralho("Attributes - Start!\n");
     attributes_parser(cf->attributes_count, cf->attributes, cf->constant_pool, file);
-    vm_error_log_caralho("Attributes - Success!\n\n");
+}
+
+/**
+ * @brief
+ */
+void utf8_helper(uint16_t length, uint8_t *bytes) {
+    uint16_t *uint16_string = vm_utf8_to_uint16_t(length, bytes);
+
+    for (uint16_t i = 0; i < length; i++) {
+        fprintf(VM_LOG_FILE, "%lc", uint16_string[i]);
+    }
 }
 
 /**
@@ -1201,62 +1006,132 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
  * @param class_file A ClassFile structure to be printed.
  */
 void class_file_reader(vm_class_file_t class_file, file_t *file) {
-
     uint16_t cp_size = class_file.constant_pool_count;
+
+    VM_LOG_FILE = fopen("vm_log.txt", "w+");
 
     // gets the jvm execution target
     const char *java_version = vm_target(class_file.major_version);
 
-    printf("\n");
-    printf("%s\n\n", file->filename);
-    printf("%2sMAGIC:                %10X\n", "", class_file.magic);
-    printf("%2sMAJOR VERSION:        %10d\n", "", class_file.major_version);
-    printf("%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
-    printf("%2sJAVA TARGET:          %10s\n", "", java_version);
-    printf("%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
-    printf("\n");
+    fprintf(VM_LOG_FILE, "\n");
+    fprintf(VM_LOG_FILE, "%s\n\n", file->filename);
+    fprintf(VM_LOG_FILE, "%2sMAGIC:                %10X\n", "", class_file.magic);
+    fprintf(VM_LOG_FILE, "%2sMAJOR VERSION:        %10d\n", "", class_file.major_version);
+    fprintf(VM_LOG_FILE, "%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
+    fprintf(VM_LOG_FILE, "%2sJAVA TARGET:          %10s\n", "", java_version);
+    fprintf(VM_LOG_FILE, "%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
+    fprintf(VM_LOG_FILE, "\n");
 
-    printf("CONSTANT POOL\n");
-    printf("-------------\n\n");
+    fprintf(VM_LOG_FILE, "CONSTANT POOL\n");
+    fprintf(VM_LOG_FILE, "-------------\n\n");
 
     for (uint16_t i = 1; i < class_file.constant_pool_count; i++) {
 
         vm_cp_info_t cp_info = class_file.constant_pool[i];
 
-        printf("%3s #%d\t| %3d %3s %-10s", "", i, cp_info.tag,
-            tag_constants[cp_info.tag], "");
+        if ((cp_info.tag != 0x01) && (cp_info.tag != 0x0C)) {
+            fprintf(VM_LOG_FILE, "#%02d | %s", i, tag_constants[cp_info.tag]);
+        }
 
         switch (class_file.constant_pool[i].tag) {
         case CONSTANT_Class:
-            printf("\t| name_index: %5d", cp_info.info.class_info.name_index);
-            printf("\t|\n");
+            fprintf(VM_LOG_FILE, " | Class Name: ");
+            utf8_helper(
+                class_file.constant_pool[cp_info.info.class_info.name_index].info.utf8_info.length,
+                class_file.constant_pool[cp_info.info.class_info.name_index].info.utf8_info.bytes);
+            fprintf(VM_LOG_FILE, "\n");
             break;
 
         case CONSTANT_Fieldref:
-            printf("\t| class_index: %5d",
-                cp_info.info.fieldref_info.class_index);
-            printf("\t| name_and_type_index: %5d\n",
-                cp_info.info.fieldref_info.name_and_type_index);
+            {
+                vm_class_t class_info = class_file.constant_pool[cp_info.info.fieldref_info.class_index].info.class_info;
+                uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Class Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.fieldref_info.name_and_type_index].info.nameandtype_info;
+                length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Field Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Field Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_Methodref:
-            printf("\t| class_index:  % 5d",
-                cp_info.info.methodref_info.class_index);
-            printf("\t| name_and_type_index: % 5d\n",
-                cp_info.info.methodref_info.name_and_type_index);
+            {
+                vm_class_t class_info = class_file.constant_pool[cp_info.info.methodref_info.class_index].info.class_info;
+                uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Class Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.methodref_info.name_and_type_index].info.nameandtype_info;
+                length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Method Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Method Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_InterfaceMethodref:
-            printf("\t| class_index:  % 5d",
-                cp_info.info.interfacemethodref_info.class_index);
-            printf("\t| name_and_type_index: % 5d\n",
-                cp_info.info.interfacemethodref_info.name_and_type_index);
+            {
+                vm_class_t class_info = class_file.constant_pool[cp_info.info.interfacemethodref_info.class_index].info.class_info;
+                uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Class Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.interfacemethodref_info.name_and_type_index].info.nameandtype_info;
+                length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Interface Method Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Interface Method Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_String:
-            printf("\t| string_index: % 5d",
-                cp_info.info.string_info.string_index);
-            printf("\t|\n");
+            {
+                uint16_t length = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_Integer:
@@ -1264,7 +1139,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint32_t b = cp_info.info.integer_info.bytes;
                 int number = (int)b;
 
-                printf("\t| %d (%04X)\n", number, b);
+                fprintf(VM_LOG_FILE, " | %d (%04X)\n", number, b);
             }
             break;
 
@@ -1273,7 +1148,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint32_t bytes = cp_info.info.float_info.bytes;
                 float number = vm_itof(bytes);
 
-                printf("\t| %f (%4X)\n", number, bytes);
+                fprintf(VM_LOG_FILE, " | %f (%4X)\n", number, bytes);
             }
             break;
 
@@ -1286,7 +1161,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
                 long number = vm_itolf(low, high);
 
-                printf("\t| %ld (%4X) (%4X)\n", number, low, high);
+                fprintf(VM_LOG_FILE, " | %ld (%4X) (%4X)\n", number, low, high);
             }
             break;
 
@@ -1299,64 +1174,35 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
                 double number = vm_itod(low, high);
 
-                printf("\t| %lf (%4X) (%4X)\n", number, low, high);
+                fprintf(VM_LOG_FILE, " | %lf (%4X) (%4X)\n", number, low, high);
             }
             break;
 
         case CONSTANT_NameAndType:
-            printf("\t| name_index: %-5d",
-                cp_info.info.nameandtype_info.name_index);
-            printf("\t| descriptor_index: %-5d\n",
-                cp_info.info.nameandtype_info.descriptor_index);
+        case CONSTANT_Utf8:
             break;
 
-        case CONSTANT_Utf8:
-            {
-                uint16_t length = cp_info.info.utf8_info.length;
-                uint8_t *bytes = cp_info.info.utf8_info.bytes;
-
-                uint16_t *heap = vm_utf8_to_uint16_t(length, bytes);
-
-                printf("\t| \"");
-                for (int j = 0; j < cp_info.info.utf8_info.length; j++) {
-                    printf("%lc", heap[j]);
-                }
-                printf("\"\n");
-                break;
-            }
-
         case CONSTANT_MethodHandle:
-            printf("\t|MethodHandle - Ignoring");
-            printf("\t|\n");
             break;
 
         case CONSTANT_MethodType:
-            printf("\t|MethodType - Ignoring");
-            printf("\t|\n");
             break;
 
         case CONSTANT_InvokeDynamic:
-            printf("\t|InvokeDynamic - Ignoring");
-            printf("\t|\n");
             break;
 
         default:
-            printf("\n");
             break;
         }
     }
+
+    fclose(VM_LOG_FILE);
 }
 
 void vm_load_constant_pool(file_t *file) {
     vm_class_file_t class_file;
 
     file->read = 0;
-
-    PAI_CARECA_CACETE = fopen("vm_log.txt", "w+");
-
-    fprintf(PAI_CARECA_CACETE, "LOG DE ERROS\n\n");
-
-    fclose(PAI_CARECA_CACETE);
 
     vm_init_tag_map();
 
