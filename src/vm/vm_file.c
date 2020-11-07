@@ -9,7 +9,7 @@
 
 uint8_t read_u1(file_t *file) {
 
-    uint8_t value = 0;
+    uint8_t value = 255;
 
     if (file->read < file->size) {
         value = file->data[file->read];

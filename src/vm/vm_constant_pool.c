@@ -7,8 +7,8 @@
 #include <math.h>
 
 #include "vm_file.h"
-
 #include "utils/vm_target.h"
+#include "lib/vm_string.h"
 
 /**
  * @brief Constant Pool tag mapping.
@@ -27,6 +27,11 @@
 #define CONSTANT_MethodHandle       (0x0F)
 #define CONSTANT_MethodType         (0x10)
 #define CONSTANT_InvokeDynamic      (0x12)
+
+/**
+ * @brief
+ */
+FILE * PAI_CARECA_CACETE;
 
 /**
  * @brief Attribute Types tag mapping.
@@ -62,6 +67,14 @@ enum attribute_types_enum {
  * constant pool tags.
  */
 char *tag_constants[19];
+
+void vm_error_log_caralho(const char * message) {
+    PAI_CARECA_CACETE = fopen("vm_log.txt", "a");
+
+    fprintf(PAI_CARECA_CACETE, message);
+
+    fclose(PAI_CARECA_CACETE);
+}
 
 void vm_init_tag_map() {
     for (size_t i = 0; i < 19; i++) {
@@ -198,8 +211,12 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
  * @param cf A pointer to a vm_class_file_t structure.
  */
 void interfaces_parser(file_t *file, vm_class_file_t *cf) {
+    char buffer[80];
+
     for (int i = 0; i < (cf->interfaces_count); i++) {
         cf->interfaces[i] = read_u2(file);
+        sprintf(buffer, "\tInterfaces[%i]: 0x%04X\n", i, cf->interfaces[i]);
+        vm_error_log_caralho(buffer);
     }
 }
 
@@ -215,51 +232,55 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
         sprintf(&buffer[j], "%lc", heap[j]);
     }
 
-    if (buffer == "ConstantValue")
+    // vm_error_log_caralho("\tAttribute Name: ");
+    // vm_error_log_caralho(buffer);
+    // vm_error_log_caralho("\n");
+
+    if (vm_strcmp(buffer, "ConstantValue"))
         return ConstantValue;
-    if (buffer == "Code")
+    if (vm_strcmp(buffer, "Code"))
         return Code;
-    if (buffer == "StackMapTable")
+    if (vm_strcmp(buffer, "StackMapTable"))
         return StackMapTable;
-    if (buffer == "Exceptions")
+    if (vm_strcmp(buffer, "Exceptions"))
         return Exceptions;
-    if (buffer == "InnerClasses")
+    if (vm_strcmp(buffer, "InnerClasses"))
         return InnerClasses;
-    if (buffer == "EnclosingMethod")
+    if (vm_strcmp(buffer, "EnclosingMethod"))
         return EnclosingMethod;
-    if (buffer == "Synthetic")
+    if (vm_strcmp(buffer, "Synthetic"))
         return Synthetic;
-    if (buffer == "Signature")
+    if (vm_strcmp(buffer, "Signature"))
         return Signature;
-    if (buffer == "SourceFile")
+    if (vm_strcmp(buffer, "SourceFile"))
         return SourceFile;
-    if (buffer == "SourceDebugExtension")
+    if (vm_strcmp(buffer, "SourceDebugExtension"))
         return SourceDebugExtension;
-    if (buffer == "LineNumberTable")
+    if (vm_strcmp(buffer, "LineNumberTable"))
         return LineNumberTable;
-    if (buffer == "LocalVariableTable")
+    if (vm_strcmp(buffer, "LocalVariableTable"))
         return LocalVariableTable;
-    if (buffer == "LocalVariableTypeTable")
+    if (vm_strcmp(buffer, "LocalVariableTypeTable"))
         return LocalVariableTypeTable;
-    if (buffer == "Deprecated")
+    if (vm_strcmp(buffer, "Deprecated"))
         return Deprecated;
-    if (buffer == "RuntimeVisibleAnnotations")
+    if (vm_strcmp(buffer, "RuntimeVisibleAnnotations"))
         return RuntimeVisibleAnnotations;
-    if (buffer == "RuntimeInvisibleAnnotations")
+    if (vm_strcmp(buffer, "RuntimeInvisibleAnnotations"))
         return RuntimeInvisibleAnnotations;
-    if (buffer == "RuntimeVisibleParameterAnnotations")
+    if (vm_strcmp(buffer, "RuntimeVisibleParameterAnnotations"))
         return RuntimeVisibleParameterAnnotations;
-    if (buffer == "RuntimeInvisibleParameterAnnotations")
+    if (vm_strcmp(buffer, "RuntimeInvisibleParameterAnnotations"))
         return RuntimeInvisibleParameterAnnotations;
-    if (buffer == "RuntimeVisibleTypeAnnotations")
+    if (vm_strcmp(buffer, "RuntimeVisibleTypeAnnotations"))
         return RuntimeVisibleTypeAnnotations;
-    if (buffer == "RuntimeInvisibleTypeAnnotations")
+    if (vm_strcmp(buffer, "RuntimeInvisibleTypeAnnotations"))
         return RuntimeInvisibleTypeAnnotations;
-    if (buffer == "AnnotationDefault")
+    if (vm_strcmp(buffer, "AnnotationDefault"))
         return AnnotationDefault;
-    if (buffer == "BootstrapMethods")
+    if (vm_strcmp(buffer, "BootstrapMethods"))
         return BootstrapMethods;
-    if (buffer == "MethodParameters")
+    if (vm_strcmp(buffer, "MethodParameters"))
         return MethodParameters;
 
     return -1;
@@ -587,9 +608,16 @@ void type_annotations_parser(
 void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attributes, vm_cp_info_t *constant_pool, file_t *file) {
     vm_utf8_t utf8;
 
+    char buffer[80];
+
     for (int i = 0; i < (attributes_count); i++) {
         attributes[i].attribute_name_index = read_u2(file);
+        sprintf(buffer, "\tAttribute Name Index: 0x%04X\n", attributes[i].attribute_name_index);
+        vm_error_log_caralho(buffer);
+
         attributes[i].attribute_length = read_u4(file);
+        sprintf(buffer, "\tAttribute Length: 0x%08X\n", attributes[i].attribute_length);
+        vm_error_log_caralho(buffer);
 
         utf8 = constant_pool[attributes[i].attribute_name_index].info.utf8_info;
 
@@ -693,13 +721,21 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
 
         case LineNumberTable:
             attributes[i].info.linenumbertable_attribute.line_number_table_length = read_u2(file);
+            sprintf(buffer, "\tLNT Length: 0x%04X\n", attributes[i].info.linenumbertable_attribute.line_number_table_length);
+            vm_error_log_caralho(buffer);
+
             attributes[i].info.linenumbertable_attribute.line_number_table = calloc(
                 attributes[i].info.linenumbertable_attribute.line_number_table_length,
                 sizeof (vm_line_number_t));
 
             for (int j = 0; j < (attributes[i].info.linenumbertable_attribute.line_number_table_length); j++) {
                 attributes[i].info.linenumbertable_attribute.line_number_table[j].start_pc = read_u2(file);
+                sprintf(buffer, "\tStart PC: 0x%04X\n", attributes[i].info.linenumbertable_attribute.line_number_table[j].start_pc);
+                vm_error_log_caralho(buffer);
+
                 attributes[i].info.linenumbertable_attribute.line_number_table[j].line_number = read_u2(file);
+                sprintf(buffer, "\tLine Number: 0x%04X\n", attributes[i].info.linenumbertable_attribute.line_number_table[j].line_number);
+                vm_error_log_caralho(buffer);
             }
             break;
 
@@ -910,11 +946,25 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
  * @param cf A pointer to a vm_class_file_t structure.
  */
 void fields_parser(file_t *file, vm_class_file_t *cf) {
+    char buffer[80];
+
     for (int i = 0; i < (cf->fields_count); i++) {
         cf->fields[i].access_flags = read_u2(file);
+        sprintf(buffer, "\tAccess Flags: 0x%04X\n", cf->fields[i].access_flags);
+        vm_error_log_caralho(buffer);
+
         cf->fields[i].name_index = read_u2(file);
+        sprintf(buffer, "\tName Index: 0x%04X\n", cf->fields[i].name_index);
+        vm_error_log_caralho(buffer);
+
         cf->fields[i].descriptor_index = read_u2(file);
+        sprintf(buffer, "\tDescriptor Index: 0x%04X\n", cf->fields[i].descriptor_index);
+        vm_error_log_caralho(buffer);
+
         cf->fields[i].attributes_count = read_u2(file);
+        sprintf(buffer, "\tAttributes Count: 0x%04X\n", cf->fields[i].attributes_count);
+        vm_error_log_caralho(buffer);
+
         cf->fields[i].attributes = calloc(cf->fields[i].attributes_count,
             sizeof (vm_attribute_info_t));
 
@@ -929,11 +979,25 @@ void fields_parser(file_t *file, vm_class_file_t *cf) {
  * @param cf A pointer to a vm_class_file_t structure.
  */
 void methods_parser(file_t *file, vm_class_file_t *cf) {
-    for (int i = 0; i < (cf->methods_count); i++) {
+    char buffer[80];
+
+    for (uint16_t i = 0; i < (cf->methods_count); i++) {
         cf->methods[i].access_flags = read_u2(file);
+        sprintf(buffer, "\tAccess Flags: 0x%04X\n", cf->methods[i].access_flags);
+        vm_error_log_caralho(buffer);
+
         cf->methods[i].name_index = read_u2(file);
+        sprintf(buffer, "\tName Index: 0x%04X\n", cf->methods[i].name_index);
+        vm_error_log_caralho(buffer);
+
         cf->methods[i].descriptor_index = read_u2(file);
+        sprintf(buffer, "\tDescriptor Index: 0x%04X\n", cf->methods[i].descriptor_index);
+        vm_error_log_caralho(buffer);
+
         cf->methods[i].attributes_count = read_u2(file);
+        sprintf(buffer, "\tAttributes Count: 0x%04X\n", cf->methods[i].attributes_count);
+        vm_error_log_caralho(buffer);
+
         cf->methods[i].attributes = calloc(cf->methods[i].attributes_count,
             sizeof (vm_attribute_info_t));
 
@@ -948,38 +1012,81 @@ void methods_parser(file_t *file, vm_class_file_t *cf) {
  * @returns A ClassFile structure containing the .class information.
  */
 const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
+    char buffer[80];
+
     cf->magic = read_u4(file);
+    sprintf(buffer, "MAGIC: 0x%08X\n", cf->magic);
+    vm_error_log_caralho(buffer);
+
     cf->minor_version = read_u2(file);
+    sprintf(buffer, "Minor Version: 0x%04X\n", cf->minor_version);
+    vm_error_log_caralho(buffer);
+
     cf->major_version = read_u2(file);
+    sprintf(buffer, "Major Version: 0x%04X\n", cf->major_version);
+    vm_error_log_caralho(buffer);
 
     cf->constant_pool_count = read_u2(file);
+    sprintf(buffer, "Constant Pool Count: 0x%04X\n\n", cf->constant_pool_count);
+    vm_error_log_caralho(buffer);
+
     cf->constant_pool = calloc(cf->constant_pool_count - 1, sizeof (vm_cp_info_t));
 
+    vm_error_log_caralho("Constant Pool - Start!\n");
     constant_pool_parser(file, cf);
+    vm_error_log_caralho("Constant Pool - Success!\n\n");
 
     cf->access_flags = read_u2(file);
+    sprintf(buffer, "Access Flags: 0x%04X\n", cf->access_flags);
+    vm_error_log_caralho(buffer);
+
     cf->this_class = read_u2(file);
+    sprintf(buffer, "This Class: 0x%04X\n", cf->this_class);
+    vm_error_log_caralho(buffer);
+
     cf->super_class = read_u2(file);
+    sprintf(buffer, "Super Class: 0x%04X\n", cf->super_class);
+    vm_error_log_caralho(buffer);
 
     cf->interfaces_count = read_u2(file);
+    sprintf(buffer, "Interfaces Count: 0x%04X\n\n", cf->interfaces_count);
+    vm_error_log_caralho(buffer);
+
     cf->interfaces = calloc(cf->interfaces_count, sizeof (uint16_t));
 
+    vm_error_log_caralho("Interfaces - Start!\n");
     interfaces_parser(file, cf);
+    vm_error_log_caralho("Interfaces - Success!\n\n");
 
     cf->fields_count = read_u2(file);
+    sprintf(buffer, "Fields Count: 0x%04X\n\n", cf->fields_count);
+    vm_error_log_caralho(buffer);
+
     cf->fields = calloc(cf->fields_count, sizeof (vm_field_info_t));
 
+    vm_error_log_caralho("Fields - Start!\n");
     fields_parser(file, cf);
+    vm_error_log_caralho("Fields - Success!\n\n");
 
     cf->methods_count = read_u2(file);
+    sprintf(buffer, "Methods Count: 0x%04X\n\n", cf->methods_count);
+    vm_error_log_caralho(buffer);
+
     cf->methods = calloc(cf->methods_count, sizeof (vm_method_info_t));
 
+    vm_error_log_caralho("Methods - Start!\n");
     methods_parser(file, cf);
+    vm_error_log_caralho("Methods - Success!\n\n");
 
     cf->attributes_count = read_u2(file);
+    sprintf(buffer, "Attributes Count: 0x%04X\n\n", cf->attributes_count);
+    vm_error_log_caralho(buffer);
+
     cf->attributes = calloc(cf->attributes_count, sizeof (vm_attribute_info_t));
 
+    vm_error_log_caralho("Attributes - Start!\n");
     attributes_parser(cf->attributes_count, cf->attributes, cf->constant_pool, file);
+    vm_error_log_caralho("Attributes - Success!\n\n");
 }
 
 /**
@@ -1138,6 +1245,12 @@ void vm_load_constant_pool(file_t *file) {
     vm_class_file_t class_file;
 
     file->read = 0;
+
+    PAI_CARECA_CACETE = fopen("vm_log.txt", "w+");
+
+    fprintf(PAI_CARECA_CACETE, "LOG DE ERROS\n\n");
+
+    fclose(PAI_CARECA_CACETE);
 
     vm_init_tag_map();
 

@@ -53,6 +53,7 @@ dkms.conf
 
 # Custom files
 *.class
+vm_log.txt
 
 # Custom doc files
 doc/html/*
