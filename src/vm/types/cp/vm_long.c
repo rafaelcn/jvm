@@ -23,7 +23,7 @@ long vm_itolf(uint32_t low, uint32_t high) {
                 (bits & 0xfffffffffffffL) << 1 :
                 (bits & 0xfffffffffffffL) | 0x10000000000000L;
 
-    long long result = s * m * pow(m, (e-1075));
+    long long result = s * m * pow(2, (e-1075));
 
     if (__debug_t) {
         printf(" | s = %d, e = %d, m = %ld, r = %lld | ", s, e, m, result);
