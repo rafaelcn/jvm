@@ -217,35 +217,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
     for (uint8_t i = 0; i <= _WIDE; i++) {
         switch (code[pc]) {
-        case _wide:
-            // The wide instruction modifies the behavior of another instruction.
-            // It takes one of two formats, depending on the instruction being
-            // modified. The first form of the wide instruction modifies one of the
-            // instructions iload, fload, aload, lload, dload, istore, fstore, astore,
-            // lstore, dstore, or ret (§iload, §fload, §aload, §lload, §dload,
-            // §istore, §fstore, §astore, §lstore, §dstore, §ret). The second form
-            // applies only to the iinc instruction (§iinc).
-            // In either case, the wide opcode itself is followed in the compiled
-            // code by the opcode of the instruction wide modifies. In either
-            // form, two unsigned bytes indexbyte1 and indexbyte2 follow the
-            // modified opcode and are assembled into a 16-bit unsigned index
-            // to a local variable in the current frame (§2.6), where the value
-            // of the index is (indexbyte1 << 8) | indexbyte2. The calculated
-            // index must be an index into the local variable array of the current
-            // frame. Where the wide instruction modifies an lload, dload, lstore,
-            // or dstore instruction, the index following the calculated index
-            // (index + 1) must also be an index into the local variable array. In
-            // the second form, two immediate unsigned bytes constbyte1 and
-            // constbyte2 follow indexbyte1 and indexbyte2 in the code stream.
-            // Those bytes are also assembled into a signed 16-bit constant,
-            // where the constant is (constbyte1 << 8) | constbyte2.
-            // The widened bytecode operates as normal, except for the use of
-            // the wider index and, in the case of the second form, the larger
-            // increment range.
-            _WIDE = 1;
-            pc += 1;
-            break;
-
         case _iconst_m1:
         case _iconst_0:
         case _iconst_1:
@@ -454,10 +425,12 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 uint8_t indexbyte1 = code[pc+1];
                 uint8_t indexbyte2 = code[pc+2];
                 uint16_t index = (indexbyte1 << 8) | indexbyte2;
-                // TO DO
-                pc += 3;
-                break;
+
+                current_constant_pool[index];
+
             }
+            pc += 3;
+            break;
 
         case _fstore_0:
         case _fstore_1:
@@ -478,6 +451,35 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 }
                 local_variable_item->value._float = stack_frame->value._float;
             }
+            pc += 1;
+            break;
+
+        case _wide:
+            // The wide instruction modifies the behavior of another instruction.
+            // It takes one of two formats, depending on the instruction being
+            // modified. The first form of the wide instruction modifies one of the
+            // instructions iload, fload, aload, lload, dload, istore, fstore, astore,
+            // lstore, dstore, or ret (§iload, §fload, §aload, §lload, §dload,
+            // §istore, §fstore, §astore, §lstore, §dstore, §ret). The second form
+            // applies only to the iinc instruction (§iinc).
+            // In either case, the wide opcode itself is followed in the compiled
+            // code by the opcode of the instruction wide modifies. In either
+            // form, two unsigned bytes indexbyte1 and indexbyte2 follow the
+            // modified opcode and are assembled into a 16-bit unsigned index
+            // to a local variable in the current frame (§2.6), where the value
+            // of the index is (indexbyte1 << 8) | indexbyte2. The calculated
+            // index must be an index into the local variable array of the current
+            // frame. Where the wide instruction modifies an lload, dload, lstore,
+            // or dstore instruction, the index following the calculated index
+            // (index + 1) must also be an index into the local variable array. In
+            // the second form, two immediate unsigned bytes constbyte1 and
+            // constbyte2 follow indexbyte1 and indexbyte2 in the code stream.
+            // Those bytes are also assembled into a signed 16-bit constant,
+            // where the constant is (constbyte1 << 8) | constbyte2.
+            // The widened bytecode operates as normal, except for the use of
+            // the wider index and, in the case of the second form, the larger
+            // increment range.
+            _WIDE = 1;
             pc += 1;
             break;
 
