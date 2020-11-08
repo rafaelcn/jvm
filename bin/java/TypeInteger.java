@@ -3,5 +3,6 @@ public class TypeInteger {
         int a = 3;
         int b = 5;
         int c = 3;
+        System.out.println(a+b);
     }
 }

@@ -214,32 +214,75 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
     for (uint8_t i = 0; i <= _WIDE; i++) {
         switch (code[pc]) {
-        case _wide:
-            _WIDE = 1;
-            ++pc;
+        case _iconst_m1:
+        case _iconst_0:
+        case _iconst_1:
+        case _iconst_2:
+        case _iconst_3:
+        case _iconst_4:
+        case _iconst_5:
+            // Push the int constant <i> (-1, 0, 1, 2, 3, 4 or 5) onto the
+            // operand stack.
+            push(code[pc] - 0x03);
+            pc++;
             break;
 
         case _ldc:
             {
                 uint8_t index = code[++pc];
-
-                switch (STACK->top_frame->constant_pool[index].tag)
-                {
-                case 4: // Float
-                    break;
-
-                default:
-                    break;
-                }
+                STACK->top_frame->constant_pool[index];
             }
-            ++pc;
             break;
 
+        case _istore_0:
+        case _istore_1:
+        case _istore_2:
+        case _istore_3:
+            // The <n> must be an index into the local variable array of the
+            //  current frame (§2.6). The value on the top of the operand stack
+            //  must be of type int. It is popped from the operand stack, and the
+            //  value of the local variable at <n> is set to value.
+            uint16_t local_variable_index = code[pc] - 0x3b;
+            vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+            vm_operand_stack_frame_t* stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
+            
+            for(uint16_t j = 0; j < local_variable_index; j++)
+            {
+                local_variable_item = local_variable_item->next_item;
+            }
+            local_variable_item->value._int = stack_frame->value._int;
+            pc++;
+            break;
+
+        case _getstatic:
+            // The unsigned indexbyte1 and indexbyte2 are used to construct an
+            // index into the run-time constant pool of the current class (§2.6),
+            // where the value of the index is (indexbyte1 << 8) | indexbyte2.
+            // The run-time constant pool item at that index must be a symbolic
+            // reference to a field (§5.1), which gives the name and descriptor of
+            // the field as well as a symbolic reference to the class or interface
+            // in which the field is to be found. The referenced field is resolved
+            // (§5.4.3.2).
+            // On successful resolution of the field, the class or interface that
+            // declared the resolved field is initialized (§5.5) if that class or
+            // interface has not already been initialized.
+            // The value of the class or interface field is fetched and pushed onto
+            // the operand stack.
+            uint8_t indexbyte1 = code[pc+1];
+            uint8_t indexbyte2 = code[pc+2];
+            uint16_t index = (indexbyte1 << 8) | indexbyte2;
+            // TO DO
+            pc += 3;
+            break;
+        case _wide:
+            _WIDE = 1;
+            pc++;
+
         default:
-            ++pc;
             break;
         }
     }
+
 
     return pc;
 }
