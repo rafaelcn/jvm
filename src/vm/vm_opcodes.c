@@ -224,13 +224,14 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 uint8_t index = code[++pc];
                 STACK->top_frame->constant_pool[index];
             }
+            ++pc;
             break;
 
         default:
+            ++pc;
             break;
         }
     }
-
 
     return pc;
 }
