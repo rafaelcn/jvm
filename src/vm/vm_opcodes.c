@@ -226,7 +226,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         case _iconst_5:
             // Push the int constant <i> (-1, 0, 1, 2, 3, 4 or 5) onto the
             // operand stack.
-            //push(code[pc] - 0x03);
+            {
+                vm_operand_stack_frame_t *new_operand_frame = calloc(
+                        1, sizeof (vm_operand_stack_frame_t));
+
+                new_operand_frame->value._int = code[pc] - 0x03;
+                push_into_ostack(current_operand_stack, new_operand_frame);
+            }
             pc += 1;
             break;
 
