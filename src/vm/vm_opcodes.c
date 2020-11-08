@@ -339,10 +339,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
-        case _fload_0;
-        case _fload_1;
-        case _fload_2;
-        case _fload_3;
+        case _fload_0:
+        case _fload_1:
+        case _fload_2:
+        case _fload_3:
             // The <n> must be an index into the local variable array of the
             // current frame (§2.6). The local variable at <n> must contain a
             // float. The value of the local variable at <n> is pushed onto the
