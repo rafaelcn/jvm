@@ -216,7 +216,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         switch (code[pc]) {
         case _wide:
             _WIDE = 1;
-            ++pc;
+            pc++;
             break;
 
         case _ldc:
@@ -225,18 +225,63 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 switch (STACK->top_frame->constant_pool[index].tag)
                 {
+                case 3: // Integer
+                    {
+                        int _i = STACK->top_frame->constant_pool[index].info.integer_info.bytes;
+
+                        vm_local_variable_item_t *new_item = calloc(1, sizeof (vm_local_variable_item_t));
+                        new_item->value._float = (float) _i;
+                        new_item->next_item = NULL;
+
+                        vm_local_variable_item_t *current_item = STACK->top_frame->local_variables_list->first_item;
+
+                        STACK->top_frame->local_variables_list->local_variables_count += 1;
+                        if (current_item == NULL) {
+                            current_item = new_item;
+                        } else {
+                            while (current_item->next_item != NULL)
+                            {
+                                current_item = current_item->next_item;
+                            }
+
+                            current_item->next_item = new_item;
+                        }
+                    }
+                    break;
+
                 case 4: // Float
+                    {
+                        float _f = STACK->top_frame->constant_pool[index].info.float_info.bytes;
+
+                        vm_local_variable_item_t *new_item = calloc(1, sizeof (vm_local_variable_item_t));
+                        new_item->value._float = _f;
+                        new_item->next_item = NULL;
+
+                        vm_local_variable_item_t *current_item = STACK->top_frame->local_variables_list->first_item;
+
+                        STACK->top_frame->local_variables_list->local_variables_count += 1;
+                        if (current_item == NULL) {
+                            current_item = new_item;
+                        } else {
+                            while (current_item->next_item != NULL)
+                            {
+                                current_item = current_item->next_item;
+                            }
+
+                            current_item->next_item = new_item;
+                        }
+                    }
                     break;
 
                 default:
                     break;
                 }
             }
-            ++pc;
+            pc++;
             break;
 
         default:
-            ++pc;
+            pc++;
             break;
         }
     }
