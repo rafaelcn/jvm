@@ -491,6 +491,30 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _dstore:
+        case _dstore_0:
+        case _dstore_1:
+        case _dstore_2:
+        case _dstore_3:
+            // Both <n> and <n>+1 must be indices into the local variable array
+            // of the current frame (§2.6). The value on the top of the operand
+            // stack must be of type double. It is popped from the operand stack
+            // and undergoes value set conversion (§2.8.3), resulting in value'.
+            // The local variables at <n> and <n>+1 are set to value'
+            {
+                uint16_t local_variable_index = code[pc] - 0x47;
+                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                vm_operand_stack_frame_t *high_operand = pop_from_ostack(STACK->top_frame->operand_stack);
+                vm_operand_stack_frame_t *low_operand = pop_from_ostack(STACK->top_frame->operand_stack);
+                for(uint16_t j = 0; j < local_variable_index; j++) {
+                    local_variable_item = local_variable_item->next_item;
+                }
+                local_variable_item->value._double = high_operand->value._double;
+                local_variable_item->next_item->value._double = low_operand->value._double;
+            }
+            pc++;
+            break;
+            
         case _wide:
             // The wide instruction modifies the behavior of another instruction.
             // It takes one of two formats, depending on the instruction being
