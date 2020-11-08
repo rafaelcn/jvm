@@ -137,5 +137,36 @@ const char * vm_execute(file_t *file) {
         return "Couldn't find a main method";
     }
 
+    // looking for the main code
+    vm_code_t *main_code = calloc(1, sizeof (vm_code_t));
+    vm_utf8_t attribute_name;
+    uint16_t *uint16_string;
+    char buffer[80];
+
+    for (uint16_t i = 0; i < main_method->attributes_count; i++) {
+        attribute_name = class_file.constant_pool[main_method->attributes[i].attribute_name_index].info.utf8_info;
+        uint16_string = vm_utf8_to_uint16_t(attribute_name.length, attribute_name.bytes);
+
+        // first we print the name of the method to a buffer
+        for (int j = 0; j < method_name.length; j++) {
+            sprintf(&buffer[j], "%lc", uint16_string[j]);
+        }
+
+        if (vm_strcmp(buffer, "Code")) {
+            main_code = &(main_method->attributes[i].info.code_attribute);
+            break;
+        } else {
+            main_code = NULL;
+        }
+    }
+
+    if (main_code == NULL) {
+        return "Couldn't find the code attribute of the main method";
+    }
+
+    for (uint32_t pc = 0; pc < main_code->code_length;) {
+        pc = vm_opcodes(main_code->code, pc);
+    }
+
     return "";
 }
