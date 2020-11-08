@@ -214,11 +214,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
     for (uint8_t i = 0; i <= _WIDE; i++) {
         switch (code[pc]) {
-        case _wide:
-            _WIDE = 1;
-            pc += 1;
-            break;
-
         case _iconst_m1:
         case _iconst_0:
         case _iconst_1:
@@ -291,7 +286,28 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 2;
             break;
-
+        case _iload_0:
+        case _iload_1:
+        case _iload_2:
+        case _iload_3:
+            // The <n> must be an index into the local variable array of the
+            // current frame (§2.6). The local variable at <n> must contain an
+            // int. The value of the local variable at <n> is pushed onto the
+            // operand stack.
+            uint16_t local_variable_index = code[pc] - 0x1a;
+            vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+            
+            for(uint16_t j = 0; j < local_variable_index; j++)
+            {
+                local_variable_item = local_variable_item->next_item;
+            }
+            vm_operand_stack_frame_t *new_operand_frame = calloc(
+                1, sizeof (vm_operand_stack_frame_t));
+            
+            new_operand_frame->value._int = local_variable_item->value._int;
+            push_into_ostack(STACK->top_frame->operand_stack, new_operand_frame);
+            pc++;
+            break;
         case _istore_0:
         case _istore_2:
         case _istore_1:
@@ -312,7 +328,52 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
-
+        case _iadd:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. The int result is value1 + value2. The
+            // result is pushed onto the operand stack.
+            // The result is the 32 low-order bits of the true mathematical result
+            // in a sufficiently wide two's-complement format, represented as a
+            // value of type int. If overflow occurs, then the sign of the result
+            // may not be the same as the sign of the mathematical sum of the
+            // two values.
+            // Despite the fact that overflow may occur, execution of an iadd
+            // instruction never throws a run-time exception.
+            vm_operand_stack_frame_t* first_stack_frame = pop_from_ostack(
+                STACK->top_frame->operand_stack);
+            vm_operand_stack_frame_t* second_stack_frame = pop_from_ostack(
+                STACK->top_frame->operand_stack);
+            vm_operand_stack_frame_t * result_frame = calloc(
+                1, sizeof (vm_operand_stack_frame_t));
+            
+            result_frame->value._int = first_stack_frame->value._int +\
+                second_stack_frame->value._int;
+            push_into_ostack(STACK->top_frame->operand_stack, result_frame);
+            pc++;
+            break;
+        case _return:
+            {
+                // The current method must have return type void. If the
+                // current method is a synchronized method, the monitor entered
+                // or reentered on invocation of the method is updated and
+                // possibly exited as if by execution of a monitorexit instruction
+                // (§monitorexit) in the current thread. If no exception is thrown,
+                // any values on the operand stack of the current frame (§2.6) are
+                // discarded.
+                // The interpreter then returns control to the invoker of the method,
+                // reinstating the frame of the invoker.
+                vm_operand_stack_frame_t* stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
+                vm_operand_stack_frame_t* temp_stack;
+                
+                while(stack_frame != NULL)
+                {
+                    temp_stack = stack_frame;
+                    stack_frame = stack_frame->next_frame;
+                    free(temp_stack);
+                }
+                pc += 1;
+                break;
+            }
         case _getstatic:
             {
                 // The unsigned indexbyte1 and indexbyte2 are used to construct an
@@ -332,9 +393,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 uint8_t indexbyte2 = code[pc+2];
                 uint16_t index = (indexbyte1 << 8) | indexbyte2;
                 // TO DO
+                pc += 3;
+                break;
             }
-            pc += 3;
-            break;
+
+        case _wide:
+            _WIDE = 1;
+            pc++;
 
         default:
             pc += 1;
