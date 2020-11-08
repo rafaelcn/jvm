@@ -2,6 +2,7 @@
 #define VM_ENTRY_H
 
 #include <stdio.h>
+#include "vm_file.h"
 
 /**
  * @brief The entry function of the java virtual machine. This method
@@ -9,6 +10,6 @@
  * @param filename Is a filepath string pointing to a filename that contains a
  * valid .class file.
  */
-int vm_init(const char *filename);
+int vm_init(const char *filename, file_t *file);
 
 #endif /* VM_ENTRY_H */

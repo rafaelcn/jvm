@@ -218,7 +218,6 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
         sprintf(&buffer[j], "%lc", heap[j]);
     }
 
-
     if (vm_strcmp(buffer, "ConstantValue"))
         return ConstantValue;
     if (vm_strcmp(buffer, "Code"))
@@ -1223,15 +1222,4 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
     }
 
     fclose(VM_LOG_FILE);
-}
-
-void vm_load_constant_pool(file_t *file) {
-    vm_class_file_t class_file;
-
-    file->read = 0;
-
-    vm_init_tag_map();
-
-    class_file_parser(file, &class_file);
-    class_file_reader(class_file, file);
 }

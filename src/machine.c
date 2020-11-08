@@ -3,60 +3,9 @@
 #include <stdint.h>
 
 #include "machine.h"
+#include "vm/lib/vm_string.h"
 
-typedef struct vm_stack_frame vm_stack_frame_t;
-typedef struct vm_operand_stack_frame vm_operand_stack_frame_t;
-typedef struct vm_local_variable_item vm_local_variable_item_t;
-
-/**
- * @brief
- */
-struct vm_local_variable_item {
-    // some form of value here
-    vm_local_variable_item_t *next_item;
-};
-
-/**
- * @brief
- */
-typedef struct vm_local_variables_list {
-    uint16_t local_variables_count;
-    vm_local_variable_item_t *first_item;
-} vm_local_variables_list_t;
-
-/**
- * @brief
- */
-struct vm_operand_stack_frame {
-    // some form of value here
-    vm_operand_stack_frame_t *next_frame;
-} ;
-
-/**
- * @brief
- */
-typedef struct vm_operand_stack {
-    uint16_t frames_count;
-    vm_operand_stack_frame_t *top_frame;
-} vm_operand_stack_t;
-
-/**
- * @brief
- */
-struct vm_stack_frame {
-    vm_local_variables_list_t *local_variables_list;
-    vm_operand_stack_t *operand_stack;
-    vm_cp_info_t *constant_pool;
-    vm_stack_frame_t *next_frame;
-} ;
-
-/**
- * @brief
- */
-typedef struct vm_stack {
-    uint16_t frames_count;
-    vm_stack_frame_t *top_frame;
-} vm_stack_t;
+vm_stack_t *VM_STACK;
 
 /**
  * @brief Pushes a stack_frame into the JVM Stack.
@@ -69,6 +18,10 @@ void push_into_stack(vm_stack_t *stack, vm_stack_frame_t *new_frame) {
     new_frame->next_frame = stack->top_frame;
     // the new_frame is the new top_frame
     stack->top_frame = new_frame;
+    // the frames_count is increased
+    stack->frames_count += 1;
+
+    return;
 }
 
 /**
@@ -77,11 +30,15 @@ void push_into_stack(vm_stack_t *stack, vm_stack_frame_t *new_frame) {
  * @param new_frame A pointer to the a new frame.
  * @returns Nothing.
  */
-void push_into_stack(vm_operand_stack_t *stack, vm_operand_stack_frame_t *new_frame) {
+void push_into_ostack(vm_operand_stack_t *stack, vm_operand_stack_frame_t *new_frame) {
     // the new_frame points towards the former top_frame
     new_frame->next_frame = stack->top_frame;
     // the new_frame is the new top_frame
     stack->top_frame = new_frame;
+    // the frames_count is increased
+    stack->frames_count += 1;
+
+    return;
 }
 
 /**
@@ -94,8 +51,11 @@ vm_stack_frame_t * pop_from_stack(vm_stack_t *stack) {
     vm_stack_frame_t *popped_frame = stack->top_frame;
     // a new top_frame is assigned to the stack
     stack->top_frame = popped_frame->next_frame;
+    // the frames_count is decreased
+    stack->frames_count -= 1;
     // the popped_frame points to NULL
     popped_frame->next_frame = NULL;
+
     return popped_frame;
 }
 
@@ -104,12 +64,78 @@ vm_stack_frame_t * pop_from_stack(vm_stack_t *stack) {
  * @param stack A pointer to the Operands Stack.
  * @returns A pointer to the popped frame.
  */
-vm_operand_stack_frame_t * pop_from_stack(vm_operand_stack_t *stack) {
+vm_operand_stack_frame_t * pop_from_ostack(vm_operand_stack_t *stack) {
     // temporarily holds the former top_frame
     vm_operand_stack_frame_t *popped_frame = stack->top_frame;
     // a new top_frame is assigned to the stack
     stack->top_frame = popped_frame->next_frame;
+    // the frames_count is increased
+    stack->frames_count -= 1;
     // the popped_frame points to NULL
     popped_frame->next_frame = NULL;
+
     return popped_frame;
+}
+
+void vm_inform(file_t *file) {
+    vm_class_file_t class_file;
+
+    file->read = 0;
+
+    vm_init_tag_map();
+
+    class_file_parser(file, &class_file);
+
+    // inform
+    class_file_reader(class_file, file);
+}
+
+const char * vm_execute(file_t *file) {
+    vm_class_file_t class_file;
+
+    file->read = 0;
+
+    vm_init_tag_map();
+
+    class_file_parser(file, &class_file);
+
+    // setting up the stack
+    VM_STACK = calloc(1, sizeof (vm_stack_t));
+    VM_STACK->frames_count = 0;
+    VM_STACK->top_frame = NULL;
+
+    // finding the main
+    vm_method_info_t *main_method = calloc(1, sizeof (vm_method_info_t));
+    vm_utf8_t method_name;
+    uint16_t *uint16_string;
+    char buffer[80];
+
+    for (uint16_t i = 0; i < class_file.methods_count; i++) {
+        method_name = class_file.constant_pool[class_file.methods[i].name_index].info.utf8_info;
+        uint16_string = vm_utf8_to_uint16_t(method_name.length, method_name.bytes);
+
+        // first we print the name of the method to a buffer
+        for (int j = 0; j < method_name.length; j++) {
+            sprintf(&buffer[j], "%lc", uint16_string[j]);
+        }
+
+        // after that we check if the name is 'main'
+        if (vm_strcmp(buffer, "main")) {
+            // on success we save a reference to that method
+            main_method = &(class_file.methods[i]);
+            // and quit the loop
+            break;
+        } else {
+            // if the method isn't the main method we set it to NULL
+            main_method = NULL;
+        }
+    }
+
+    // Check if we could find a main method
+    if (main_method == NULL) {
+        // Finishes the execution if we couldn't
+        return "Couldn't find a main method";
+    }
+
+    return "";
 }

@@ -62,8 +62,20 @@ typedef struct vm_class_file {
 } vm_class_file_t;
 
 /**
- * @brief
+ * @brief Prints the information contained in the ClassFile structure in a
+ * formatted manner.
+ * @param class_file A ClassFile structure to be printed.
  */
-void vm_load_constant_pool(file_t *file);
+void class_file_reader(vm_class_file_t class_file, file_t *file);
+
+/**
+ * @brief Parses the .class bytecode to a ClassFile structure.
+ * @param file A FILE (from stdio, in rb mode) pointer to a .class file.
+ * @param cf A pointer to a ClassFile structure.
+ * @returns A ClassFile structure containing the .class information.
+ */
+const char * class_file_parser(file_t *file, vm_class_file_t *cf);
+
+void vm_init_tag_map();
 
 #endif /* VM_CONSTANT_POOL_H */
