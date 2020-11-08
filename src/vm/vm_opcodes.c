@@ -469,6 +469,28 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 3;
             break;
 
+        case _fstore:
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The value on the top
+            // of the operand stack must be of type float. It is popped from
+            // the operand stack and undergoes value set conversion (§2.8.3),
+            // resulting in value'. The value of the local variable at index is set
+            // to value'.
+            {
+                uint8_t index = code[pc+1];
+
+                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
+
+                for(uint16_t j = 0; j < index; j++) {
+                    local_variable_item = local_variable_item->next_item;
+                }
+                local_variable_item->value._float = stack_frame->value._float;
+
+            }
+            pc += 2;
+            break;
+
         case _fstore_0:
         case _fstore_1:
         case _fstore_2:
@@ -514,7 +536,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc++;
             break;
-            
+
         case _wide:
             // The wide instruction modifies the behavior of another instruction.
             // It takes one of two formats, depending on the instruction being
