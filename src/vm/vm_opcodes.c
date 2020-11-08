@@ -422,12 +422,14 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The value of the class or interface field is fetched and pushed onto
             // the operand stack.
             {
-                uint8_t indexbyte1 = code[pc+1];
-                uint8_t indexbyte2 = code[pc+2];
-                uint16_t index = (indexbyte1 << 8) | indexbyte2;
+                vm_operand_stack_frame_t *new_operand_frame = calloc(
+                    1, sizeof (vm_operand_stack_frame_t));
 
-                current_constant_pool[index];
+                new_operand_frame->value._string = calloc(
+                    10, sizeof (char));
 
+                sprintf(new_operand_frame->value._string, "getstatic");
+                push_into_ostack(current_operand_stack, new_operand_frame);
             }
             pc += 3;
             break;
