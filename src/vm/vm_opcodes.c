@@ -211,6 +211,8 @@
 
 uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
     uint8_t _WIDE = 0;
+    vm_cp_info_t *current_constant_pool = STACK->top_frame->constant_pool;
+    vm_operand_stack_frame_t *current_operand_stack = STACK->top_frame->operand_stack;
 
     for (uint8_t i = 0; i <= _WIDE; i++) {
         switch (code[pc]) {
@@ -231,10 +233,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 uint8_t index = code[pc+1];
 
-                switch (STACK->top_frame->constant_pool[index].tag) {
+                switch (current_constant_pool[index].tag) {
                 case 3: // Integer
                     {
-                        int _i = STACK->top_frame->constant_pool[index].info.integer_info.bytes;
+                        int _i = current_constant_pool[index].info.integer_info.bytes;
 
                         vm_local_variable_item_t *new_item = calloc(1, sizeof (vm_local_variable_item_t));
                         new_item->value._float = (float) _i;
@@ -258,7 +260,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 case 4: // Float
                     {
-                        float _f = STACK->top_frame->constant_pool[index].info.float_info.bytes;
+                        float _f = current_constant_pool[index].info.float_info.bytes;
 
                         vm_local_variable_item_t *new_item = calloc(1, sizeof (vm_local_variable_item_t));
                         new_item->value._float = _f;
@@ -305,7 +307,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 1, sizeof (vm_operand_stack_frame_t));
             
             new_operand_frame->value._int = local_variable_item->value._int;
-            push_into_ostack(STACK->top_frame->operand_stack, new_operand_frame);
+            push_into_ostack(current_operand_stack, new_operand_frame);
             pc++;
             break;
         case _istore_0:
@@ -319,7 +321,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 //  value of the local variable at <n> is set to value.
                 uint16_t local_variable_index = code[pc] - 0x3b;
                 vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
-                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
+                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(current_operand_stack);
 
                 for(uint16_t j = 0; j < local_variable_index; j++) {
                     local_variable_item = local_variable_item->next_item;
@@ -340,15 +342,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an iadd
             // instruction never throws a run-time exception.
             vm_operand_stack_frame_t* first_stack_frame = pop_from_ostack(
-                STACK->top_frame->operand_stack);
+                current_operand_stack);
             vm_operand_stack_frame_t* second_stack_frame = pop_from_ostack(
-                STACK->top_frame->operand_stack);
+                current_operand_stack);
             vm_operand_stack_frame_t * result_frame = calloc(
                 1, sizeof (vm_operand_stack_frame_t));
             
             result_frame->value._int = first_stack_frame->value._int +\
                 second_stack_frame->value._int;
-            push_into_ostack(STACK->top_frame->operand_stack, result_frame);
+            push_into_ostack(current_operand_stack, result_frame);
             pc++;
             break;
         case _return:
@@ -362,7 +364,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 // discarded.
                 // The interpreter then returns control to the invoker of the method,
                 // reinstating the frame of the invoker.
-                vm_operand_stack_frame_t* stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
+                vm_operand_stack_frame_t* stack_frame = pop_from_ostack(current_operand_stack);
                 vm_operand_stack_frame_t* temp_stack;
                 
                 while(stack_frame != NULL)
