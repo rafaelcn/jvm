@@ -215,6 +215,30 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
     for (uint8_t i = 0; i <= _WIDE; i++) {
         switch (code[pc]) {
         case _wide:
+            // The wide instruction modifies the behavior of another instruction.
+            // It takes one of two formats, depending on the instruction being
+            // modified. The first form of the wide instruction modifies one of the
+            // instructions iload, fload, aload, lload, dload, istore, fstore, astore,
+            // lstore, dstore, or ret (§iload, §fload, §aload, §lload, §dload,
+            // §istore, §fstore, §astore, §lstore, §dstore, §ret). The second form
+            // applies only to the iinc instruction (§iinc).
+            // In either case, the wide opcode itself is followed in the compiled
+            // code by the opcode of the instruction wide modifies. In either
+            // form, two unsigned bytes indexbyte1 and indexbyte2 follow the
+            // modified opcode and are assembled into a 16-bit unsigned index
+            // to a local variable in the current frame (§2.6), where the value
+            // of the index is (indexbyte1 << 8) | indexbyte2. The calculated
+            // index must be an index into the local variable array of the current
+            // frame. Where the wide instruction modifies an lload, dload, lstore,
+            // or dstore instruction, the index following the calculated index
+            // (index + 1) must also be an index into the local variable array. In
+            // the second form, two immediate unsigned bytes constbyte1 and
+            // constbyte2 follow indexbyte1 and indexbyte2 in the code stream.
+            // Those bytes are also assembled into a signed 16-bit constant,
+            // where the constant is (constbyte1 << 8) | constbyte2.
+            // The widened bytecode operates as normal, except for the use of
+            // the wider index and, in the case of the second form, the larger
+            // increment range.
             _WIDE = 1;
             pc += 1;
             break;
@@ -233,6 +257,28 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _ldc:
+            // The index is an unsigned byte that must be a valid index into the
+            // run-time constant pool of the current class (§2.6). The run-time
+            // constant pool entry at index either must be a run-time constant of
+            // type int or float, or a reference to a string literal, or a symbolic
+            // reference to a class, method type, or method handle (§5.1).
+            // If the run-time constant pool entry is a run-time constant of type
+            // int or float, the numeric value of that run-time constant is pushed
+            // onto the operand stack as an int or float, respectively.
+            // Otherwise, if the run-time constant pool entry is a reference to an
+            // instance of class String representing a string literal (§5.1), then
+            // a reference to that instance, value, is pushed onto the operand
+            // stack.
+            // Otherwise, if the run-time constant pool entry is a symbolic
+            // reference to a class (§5.1), then the named class is resolved
+            // (§5.4.3.1) and a reference to the Class object representing that
+            // class, value, is pushed onto the operand stack.
+            // Otherwise, the run-time constant pool entry must be a symbolic
+            // reference to a method type or a method handle (§5.1). The method
+            // type or method handle is resolved (§5.4.3.5) and a reference
+            // to the resulting instance of java.lang.invoke.MethodType or
+            // java.lang.invoke.MethodHandle, value, is pushed onto the
+            // operand stack.
             {
                 uint8_t index = code[pc+1];
 
@@ -293,14 +339,14 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _istore_0:
-        case _istore_2:
         case _istore_1:
+        case _istore_2:
         case _istore_3:
+            // The <n> must be an index into the local variable array of the
+            //  current frame (§2.6). The value on the top of the operand stack
+            //  must be of type int. It is popped from the operand stack, and the
+            //  value of the local variable at <n> is set to value.
             {
-                // The <n> must be an index into the local variable array of the
-                //  current frame (§2.6). The value on the top of the operand stack
-                //  must be of type int. It is popped from the operand stack, and the
-                //  value of the local variable at <n> is set to value.
                 uint16_t local_variable_index = code[pc] - 0x3b;
                 vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
                 vm_operand_stack_frame_t *stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
@@ -314,26 +360,48 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _getstatic:
+            // The unsigned indexbyte1 and indexbyte2 are used to construct an
+            // index into the run-time constant pool of the current class (§2.6),
+            // where the value of the index is (indexbyte1 << 8) | indexbyte2.
+            // The run-time constant pool item at that index must be a symbolic
+            // reference to a field (§5.1), which gives the name and descriptor of
+            // the field as well as a symbolic reference to the class or interface
+            // in which the field is to be found. The referenced field is resolved
+            // (§5.4.3.2).
+            // On successful resolution of the field, the class or interface that
+            // declared the resolved field is initialized (§5.5) if that class or
+            // interface has not already been initialized.
+            // The value of the class or interface field is fetched and pushed onto
+            // the operand stack.
             {
-                // The unsigned indexbyte1 and indexbyte2 are used to construct an
-                // index into the run-time constant pool of the current class (§2.6),
-                // where the value of the index is (indexbyte1 << 8) | indexbyte2.
-                // The run-time constant pool item at that index must be a symbolic
-                // reference to a field (§5.1), which gives the name and descriptor of
-                // the field as well as a symbolic reference to the class or interface
-                // in which the field is to be found. The referenced field is resolved
-                // (§5.4.3.2).
-                // On successful resolution of the field, the class or interface that
-                // declared the resolved field is initialized (§5.5) if that class or
-                // interface has not already been initialized.
-                // The value of the class or interface field is fetched and pushed onto
-                // the operand stack.
                 uint8_t indexbyte1 = code[pc+1];
                 uint8_t indexbyte2 = code[pc+2];
                 uint16_t index = (indexbyte1 << 8) | indexbyte2;
                 // TO DO
             }
             pc += 3;
+            break;
+
+        case _fstore_0:
+        case _fstore_1:
+        case _fstore_2:
+        case _fstore_3:
+            // The <n> must be an index into the local variable array of the
+            // current frame (§2.6). The value on the top of the operand stack
+            // must be of type float. It is popped from the operand stack and
+            // undergoes value set conversion (§2.8.3), resulting in value'. The
+            // value of the local variable at <n> is set to value'.
+            {
+                uint16_t local_variable_index = code[pc] - 0x43;
+                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
+
+                for(uint16_t j = 0; j < local_variable_index; j++) {
+                    local_variable_item = local_variable_item->next_item;
+                }
+                local_variable_item->value._float = stack_frame->value._float;
+            }
+            pc += 1;
             break;
 
         default:
