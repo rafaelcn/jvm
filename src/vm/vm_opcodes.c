@@ -318,7 +318,26 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 2;
             break;
+        case _iload:
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The local variable at
+            // index must contain an int. The value of the local variable at index
+            // is pushed onto the operand stack
+            {
+                uint16_t local_variable_index = code[pc+1];
+                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
 
+                for(uint16_t j = 0; j < local_variable_index; j++) {
+                    local_variable_item = local_variable_item->next_item;
+                }
+                vm_operand_stack_frame_t *new_operand_frame = calloc(
+                    1, sizeof (vm_operand_stack_frame_t));
+
+                new_operand_frame->value._int = local_variable_item->value._int;
+                push_into_ostack(current_operand_stack, new_operand_frame);
+            }
+            pc += 2;
+            break;
         case _iload_0:
         case _iload_1:
         case _iload_2:
