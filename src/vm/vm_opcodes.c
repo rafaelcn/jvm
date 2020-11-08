@@ -318,7 +318,26 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 2;
             break;
+        case _iload:
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The local variable at
+            // index must contain an int. The value of the local variable at index
+            // is pushed onto the operand stack
+            {
+                uint16_t local_variable_index = code[pc+1];
+                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
 
+                for(uint16_t j = 0; j < local_variable_index; j++) {
+                    local_variable_item = local_variable_item->next_item;
+                }
+                vm_operand_stack_frame_t *new_operand_frame = calloc(
+                    1, sizeof (vm_operand_stack_frame_t));
+
+                new_operand_frame->value._int = local_variable_item->value._int;
+                push_into_ostack(current_operand_stack, new_operand_frame);
+            }
+            pc += 2;
+            break;
         case _iload_0:
         case _iload_1:
         case _iload_2:
@@ -343,6 +362,27 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _fload:
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The local variable at
+            // index must contain a float. The value of the local variable at index
+            // is pushed onto the operand stack.
+            {
+                uint8_t local_variable_index = code[pc+1];
+                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+
+                for(uint16_t j = 0; j < local_variable_index; j++) {
+                    local_variable_item = local_variable_item->next_item;
+                }
+                vm_operand_stack_frame_t *new_operand_frame = calloc(
+                    1, sizeof (vm_operand_stack_frame_t));
+
+                new_operand_frame->value._float = local_variable_item->value._float;
+                push_into_ostack(current_operand_stack, new_operand_frame);
+            }
+            pc += 2;
+            break;
+
         case _fload_0:
         case _fload_1:
         case _fload_2:
@@ -365,6 +405,28 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 push_into_ostack(current_operand_stack, new_operand_frame);
             }
             pc += 1;
+            break;
+
+        case _istore:
+            // The address of the opcode of the instruction immediately
+            // following this jsr instruction is pushed onto the operand stack as
+            // a value of type returnAddress. The unsigned branchbyte1 and
+            // branchbyte2 are used to construct a signed 16-bit offset, where
+            // the offset is (branchbyte1 << 8) | branchbyte2. Execution proceeds
+            // at that offset from the address of this jsr instruction. The target
+            // address must be that of an opcode of an instruction within the
+            // method that contains this jsr instruction.
+            {
+                uint16_t local_variable_index = code[pc+1];
+                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(current_operand_stack);
+
+                for(uint16_t j = 0; j < local_variable_index; j++) {
+                    local_variable_item = local_variable_item->next_item;
+                }
+                local_variable_item->value._int = stack_frame->value._int;
+            }
+            pc += 2;
             break;
 
         case _istore_0:
