@@ -12,8 +12,16 @@ typedef struct vm_local_variable_item vm_local_variable_item_t;
 /**
  * @brief
  */
+typedef union _values {
+    int _int;
+    float _float;
+} _values_t;
+
+/**
+ * @brief
+ */
 struct vm_local_variable_item {
-    // some form of value here
+    _values_t value;
     vm_local_variable_item_t *next_item;
 };
 
@@ -29,7 +37,7 @@ typedef struct vm_local_variables_list {
  * @brief
  */
 struct vm_operand_stack_frame {
-    // some form of value here
+    _values_t value;
     vm_operand_stack_frame_t *next_frame;
 } ;
 

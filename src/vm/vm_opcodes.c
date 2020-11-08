@@ -216,13 +216,21 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         switch (code[pc]) {
         case _wide:
             _WIDE = 1;
-            pc++;
+            ++pc;
             break;
 
         case _ldc:
             {
                 uint8_t index = code[++pc];
-                STACK->top_frame->constant_pool[index];
+
+                switch (STACK->top_frame->constant_pool[index].tag)
+                {
+                case 4: // Float
+                    break;
+
+                default:
+                    break;
+                }
             }
             ++pc;
             break;
