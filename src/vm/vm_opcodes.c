@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "vm_opcodes.h"
+#include "lib/vm_string.h"
 
 /**
  * @brief OpCode mapping.
@@ -436,6 +437,34 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 sprintf(new_operand_frame->value._string, "getstatic");
                 push_into_ostack(current_operand_stack, new_operand_frame);
+            }
+            pc += 3;
+            break;
+
+        case _invokevirtual:
+            // jesus tenha piedade da minha menção
+            {
+                uint8_t indexbyte1 = code[pc+1];
+                uint8_t indexbyte2 = code[pc+2];
+                uint16_t index = (indexbyte1 << 8) | indexbyte2;
+
+                uint16_t name_and_type_index = current_constant_pool[index].info.methodref_info.name_and_type_index;
+
+                uint16_t name_index = current_constant_pool[name_and_type_index].info.nameandtype_info.name_index;
+
+                vm_utf8_t utf8_info = current_constant_pool[name_index].info.utf8_info;
+
+                uint16_t * uint16_string = vm_utf8_to_uint16_t(utf8_info.length, utf8_info.bytes);
+                char buffer[80];
+
+                for (uint16_t j = 0; j < utf8_info.length; j++) {
+                    sprintf(buffer, "%lc", uint16_string[j]);
+                }
+
+                if (vm_strcmp(buffer, "println")) {
+                    printf("%f\n", current_operand_stack->top_frame->value._float);
+                    pop_from_ostack(current_operand_stack);
+                }
             }
             pc += 3;
             break;
