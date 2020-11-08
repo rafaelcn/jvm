@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "vm_opcodes.h"
+#include "lib/vm_string.h"
 
 /**
  * @brief OpCode mapping.
@@ -216,8 +217,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
     vm_operand_stack_t *current_operand_stack = STACK->top_frame->operand_stack;
 
     for (uint8_t i = 0; i <= _WIDE; i++) {
-        switch (code[pc]) 
-        {
+        switch (code[pc]) {
         case _iconst_m1:
         case _iconst_0:
         case _iconst_1:
@@ -227,10 +227,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         case _iconst_5:
             // Push the int constant <i> (-1, 0, 1, 2, 3, 4 or 5) onto the
             // operand stack.
-            vm_operand_stack_frame_t *new_operand_frame = calloc(
-                    1, sizeof (vm_operand_stack_frame_t));
-            new_operand_frame->value._int = code[pc] - 0x03;
-            push_into_ostack(new_operand_frame);
+            {
+                vm_operand_stack_frame_t *new_operand_frame = calloc(
+                        1, sizeof (vm_operand_stack_frame_t));
+
+                new_operand_frame->value._int = code[pc] - 0x03;
+                push_into_ostack(current_operand_stack, new_operand_frame);
+            }
             pc += 1;
             break;
 
@@ -448,13 +451,46 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The value of the class or interface field is fetched and pushed onto
             // the operand stack.
             {
+                vm_operand_stack_frame_t *new_operand_frame = calloc(
+                    1, sizeof (vm_operand_stack_frame_t));
+
+                new_operand_frame->value._string = calloc(
+                    10, sizeof (char));
+
+                sprintf(new_operand_frame->value._string, "getstatic");
+                push_into_ostack(current_operand_stack, new_operand_frame);
+            }
+            pc += 3;
+            break;
+
+        case _invokevirtual:
+            // jesus tenha piedade da minha menção
+            {
                 uint8_t indexbyte1 = code[pc+1];
                 uint8_t indexbyte2 = code[pc+2];
                 uint16_t index = (indexbyte1 << 8) | indexbyte2;
-                // TO DO
-                pc += 3;
-                break;
+
+                uint16_t name_and_type_index = current_constant_pool[index].info.methodref_info.name_and_type_index;
+
+                uint16_t name_index = current_constant_pool[name_and_type_index].info.nameandtype_info.name_index;
+
+                vm_utf8_t utf8_info = current_constant_pool[name_index].info.utf8_info;
+
+                uint16_t * uint16_string = vm_utf8_to_uint16_t(utf8_info.length, utf8_info.bytes);
+                char buffer[80];
+
+                for (uint16_t j = 0; j < utf8_info.length; j++) {
+                    sprintf(buffer, "%lc", uint16_string[j]);
+                }
+
+                if (vm_strcmp(buffer, "println")) {
+                    printf("%f\n", current_operand_stack->top_frame->value._float);
+                    pop_from_ostack(current_operand_stack);
+                }
             }
+            pc += 3;
+            break;
+
         case _fstore_0:
         case _fstore_1:
         case _fstore_2:
