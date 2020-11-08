@@ -15,6 +15,7 @@ typedef struct vm_local_variable_item vm_local_variable_item_t;
 typedef union _values {
     int _int;
     float _float;
+    double _double;
     char *_string;
 } _values_t;
 
