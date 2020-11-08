@@ -377,6 +377,8 @@ void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file)
     }
 }
 
+void element_value_pairs_parser(uint16_t, vm_element_value_pairs_t *, file_t *);
+
 /**
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
@@ -416,6 +418,7 @@ void element_value_parser(
         // For some reason it was not accepting just pasing the pointer directly
         // Also this line bellow seems to still raise a warning.
         vm_element_value_pairs_t *temporary_pair = element_value_pt->value.annotation_value.element_value_pairs;
+
         element_value_pairs_parser(
             element_value_pt->value.annotation_value.num_element_value_pairs,
             temporary_pair,
@@ -1008,7 +1011,7 @@ void utf8_helper(uint16_t length, uint8_t *bytes) {
 void class_file_reader(vm_class_file_t class_file, file_t *file) {
     uint16_t cp_size = class_file.constant_pool_count;
 
-    VM_LOG_FILE = fopen("vm_log.txt", "w+");
+    VM_LOG_FILE = fopen("output.txt", "w+");
 
     // gets the jvm execution target
     const char *java_version = vm_target(class_file.major_version);

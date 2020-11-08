@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+typedef struct vm_element_value_pairs vm_element_value_pairs_t;
 
 typedef struct vm_element_value {
     uint8_t tag;
@@ -20,12 +21,8 @@ typedef struct vm_element_value {
             uint16_t type_index;
             uint16_t num_element_value_pairs;
 
-            struct vm_element_value_pairs_t {
-                uint16_t element_name_index;
-                struct vm_element_value *value;
-            } *element_value_pairs;
+            vm_element_value_pairs_t *element_value_pairs;
         } annotation_value;
-        //vm_annotation_t annotation_value;
 
         struct {
             uint16_t num_values;
@@ -34,15 +31,13 @@ typedef struct vm_element_value {
     } value;
 } vm_element_value_t;
 
-
 /**
  * @brief
  */
-typedef struct vm_element_value_pairs {
+struct vm_element_value_pairs {
     uint16_t element_name_index;
     vm_element_value_t value;
-} vm_element_value_pairs_t;
-
+};
 
 /**
  * @brief
