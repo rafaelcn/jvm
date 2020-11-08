@@ -342,6 +342,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
+
         case _fload_0:
         case _fload_1:
         case _fload_2:
@@ -365,6 +366,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
+
         case _istore_0:
         case _istore_1:
         case _istore_2:
@@ -408,6 +410,26 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 result_frame->value._int = first_stack_frame->value._int +\
                     second_stack_frame->value._int;
                 push_into_ostack(current_operand_stack, result_frame);
+            }
+            pc += 1;
+            break;
+
+        case _fadd:
+            // Both value1 and value2 must be of type float. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The float result is
+            // value1' + value2'. The result is pushed onto the operand stack.
+            {
+                float f1 = current_operand_stack->top_frame->value._float;
+                pop_from_ostack(current_operand_stack);
+                float f2 = current_operand_stack->top_frame->value._float;
+                pop_from_ostack(current_operand_stack);
+
+                float f3 = f1 + f2;
+
+                vm_operand_stack_frame_t *new_frame = calloc(1, sizeof (vm_operand_stack_frame_t));
+
+                push_into_ostack(current_operand_stack, new_frame);
             }
             pc += 1;
             break;
