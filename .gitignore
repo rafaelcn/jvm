@@ -53,7 +53,7 @@ dkms.conf
 
 # Custom files
 *.class
-output.txt
+*.txt
 
 # Custom doc files
 doc/html/*

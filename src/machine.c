@@ -29,21 +29,6 @@ const char * vm_execute(file_t *file) {
 
     // setting up the stack
     vm_stack_t *VM_STACK = calloc(1, sizeof (vm_stack_t));
-    vm_stack_frame_t *MAIN_FRAME = calloc(1, sizeof (vm_stack_frame_t));
-
-    VM_STACK->frames_count = 1;
-    VM_STACK->top_frame = MAIN_FRAME;
-
-    MAIN_FRAME->constant_pool = class_file.constant_pool;
-    MAIN_FRAME->local_variables_list = calloc(1, sizeof (vm_local_variables_list_t));
-    MAIN_FRAME->operand_stack = calloc(1, sizeof (vm_operand_stack_t));
-    MAIN_FRAME->next_frame = NULL;
-
-    MAIN_FRAME->local_variables_list->local_variables_count = 0;
-    MAIN_FRAME->local_variables_list->first_item = NULL;
-
-    MAIN_FRAME->operand_stack->frames_count = 0;
-    MAIN_FRAME->operand_stack->top_frame = NULL;
 
     // finding the main
     vm_method_info_t *main_method = calloc(1, sizeof (vm_method_info_t));
@@ -102,6 +87,13 @@ const char * vm_execute(file_t *file) {
     if (main_code == NULL) {
         return "Couldn't find the code attribute of the main method";
     }
+
+    vm_stack_t *MAIN_FRAME = VM_STACK;
+
+    MAIN_FRAME->local_variables = calloc(main_code->max_local, sizeof(vm_local_variables_t));
+    MAIN_FRAME->operand_stack = calloc(1, sizeof(vm_ostack_t));
+    MAIN_FRAME->constant_pool = class_file.constant_pool;
+    MAIN_FRAME->next_frame = NULL;
 
     for (uint32_t pc = 0; pc < main_code->code_length;) {
         pc = vm_opcodes(main_code->code, pc, VM_STACK);

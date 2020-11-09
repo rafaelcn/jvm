@@ -213,8 +213,8 @@
 uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
     uint8_t _WIDE = 0;
 
-    vm_cp_info_t *current_constant_pool = STACK->top_frame->constant_pool;
-    vm_operand_stack_t *current_operand_stack = STACK->top_frame->operand_stack;
+    vm_local_variables_t *current_local_variables = STACK->local_variables;
+    vm_cp_info_t *current_constant_pool = STACK->constant_pool;
 
     for (uint8_t i = 0; i <= _WIDE; i++) {
         switch (code[pc]) {
@@ -228,11 +228,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Push the int constant <i> (-1, 0, 1, 2, 3, 4 or 5) onto the
             // operand stack.
             {
-                vm_operand_stack_frame_t *new_operand_frame = calloc(
-                        1, sizeof (vm_operand_stack_frame_t));
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
 
                 new_operand_frame->value._int = code[pc] - 0x03;
-                push_into_ostack(current_operand_stack, new_operand_frame);
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 1;
             break;
@@ -268,47 +267,25 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     {
                         int _i = current_constant_pool[index].info.integer_info.bytes;
 
-                        vm_local_variable_item_t *new_item = calloc(1, sizeof (vm_local_variable_item_t));
-                        new_item->value._float = (float) _i;
-                        new_item->next_item = NULL;
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                        vm_local_variable_item_t *current_item = STACK->top_frame->local_variables_list->first_item;
+                        new_frame->value._float = (float) _i;
+                        new_frame->next_frame = NULL;
 
-                        STACK->top_frame->local_variables_list->local_variables_count += 1;
-                        if (current_item == NULL) {
-                            current_item = new_item;
-                        } else {
-                            while (current_item->next_item != NULL)
-                            {
-                                current_item = current_item->next_item;
-                            }
-
-                            current_item->next_item = new_item;
-                        }
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
                     }
                     break;
 
                 case 4: // Float
                     {
-                        float _f = current_constant_pool[index].info.float_info.bytes;
+                        float _f = vm_itof(current_constant_pool[index].info.float_info.bytes);
 
-                        vm_local_variable_item_t *new_item = calloc(1, sizeof (vm_local_variable_item_t));
-                        new_item->value._float = _f;
-                        new_item->next_item = NULL;
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                        vm_local_variable_item_t *current_item = STACK->top_frame->local_variables_list->first_item;
+                        new_frame->value._float = _f;
+                        new_frame->next_frame = NULL;
 
-                        STACK->top_frame->local_variables_list->local_variables_count += 1;
-                        if (current_item == NULL) {
-                            current_item = new_item;
-                        } else {
-                            while (current_item->next_item != NULL)
-                            {
-                                current_item = current_item->next_item;
-                            }
-
-                            current_item->next_item = new_item;
-                        }
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
                     }
                     break;
 
@@ -318,26 +295,25 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 2;
             break;
+
         case _iload:
             // The index is an unsigned byte that must be an index into the local
             // variable array of the current frame (§2.6). The local variable at
             // index must contain an int. The value of the local variable at index
             // is pushed onto the operand stack
             {
-                uint16_t local_variable_index = code[pc+1];
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                uint8_t index = code[pc+1];
 
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                vm_operand_stack_frame_t *new_operand_frame = calloc(
-                    1, sizeof (vm_operand_stack_frame_t));
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_operand_frame->value._int = local_variable_item->value._int;
-                push_into_ostack(current_operand_stack, new_operand_frame);
+                new_frame->value._int = current_local_variables[index]._int;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 2;
             break;
+
         case _iload_0:
         case _iload_1:
         case _iload_2:
@@ -347,17 +323,14 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // int. The value of the local variable at <n> is pushed onto the
             // operand stack.
             {
-                uint16_t local_variable_index = code[pc] - 0x1a;
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                uint8_t index = code[pc] - 0x1a;
 
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                vm_operand_stack_frame_t *new_operand_frame = calloc(
-                    1, sizeof (vm_operand_stack_frame_t));
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_operand_frame->value._int = local_variable_item->value._int;
-                push_into_ostack(current_operand_stack, new_operand_frame);
+                new_frame->value._int = current_local_variables[index]._int;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 1;
             break;
@@ -368,17 +341,14 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // index must contain a float. The value of the local variable at index
             // is pushed onto the operand stack.
             {
-                uint8_t local_variable_index = code[pc+1];
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                uint8_t index = code[pc+1];
 
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                vm_operand_stack_frame_t *new_operand_frame = calloc(
-                    1, sizeof (vm_operand_stack_frame_t));
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_operand_frame->value._float = local_variable_item->value._float;
-                push_into_ostack(current_operand_stack, new_operand_frame);
+                new_frame->value._float = current_local_variables[index]._float;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 2;
             break;
@@ -392,39 +362,54 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // float. The value of the local variable at <n> is pushed onto the
             // operand stack.
             {
-                uint16_t local_variable_index = code[pc] - 0x22;
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
+                uint16_t index = code[pc] - 0x22;
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                vm_operand_stack_frame_t *new_operand_frame = calloc(
-                    1, sizeof (vm_operand_stack_frame_t));
+                new_frame->value._float = current_local_variables[index]._float;
+                new_frame->next_frame = NULL;
 
-                new_operand_frame->value._float = local_variable_item->value._float;
-                push_into_ostack(current_operand_stack, new_operand_frame);
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 1;
             break;
 
         case _istore:
-            // The address of the opcode of the instruction immediately
-            // following this jsr instruction is pushed onto the operand stack as
-            // a value of type returnAddress. The unsigned branchbyte1 and
-            // branchbyte2 are used to construct a signed 16-bit offset, where
-            // the offset is (branchbyte1 << 8) | branchbyte2. Execution proceeds
-            // at that offset from the address of this jsr instruction. The target
-            // address must be that of an opcode of an instruction within the
-            // method that contains this jsr instruction.
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The value on the top
+            // of the operand stack must be of type int. It is popped from the
+            // operand stack, and the value of the local variable at index is set
+            // to value.
             {
-                uint16_t local_variable_index = code[pc+1];
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
-                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(current_operand_stack);
+                uint8_t index = code[pc+1];
+                current_local_variables[index]._int = pop_from_ostack(&(STACK->operand_stack))->value._int;
+            }
+            pc += 2;
+            break;
 
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                local_variable_item->value._int = stack_frame->value._int;
+        case _fstore:
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The value on the top
+            // of the operand stack must be of type float. It is popped from
+            // the operand stack and undergoes value set conversion (§2.8.3),
+            // resulting in value'. The value of the local variable at index is set
+            // to value'.
+            {
+                uint8_t index = code[pc+1];
+                current_local_variables[index]._float = pop_from_ostack(&(STACK->operand_stack))->value._float;
+            }
+            pc += 2;
+            break;
+
+        case _dstore:
+            // The index is an unsigned byte. Both index and index+1 must be
+            // indices into the local variable array of the current frame (§2.6).
+            // The value on the top of the operand stack must be of type double.
+            // It is popped from the operand stack and undergoes value set
+            // conversion (§2.8.3), resulting in value'. The local variables at index
+            // and index+1 are set to value'.
+            {
+                uint8_t index = code[pc+1];
+                current_local_variables[index]._double = pop_from_ostack(&(STACK->operand_stack))->value._double;
             }
             pc += 2;
             break;
@@ -438,14 +423,40 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             //  must be of type int. It is popped from the operand stack, and the
             //  value of the local variable at <n> is set to value.
             {
-                uint16_t local_variable_index = code[pc] - 0x3b;
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
-                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(current_operand_stack);
+                uint8_t index = code[pc] - 0x3b;
+                current_local_variables[index]._int = pop_from_ostack(&(STACK->operand_stack))->value._int;
+            }
+            pc += 1;
+            break;
 
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                local_variable_item->value._int = stack_frame->value._int;
+        case _fstore_0:
+        case _fstore_1:
+        case _fstore_2:
+        case _fstore_3:
+            // The <n> must be an index into the local variable array of the
+            // current frame (§2.6). The value on the top of the operand stack
+            // must be of type float. It is popped from the operand stack and
+            // undergoes value set conversion (§2.8.3), resulting in value'. The
+            // value of the local variable at <n> is set to value'.
+            {
+                uint8_t index = code[pc] - 0x43;
+                current_local_variables[index]._float = pop_from_ostack(&(STACK->operand_stack))->value._float;
+            }
+            pc += 1;
+            break;
+
+        case _dstore_0:
+        case _dstore_1:
+        case _dstore_2:
+        case _dstore_3:
+            // Both <n> and <n>+1 must be indices into the local variable array
+            // of the current frame (§2.6). The value on the top of the operand
+            // stack must be of type double. It is popped from the operand stack
+            // and undergoes value set conversion (§2.8.3), resulting in value'.
+            // The local variables at <n> and <n>+1 are set to value'
+            {
+                uint8_t index = code[pc] - 0x47;
+                current_local_variables[index]._double = pop_from_ostack(&(STACK->operand_stack))->value._double;
             }
             pc += 1;
             break;
@@ -462,16 +473,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an iadd
             // instruction never throws a run-time exception.
             {
-                vm_operand_stack_frame_t* first_stack_frame = pop_from_ostack(
-                    current_operand_stack);
-                vm_operand_stack_frame_t* second_stack_frame = pop_from_ostack(
-                    current_operand_stack);
-                vm_operand_stack_frame_t * result_frame = calloc(
-                    1, sizeof (vm_operand_stack_frame_t));
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->value._int;
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->value._int;
 
-                result_frame->value._int = first_stack_frame->value._int +\
-                    second_stack_frame->value._int;
-                push_into_ostack(current_operand_stack, result_frame);
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->value._int = _i1 + _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 1;
             break;
@@ -482,16 +492,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The float result is
             // value1' + value2'. The result is pushed onto the operand stack.
             {
-                float f1 = current_operand_stack->top_frame->value._float;
-                pop_from_ostack(current_operand_stack);
-                float f2 = current_operand_stack->top_frame->value._float;
-                pop_from_ostack(current_operand_stack);
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->value._float;
+                float _f2 = pop_from_ostack(&(STACK->operand_stack))->value._float;
 
-                float f3 = f1 + f2;
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                vm_operand_stack_frame_t *new_frame = calloc(1, sizeof (vm_operand_stack_frame_t));
+                new_frame->value._float = _f1 + _f2;
+                new_frame->next_frame = NULL;
 
-                push_into_ostack(current_operand_stack, new_frame);
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 1;
             break;
@@ -507,8 +516,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The interpreter then returns control to the invoker of the method,
             // reinstating the frame of the invoker.
             {
-                vm_operand_stack_frame_t* stack_frame = pop_from_ostack(current_operand_stack);
-                vm_operand_stack_frame_t* temp_stack;
+                vm_ostack_t *stack_frame = pop_from_ostack(&(STACK->operand_stack));
+                vm_ostack_t *temp_stack;
 
                 while(stack_frame != NULL)
                 {
@@ -535,14 +544,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The value of the class or interface field is fetched and pushed onto
             // the operand stack.
             {
-                vm_operand_stack_frame_t *new_operand_frame = calloc(
-                    1, sizeof (vm_operand_stack_frame_t));
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
 
-                new_operand_frame->value._string = calloc(
-                    10, sizeof (char));
+                new_operand_frame->value._string = calloc(10, sizeof (char));
+                new_operand_frame->next_frame = NULL;
 
                 sprintf(new_operand_frame->value._string, "getstatic");
-                push_into_ostack(current_operand_stack, new_operand_frame);
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 3;
             break;
@@ -561,86 +569,18 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 vm_utf8_t utf8_info = current_constant_pool[name_index].info.utf8_info;
 
                 uint16_t * uint16_string = vm_utf8_to_uint16_t(utf8_info.length, utf8_info.bytes);
-                char buffer[80];
 
-                for (uint16_t j = 0; j < utf8_info.length; j++) {
-                    sprintf(buffer, "%lc", uint16_string[j]);
+                char buffer[utf8_info.length];
+
+                for (int j = 0; j < utf8_info.length; j++) {
+                    sprintf(&(buffer[j]), "%lc", uint16_string[j]);
                 }
 
                 if (vm_strcmp(buffer, "println")) {
-                    printf("%f\n", current_operand_stack->top_frame->value._float);
-                    pop_from_ostack(current_operand_stack);
+                    printf("%f\n", pop_from_ostack(&(STACK->operand_stack))->value._float);
                 }
             }
             pc += 3;
-            break;
-
-        case _fstore:
-            // The index is an unsigned byte that must be an index into the local
-            // variable array of the current frame (§2.6). The value on the top
-            // of the operand stack must be of type float. It is popped from
-            // the operand stack and undergoes value set conversion (§2.8.3),
-            // resulting in value'. The value of the local variable at index is set
-            // to value'.
-            {
-                uint8_t index = code[pc+1];
-
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
-                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
-
-                for(uint16_t j = 0; j < index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                local_variable_item->value._float = stack_frame->value._float;
-
-            }
-            pc += 2;
-            break;
-
-        case _fstore_0:
-        case _fstore_1:
-        case _fstore_2:
-        case _fstore_3:
-            // The <n> must be an index into the local variable array of the
-            // current frame (§2.6). The value on the top of the operand stack
-            // must be of type float. It is popped from the operand stack and
-            // undergoes value set conversion (§2.8.3), resulting in value'. The
-            // value of the local variable at <n> is set to value'.
-            {
-                uint16_t local_variable_index = code[pc] - 0x43;
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
-                vm_operand_stack_frame_t *stack_frame = pop_from_ostack(STACK->top_frame->operand_stack);
-
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                local_variable_item->value._float = stack_frame->value._float;
-            }
-            pc += 1;
-            break;
-
-        case _dstore:
-        case _dstore_0:
-        case _dstore_1:
-        case _dstore_2:
-        case _dstore_3:
-            // Both <n> and <n>+1 must be indices into the local variable array
-            // of the current frame (§2.6). The value on the top of the operand
-            // stack must be of type double. It is popped from the operand stack
-            // and undergoes value set conversion (§2.8.3), resulting in value'.
-            // The local variables at <n> and <n>+1 are set to value'
-            {
-                uint16_t local_variable_index = code[pc] - 0x47;
-                vm_local_variable_item_t *local_variable_item = STACK->top_frame->local_variables_list->first_item;
-                vm_operand_stack_frame_t *high_operand = pop_from_ostack(STACK->top_frame->operand_stack);
-                vm_operand_stack_frame_t *low_operand = pop_from_ostack(STACK->top_frame->operand_stack);
-                for(uint16_t j = 0; j < local_variable_index; j++) {
-                    local_variable_item = local_variable_item->next_item;
-                }
-                local_variable_item->value._double = high_operand->value._double;
-                local_variable_item->next_item->value._double = low_operand->value._double;
-            }
-            pc++;
             break;
 
         case _wide:
