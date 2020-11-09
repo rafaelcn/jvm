@@ -1,5 +1,5 @@
-#ifndef VM_STRING_H
-#define VM_STRING_H
+#ifndef VM_CP_STRING_H
+#define VM_CP_STRING_H
 
 #include <stdint.h>
 
@@ -11,4 +11,4 @@ typedef struct vm_string_t
     uint16_t string_index;
 } vm_string_t;
 
-#endif /* VM_STRING_H */
+#endif /* VM_CP_STRING_H */

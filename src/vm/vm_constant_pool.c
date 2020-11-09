@@ -7,8 +7,8 @@
 #include <math.h>
 
 #include "vm_file.h"
-
 #include "utils/vm_target.h"
+#include "lib/vm_string.h"
 
 /**
  * @brief Constant Pool tag mapping.
@@ -27,6 +27,11 @@
 #define CONSTANT_MethodHandle       (0x0F)
 #define CONSTANT_MethodType         (0x10)
 #define CONSTANT_InvokeDynamic      (0x12)
+
+/**
+ * @brief
+ */
+FILE * VM_LOG_FILE;
 
 /**
  * @brief Attribute Types tag mapping.
@@ -95,7 +100,7 @@ void vm_init_tag_map() {
 void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
     uint8_t tag;
 
-    for (int i = 0; i < (cf->constant_pool_count - 1); i++) {
+    for (int i = 1; i < cf->constant_pool_count; i++) {
         tag = read_u1(file);
 
         switch (tag) {
@@ -161,9 +166,7 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
             cf->constant_pool[i].info.utf8_info.bytes = (uint8_t*) calloc(
                 cf->constant_pool[i].info.utf8_info.length, sizeof(uint8_t));
 
-            uint16_t size = cf->constant_pool[i].info.utf8_info.length;
-
-            for(int j = 0; j < size; j++) {
+            for(int j = 0; j < cf->constant_pool[i].info.utf8_info.length; j++) {
                 cf->constant_pool[i].info.utf8_info.bytes[j] = read_u1(file);
             }
             break;
@@ -215,51 +218,51 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
         sprintf(&buffer[j], "%lc", heap[j]);
     }
 
-    if (buffer == "ConstantValue")
+    if (vm_strcmp(buffer, "ConstantValue"))
         return ConstantValue;
-    if (buffer == "Code")
+    if (vm_strcmp(buffer, "Code"))
         return Code;
-    if (buffer == "StackMapTable")
+    if (vm_strcmp(buffer, "StackMapTable"))
         return StackMapTable;
-    if (buffer == "Exceptions")
+    if (vm_strcmp(buffer, "Exceptions"))
         return Exceptions;
-    if (buffer == "InnerClasses")
+    if (vm_strcmp(buffer, "InnerClasses"))
         return InnerClasses;
-    if (buffer == "EnclosingMethod")
+    if (vm_strcmp(buffer, "EnclosingMethod"))
         return EnclosingMethod;
-    if (buffer == "Synthetic")
+    if (vm_strcmp(buffer, "Synthetic"))
         return Synthetic;
-    if (buffer == "Signature")
+    if (vm_strcmp(buffer, "Signature"))
         return Signature;
-    if (buffer == "SourceFile")
+    if (vm_strcmp(buffer, "SourceFile"))
         return SourceFile;
-    if (buffer == "SourceDebugExtension")
+    if (vm_strcmp(buffer, "SourceDebugExtension"))
         return SourceDebugExtension;
-    if (buffer == "LineNumberTable")
+    if (vm_strcmp(buffer, "LineNumberTable"))
         return LineNumberTable;
-    if (buffer == "LocalVariableTable")
+    if (vm_strcmp(buffer, "LocalVariableTable"))
         return LocalVariableTable;
-    if (buffer == "LocalVariableTypeTable")
+    if (vm_strcmp(buffer, "LocalVariableTypeTable"))
         return LocalVariableTypeTable;
-    if (buffer == "Deprecated")
+    if (vm_strcmp(buffer, "Deprecated"))
         return Deprecated;
-    if (buffer == "RuntimeVisibleAnnotations")
+    if (vm_strcmp(buffer, "RuntimeVisibleAnnotations"))
         return RuntimeVisibleAnnotations;
-    if (buffer == "RuntimeInvisibleAnnotations")
+    if (vm_strcmp(buffer, "RuntimeInvisibleAnnotations"))
         return RuntimeInvisibleAnnotations;
-    if (buffer == "RuntimeVisibleParameterAnnotations")
+    if (vm_strcmp(buffer, "RuntimeVisibleParameterAnnotations"))
         return RuntimeVisibleParameterAnnotations;
-    if (buffer == "RuntimeInvisibleParameterAnnotations")
+    if (vm_strcmp(buffer, "RuntimeInvisibleParameterAnnotations"))
         return RuntimeInvisibleParameterAnnotations;
-    if (buffer == "RuntimeVisibleTypeAnnotations")
+    if (vm_strcmp(buffer, "RuntimeVisibleTypeAnnotations"))
         return RuntimeVisibleTypeAnnotations;
-    if (buffer == "RuntimeInvisibleTypeAnnotations")
+    if (vm_strcmp(buffer, "RuntimeInvisibleTypeAnnotations"))
         return RuntimeInvisibleTypeAnnotations;
-    if (buffer == "AnnotationDefault")
+    if (vm_strcmp(buffer, "AnnotationDefault"))
         return AnnotationDefault;
-    if (buffer == "BootstrapMethods")
+    if (vm_strcmp(buffer, "BootstrapMethods"))
         return BootstrapMethods;
-    if (buffer == "MethodParameters")
+    if (vm_strcmp(buffer, "MethodParameters"))
         return MethodParameters;
 
     return -1;
@@ -373,11 +376,12 @@ void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file)
     }
 }
 
+void element_value_pairs_parser(uint16_t, vm_element_value_pairs_t *, file_t *);
+
 /**
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
- * @param element_value_pairs_count
- * @param element_value_pairs
+ * @param element_value_pt
  * @param file A file_t pointer that has the .class loaded.
  */
 void element_value_parser(
@@ -385,11 +389,11 @@ void element_value_parser(
 {
     element_value_pt->tag = read_u1(file);
     uint8_t tag = element_value_pt->tag;
-    
-    // As the same behavior shall happen with different tags, let's compare the tag 
-    // with those characters 
+
+    // As the same behavior shall happen with different tags, let's compare the tag
+    // with those characters
     uint8_t is_constant_value_index_tag = strchr("BCDFIJSZs", tag) != NULL;
-    if(is_constant_value_index_tag) 
+    if(is_constant_value_index_tag)
     {
         element_value_pt->value.const_value_index = read_u2(file);
     } else if (tag == 'e')
@@ -413,6 +417,7 @@ void element_value_parser(
         // For some reason it was not accepting just pasing the pointer directly
         // Also this line bellow seems to still raise a warning.
         vm_element_value_pairs_t *temporary_pair = element_value_pt->value.annotation_value.element_value_pairs;
+
         element_value_pairs_parser(
             element_value_pt->value.annotation_value.num_element_value_pairs,
             temporary_pair,
@@ -438,17 +443,142 @@ void element_value_parser(
  * @brief A function dedicated to filling the attributes field of the
  * vm_class_file_t structure.
  * @param element_value_pairs_count
- * @param element_value_pairs
+ * @param element_value_pairs_pt
  * @param file A file_t pointer that has the .class loaded.
  */
 void element_value_pairs_parser(
     uint16_t element_value_pairs_count,
-    vm_element_value_pairs_t* element_value_pairs, file_t *file)
+    vm_element_value_pairs_t *element_value_pairs_pt, file_t *file)
 {
     for(int k = 0; k < (element_value_pairs_count); k++)
     {
-        element_value_pairs[k].element_name_index = read_u2(file);
-        element_value_parser(&(element_value_pairs[k].value), file);
+        element_value_pairs_pt[k].element_name_index = read_u2(file);
+        element_value_parser(&(element_value_pairs_pt[k].value), file);
+    }
+}
+
+/**
+ * @brief A function dedicated to filling the attributes field of the
+ * vm_class_file_t structure.
+ * @param type_annotation_count
+ * @param type_annotation_pt
+ * @param file A file_t pointer that has the .class loaded.
+ */
+void type_annotations_parser(
+    uint16_t type_annotation_count,
+    vm_type_annotation_t *type_annotation_pt, file_t *file)
+{
+    for(uint16_t j = 0; j < (type_annotation_count); j++)
+    {
+        type_annotation_pt[j].target_type = read_u1(file);
+        switch (type_annotation_pt[j].target_type)
+        {
+        case 0x00:
+            // type parameter declaration of generic class or interface
+            // Location: ClassFile
+        case 0x01:
+            // type parameter declaration of generic method or
+            // constructor
+            // Location: method_info
+            type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
+            break;
+        case 0x10:
+            // type in extends clause of class or interface declaration, or
+            // in implements clause of interface declaration
+            // Location: ClassFile
+        case 0x11:
+            // type in bound of type parameter declaration of generic
+            // class or interface
+            // Location: ClassFile
+            type_annotation_pt[j].target_info.supertype_target.supertype_index = read_u2(file);
+            break;
+        case 0x12:
+            // 0x12 type in bound of type parameter declaration of generic method
+            type_annotation_pt[j].target_info.type_parameter_bound_target.type_parameter_index = read_u1(file);
+            type_annotation_pt[j].target_info.type_parameter_bound_target.bound_index = read_u1(file);
+            break;
+        case 0x13:
+            // 0x13 type in field declaration field_info
+        case 0x14:
+            // 0x14 return type of method or constructor method_info
+        case 0x15:
+            // 0x15 receiver type of method or constructor method_info
+            type_annotation_pt[j].target_info.empty_target;
+            break;
+        case 0x16:
+            // 0x16 type in formal parameter declaration of method, constructor,
+            // or lambda expression method_info
+            type_annotation_pt[j].target_info.formal_parameter_target.formal_parameter_index = read_u1(file);
+            break;
+        case 0x17:
+            // 0x17 type in throws clause of method or constructor method_info
+            type_annotation_pt[j].target_info.throws_target.throws_type_index = read_u2(file);
+            break;
+        case 0x40:
+            // 0x40 type in local variable declaration localvar_target
+        case 0x41:
+            // 0x41 type in resource variable declaration localvar_target
+            type_annotation_pt[j].target_info.localvar_target.table_length = read_u2(file);
+            type_annotation_pt[j].target_info.localvar_target.table = calloc(
+                type_annotation_pt[j].target_info.localvar_target.table_length
+                , sizeof (vm_localvar_table_t)
+            );
+            for(uint16_t k = 0; k < (type_annotation_pt[j].target_info.localvar_target.table_length); k++)
+            {
+                type_annotation_pt[j].target_info.localvar_target.table[k].start_pc = read_u2(file);
+                type_annotation_pt[j].target_info.localvar_target.table[k].length = read_u2(file);
+                type_annotation_pt[j].target_info.localvar_target.table[k].index = read_u2(file);
+            }
+            break;
+        case 0x42:
+            // 0x42 type in exception parameter declaration catch_target
+            type_annotation_pt[j].target_info.catch_target.exception_table_index = read_u2(file);
+            break;
+        case 0x43:
+            // 0x43 type in instanceof expression offset_target
+        case 0x44:
+            // 0x44 type in new expression offset_target
+        case 0x45:
+            //0x45 type in method reference expression using ::new
+            // offset_target
+        case 0x46:
+            // 0x46 type in method reference expression using ::Identifier
+            // offset_target
+            type_annotation_pt[j].target_info.offset_target.offset = read_u2(file);
+            break;
+        case 0x47:
+            // 0x47 type in cast expression type_argument_target
+        case 0x48:
+            // 0x48 type argument for generic constructor in new
+            // expression or explicit constructor invocation statement
+            // type_argument_target
+        case 0x49:
+            // 0x49 type argument for generic method in method
+            // invocation expression
+            // type_argument_target
+        case 0x4A:
+            // 0x4A type argument for generic constructor in method
+            // reference expression using ::new type_argument_target
+        case 0x4B:
+            // 0x4B type argument for generic method in method reference
+            // expression using ::Identifier type_argument_target
+            type_annotation_pt[j].target_info.type_argument_target.offset = read_u2(file);
+            type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
+        break;
+        default:
+            printf("[ERROR] Invalid target type inside attribute type annotations!");
+            break;
+        }
+        type_annotation_pt[j].target_path.path_length = read_u1(file);
+        type_annotation_pt[j].target_path.path = calloc(
+            type_annotation_pt[j].target_path.path_length,
+            sizeof (vm_type_path_t)
+        );
+        for(uint16_t k = 0; k < (type_annotation_pt[j].target_path.path_length); k++)
+        {
+            type_annotation_pt[j].target_path.path[k].type_path_kind = read_u1(file);
+            type_annotation_pt[j].target_path.path[k].type_argument_index = read_u1(file);
+        }
     }
 }
 
@@ -462,6 +592,8 @@ void element_value_pairs_parser(
  */
 void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attributes, vm_cp_info_t *constant_pool, file_t *file) {
     vm_utf8_t utf8;
+
+    char buffer[80];
 
     for (int i = 0; i < (attributes_count); i++) {
         attributes[i].attribute_name_index = read_u2(file);
@@ -717,7 +849,10 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             attributes[i].info.runtimevisibletypeannotations_attribute.annotations = calloc(
                 attributes[i].info.runtimevisibletypeannotations_attribute.num_annotations,
                 sizeof (vm_type_annotation_t));
-            // TO DO: IMPLEMENTAR TYPE ANNOTATIONS PARSER(DESCRIÇÃO PÁGINA 143 da JVM)
+            type_annotations_parser(
+                        attributes[i].info.runtimevisibletypeannotations_attribute.num_annotations,
+                        attributes[i].info.runtimevisibletypeannotations_attribute.annotations,
+                        file);
             break;
 
         case RuntimeInvisibleTypeAnnotations:
@@ -725,11 +860,15 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
             attributes[i].info.runtimeinvisibletypeannotations_attribute.annotations = calloc(
                 attributes[i].info.runtimeinvisibletypeannotations_attribute.num_annotations,
                 sizeof (vm_type_annotation_t));
-            // TO DO: IMPLEMENTAR TYPE ANNOTATIONS PARSER(DESCRIÇÃO PÁGINA 143 da JVM)
+            type_annotations_parser(
+                        attributes[i].info.runtimeinvisibletypeannotations_attribute.num_annotations,
+                        attributes[i].info.runtimeinvisibletypeannotations_attribute.annotations,
+                        file);
             break;
 
         case AnnotationDefault:
-            // TO DO: VALIDAR SE ESSA ESTRUTURA ESTÁ IMPLEMENTADA CORRETAMENTE.
+            element_value_parser(&(attributes[i].info.annotationdefault_attribute.default_value),
+                file);
             break;
 
         case BootstrapMethods:
@@ -779,6 +918,8 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
  * @param cf A pointer to a vm_class_file_t structure.
  */
 void fields_parser(file_t *file, vm_class_file_t *cf) {
+    char buffer[80];
+
     for (int i = 0; i < (cf->fields_count); i++) {
         cf->fields[i].access_flags = read_u2(file);
         cf->fields[i].name_index = read_u2(file);
@@ -792,19 +933,41 @@ void fields_parser(file_t *file, vm_class_file_t *cf) {
 }
 
 /**
+ * @brief A function dedicated to filling the fields field of the
+ * vm_class_file_t structure.
+ * @param file A file_t pointer that has the .class loaded.
+ * @param cf A pointer to a vm_class_file_t structure.
+ */
+void methods_parser(file_t *file, vm_class_file_t *cf) {
+    char buffer[80];
+
+    for (uint16_t i = 0; i < (cf->methods_count); i++) {
+        cf->methods[i].access_flags = read_u2(file);
+        cf->methods[i].name_index = read_u2(file);
+        cf->methods[i].descriptor_index = read_u2(file);
+        cf->methods[i].attributes_count = read_u2(file);
+        cf->methods[i].attributes = calloc(cf->methods[i].attributes_count,
+            sizeof (vm_attribute_info_t));
+
+        attributes_parser(cf->methods[i].attributes_count, cf->methods[i].attributes, cf->constant_pool, file);
+    }
+}
+
+/**
  * @brief Parses the .class bytecode to a ClassFile structure.
  * @param file A FILE (from stdio, in rb mode) pointer to a .class file.
  * @param cf A pointer to a ClassFile structure.
  * @returns A ClassFile structure containing the .class information.
  */
 const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
+    char buffer[80];
+
     cf->magic = read_u4(file);
     cf->minor_version = read_u2(file);
     cf->major_version = read_u2(file);
 
     cf->constant_pool_count = read_u2(file);
-    cf->constant_pool = calloc(cf->constant_pool_count - 1, sizeof (vm_cp_info_t));
-
+    cf->constant_pool = calloc(cf->constant_pool_count, sizeof (vm_cp_info_t));
     constant_pool_parser(file, cf);
 
     cf->access_flags = read_u2(file);
@@ -813,13 +976,30 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
 
     cf->interfaces_count = read_u2(file);
     cf->interfaces = calloc(cf->interfaces_count, sizeof (uint16_t));
-
     interfaces_parser(file, cf);
 
     cf->fields_count = read_u2(file);
     cf->fields = calloc(cf->fields_count, sizeof (vm_field_info_t));
-
     fields_parser(file, cf);
+
+    cf->methods_count = read_u2(file);
+    cf->methods = calloc(cf->methods_count, sizeof (vm_method_info_t));
+    methods_parser(file, cf);
+
+    cf->attributes_count = read_u2(file);
+    cf->attributes = calloc(cf->attributes_count, sizeof (vm_attribute_info_t));
+    attributes_parser(cf->attributes_count, cf->attributes, cf->constant_pool, file);
+}
+
+/**
+ * @brief
+ */
+void utf8_helper(uint16_t length, uint8_t *bytes) {
+    uint16_t *uint16_string = vm_utf8_to_uint16_t(length, bytes);
+
+    for (uint16_t i = 0; i < length; i++) {
+        fprintf(VM_LOG_FILE, "%lc", uint16_string[i]);
+    }
 }
 
 /**
@@ -828,62 +1008,130 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
  * @param class_file A ClassFile structure to be printed.
  */
 void class_file_reader(vm_class_file_t class_file, file_t *file) {
-
     uint16_t cp_size = class_file.constant_pool_count;
+
+    VM_LOG_FILE = fopen("output.txt", "w+");
 
     // gets the jvm execution target
     const char *java_version = vm_target(class_file.major_version);
 
-    printf("\n");
-    printf("%s\n\n", file->filename);
-    printf("%2sMAGIC:                %10X\n", "", class_file.magic);
-    printf("%2sMAJOR VERSION:        %10d\n", "", class_file.major_version);
-    printf("%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
-    printf("%2sJAVA TARGET:          %10s\n", "", java_version);
-    printf("%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
-    printf("\n");
+    fprintf(VM_LOG_FILE, "\n");
+    fprintf(VM_LOG_FILE, "%s\n\n", file->filename);
+    fprintf(VM_LOG_FILE, "%2sMAGIC:                %10X\n", "", class_file.magic);
+    fprintf(VM_LOG_FILE, "%2sMAJOR VERSION:        %10d\n", "", class_file.major_version);
+    fprintf(VM_LOG_FILE, "%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
+    fprintf(VM_LOG_FILE, "%2sJAVA TARGET:          %10s\n", "", java_version);
+    fprintf(VM_LOG_FILE, "%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
+    fprintf(VM_LOG_FILE, "\n");
 
-    printf("CONSTANT POOL\n");
-    printf("-------------\n\n");
+    fprintf(VM_LOG_FILE, "CONSTANT POOL\n");
+    fprintf(VM_LOG_FILE, "-------------\n\n");
 
-    for (uint16_t i = 0; i < (class_file.constant_pool_count - 1); i++) {
+    for (uint16_t i = 1; i < class_file.constant_pool_count; i++) {
 
         vm_cp_info_t cp_info = class_file.constant_pool[i];
 
-        printf("%3s #%d\t| %3d %3s %-10s", "", i+1, cp_info.tag,
-            tag_constants[cp_info.tag], "");
+        fprintf(VM_LOG_FILE, "#% 03d | %-16s", i, tag_constants[cp_info.tag]);
 
         switch (class_file.constant_pool[i].tag) {
         case CONSTANT_Class:
-            printf("\t| name_index: %5d", cp_info.info.class_info.name_index);
-            printf("\t|\n");
+            fprintf(VM_LOG_FILE, " | Class Name: ");
+            utf8_helper(
+                class_file.constant_pool[cp_info.info.class_info.name_index].info.utf8_info.length,
+                class_file.constant_pool[cp_info.info.class_info.name_index].info.utf8_info.bytes);
+            fprintf(VM_LOG_FILE, "\n");
             break;
 
         case CONSTANT_Fieldref:
-            printf("\t| class_index: %5d",
-                cp_info.info.fieldref_info.class_index);
-            printf("\t| name_and_type_index: %5d\n",
-                cp_info.info.fieldref_info.name_and_type_index);
+            {
+                vm_class_t class_info = class_file.constant_pool[cp_info.info.fieldref_info.class_index].info.class_info;
+                uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Class Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.fieldref_info.name_and_type_index].info.nameandtype_info;
+                length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Field Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Field Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_Methodref:
-            printf("\t| class_index:  % 5d",
-                cp_info.info.methodref_info.class_index);
-            printf("\t| name_and_type_index: % 5d\n",
-                cp_info.info.methodref_info.name_and_type_index);
+            {
+                vm_class_t class_info = class_file.constant_pool[cp_info.info.methodref_info.class_index].info.class_info;
+                uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Class Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.methodref_info.name_and_type_index].info.nameandtype_info;
+                length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Method Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Method Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_InterfaceMethodref:
-            printf("\t| class_index:  % 5d",
-                cp_info.info.interfacemethodref_info.class_index);
-            printf("\t| name_and_type_index: % 5d\n",
-                cp_info.info.interfacemethodref_info.name_and_type_index);
+            {
+                vm_class_t class_info = class_file.constant_pool[cp_info.info.interfacemethodref_info.class_index].info.class_info;
+                uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Class Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.interfacemethodref_info.name_and_type_index].info.nameandtype_info;
+                length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Interface Method Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Interface Method Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_String:
-            printf("\t| string_index: % 5d",
-                cp_info.info.string_info.string_index);
-            printf("\t|\n");
+            {
+                uint16_t length = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | String: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_Integer:
@@ -891,7 +1139,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint32_t b = cp_info.info.integer_info.bytes;
                 int number = (int)b;
 
-                printf("\t| %d (%04X)\n", number, b);
+                fprintf(VM_LOG_FILE, " | %d (%04X)\n", number, b);
             }
             break;
 
@@ -900,7 +1148,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint32_t bytes = cp_info.info.float_info.bytes;
                 float number = vm_itof(bytes);
 
-                printf("\t| %f (%4X)\n", number, bytes);
+                fprintf(VM_LOG_FILE, " | %f (%4X)\n", number, bytes);
             }
             break;
 
@@ -913,7 +1161,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
                 long number = vm_itolf(low, high);
 
-                printf("\t| %ld (%4X) (%4X)\n", number, low, high);
+                fprintf(VM_LOG_FILE, " | %ld (%4X) (%4X)\n", number, low, high);
             }
             break;
 
@@ -926,15 +1174,26 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
                 double number = vm_itod(low, high);
 
-                printf("\t| %lf (%4X) (%4X)\n", number, low, high);
+                fprintf(VM_LOG_FILE, " | %lf (%4X) (%4X)\n", number, low, high);
             }
             break;
 
         case CONSTANT_NameAndType:
-            printf("\t| name_index: %-5d",
-                cp_info.info.nameandtype_info.name_index);
-            printf("\t| descriptor_index: %-5d\n",
-                cp_info.info.nameandtype_info.descriptor_index);
+            {
+                uint16_t length = class_file.constant_pool[cp_info.info.nameandtype_info.name_index].info.utf8_info.length;
+                uint8_t *bytes = class_file.constant_pool[cp_info.info.nameandtype_info.name_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " | Name: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, ",");
+
+                length = class_file.constant_pool[cp_info.info.nameandtype_info.descriptor_index].info.utf8_info.length;
+                bytes = class_file.constant_pool[cp_info.info.nameandtype_info.descriptor_index].info.utf8_info.bytes;
+
+                fprintf(VM_LOG_FILE, " Descriptor: ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
+            }
             break;
 
         case CONSTANT_Utf8:
@@ -942,45 +1201,25 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = cp_info.info.utf8_info.length;
                 uint8_t *bytes = cp_info.info.utf8_info.bytes;
 
-                uint16_t *heap = vm_utf8_to_uint16_t(length, bytes);
-
-                printf("\t| \"");
-                for (int j = 0; j < cp_info.info.utf8_info.length; j++) {
-                    printf("%lc", heap[j]);
-                }
-                printf("\"\n");
-                break;
+                fprintf(VM_LOG_FILE, " | ");
+                utf8_helper(length, bytes);
+                fprintf(VM_LOG_FILE, "\n");
             }
+            break;
 
         case CONSTANT_MethodHandle:
-            printf("\t|MethodHandle - Ignoring");
-            printf("\t|\n");
             break;
 
         case CONSTANT_MethodType:
-            printf("\t|MethodType - Ignoring");
-            printf("\t|\n");
             break;
 
         case CONSTANT_InvokeDynamic:
-            printf("\t|InvokeDynamic - Ignoring");
-            printf("\t|\n");
             break;
 
         default:
-            printf("\n");
             break;
         }
     }
-}
 
-void vm_load_constant_pool(file_t *file) {
-    vm_class_file_t class_file;
-
-    file->read = 0;
-
-    vm_init_tag_map();
-
-    class_file_parser(file, &class_file);
-    class_file_reader(class_file, file);
+    fclose(VM_LOG_FILE);
 }

@@ -1,0 +1,45 @@
+#ifndef VM_FRAME_H
+#define VM_FRAME_H
+
+#include <stdint.h>
+
+#include "vm_constant_pool.h"
+
+typedef struct vm_ostack vm_ostack_t;
+typedef struct vm_stack vm_stack_t;
+
+/**
+ * @brief
+ */
+typedef union vm_local_variables {
+    int _int;
+    float _float;
+    double _double;
+    char *_string;
+} vm_local_variables_t;
+
+/**
+ * @brief
+ */
+struct vm_ostack {
+    vm_local_variables_t value;
+    vm_ostack_t *next_frame;
+};
+
+/**
+ * @brief
+ */
+struct vm_stack {
+    vm_local_variables_t *local_variables;
+    vm_ostack_t *operand_stack;
+    vm_cp_info_t *constant_pool;
+    vm_stack_t *next_frame;
+};
+
+void push_into_stack(vm_stack_t **stack, vm_stack_t **new_frame);
+vm_stack_t * pop_from_stack(vm_stack_t **stack);
+
+void push_into_ostack(vm_ostack_t **stack, vm_ostack_t **new_frame);
+vm_ostack_t * pop_from_ostack(vm_ostack_t **stack);
+
+#endif /* VM_FRAME_H */

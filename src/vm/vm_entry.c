@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "vm_file.h"
 #include "vm_settings.h"
 #include "vm_constant_pool.h"
 
@@ -13,7 +12,7 @@
 #include "utils/vm_checks.h"
 
 
-int vm_init(const char* filename) {
+int vm_init(const char* filename, file_t *file) {
     FILE *fd = fopen(filename, "rb");
 
     if (!vm_valid_pointer((void*) fd)) {
@@ -24,9 +23,6 @@ int vm_init(const char* filename) {
             VM_LOG_WARNING);
         return 1;
     }
-
-    // initialize a java class struct
-    file_t *file = (file_t *) malloc(sizeof(file_t));
 
     file->filename = filename;
     file->read = 0;
@@ -59,9 +55,6 @@ int vm_init(const char* filename) {
 
     // reset read information to future use
     file->read = 0;
-
-    // TODO: Pass the information for the interpreter of java bytecode
-    vm_load_constant_pool(file);
 
     return 0;
 }
