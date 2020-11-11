@@ -762,6 +762,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _dsub:
+            // Both value1 and value2 must be of type double. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The double result is
+            // value1' - value2'. The result is pushed onto the operand stack.
+            {
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = _d1 - _d2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _imul:
@@ -819,6 +836,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _dmul:
+            // Both value1 and value2 must be of type double. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The double result is
+            // value1' * value2'. The result is pushed onto the operand stack.
+            {
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = _d1 * _d2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _idiv:
@@ -884,6 +918,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _ddiv:
+            // Both value1 and value2 must be of type double. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The double result is
+            // value1' / value2'. The result is pushed onto the operand stack.
+            {
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = _d1 / _d2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _return:
