@@ -839,6 +839,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
+            pc += 1;
             break;
 
         case _fmul:
@@ -921,6 +922,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
+            pc += 1;
             break;
 
         case _fdiv:
