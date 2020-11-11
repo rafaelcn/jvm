@@ -236,7 +236,19 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
+        case _bipush:
+            // The immediate byte is sign-extended to an int value. That value
+            // is pushed onto the operand stack.
+            {
+                signed char byte = code[pc+1];
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
 
+                new_operand_frame->operand.type = _int;
+                new_operand_frame->operand.value._int = byte;
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
+            pc += 2;
+            break;
         case _ldc:
             // The index is an unsigned byte that must be a valid index into the
             // run-time constant pool of the current class (§2.6). The run-time
@@ -525,7 +537,88 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
+        case _isub:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. The int result is value1 - value2. The
+            // result is pushed onto the operand stack.
+            // For int subtraction, a-b produces the same result as a+(-b). For
+            // int values, subtraction from zero is the same as negation.
+            // The result is the 32 low-order bits of the true mathematical result
+            // in a sufficiently wide two's-complement format, represented as a
+            // value of type int. If overflow occurs, then the sign of the result
+            // may not be the same as the sign of the mathematical difference of
+            // the two values.
+            // Despite the fact that overflow may occur, execution of an isub
+            // instruction never throws a run-time exception.
+            {
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 - _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _imul:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. The int result is value1 * value2. The
+            // result is pushed onto the operand stack.
+            // The result is the 32 low-order bits of the true mathematical result
+            // in a sufficiently wide two's-complement format, represented as a
+            // value of type int. If overflow occurs, then the sign of the result
+            // may not be the same as the sign of the mathematical multiplication
+            // of the two values.
+            // Despite the fact that overflow may occur, execution of an imul
+            // instruction never throws a run-time exception.
+            {
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 * _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+        case _idiv:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. The int result is the value of the Java
+            // programming language expression value1 / value2. The result is
+            // pushed onto the operand stack.
+            // An int division rounds towards 0; that is, the quotient produced
+            // for int values in n/d is an int value q whose magnitude is as large
+            // as possible while satisfying |d ⋅ q| ≤ |n|. Moreover, q is positive
+            // when |n| ≥ |d| and n and d have the same sign, but q is negative
+            // when |n| ≥ |d| and n and d have opposite signs.
+            // There is one special case that does not satisfy this rule: if the
+            // dividend is the negative integer of largest possible magnitude for
+            // the int type, and the divisor is -1, then overflow occurs, and the
+            // result is equal to the dividend. Despite the overflow, no exception
+            // is thrown in this case.
+            {
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 / _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
         case _return:
             // The current method must have return type void. If the
             // current method is a synchronized method, the monitor entered
