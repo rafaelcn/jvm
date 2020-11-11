@@ -210,6 +210,14 @@
 #define _goto_w          (0xc8)
 #define _jsr_w           (0xc9)
 
+FILE * error_log;
+
+void vm_error_log(char *s) {
+    error_log = fopen("error_log.txt", "a");
+    fprintf(error_log, "%s", s);
+    fclose(error_log);
+}
+
 uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
     uint8_t _WIDE = 0;
 
@@ -623,14 +631,18 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an iadd
             // instruction never throws a run-time exception.
             {
-                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
                 int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_frame->operand.type = _int;
                 new_frame->operand.value._int = _i1 + _i2;
                 new_frame->next_frame = NULL;
+
+                char buffer[80];
+                sprintf(buffer, "_i1: %i, _i2: %i, _i1+_i2: %i\n", _i1, _i2, new_frame->operand.value._int);
+                vm_error_log(buffer);
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
@@ -649,8 +661,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an ladd
             // instruction never throws a run-time exception.
             {
-                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
                 long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -669,8 +681,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The float result is
             // value1' + value2'. The result is pushed onto the operand stack.
             {
-                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
                 float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -689,8 +701,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The double result is
             // value1' + value2'. The result is pushed onto the operand stack.
             {
-                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
                 double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -717,14 +729,18 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an isub
             // instruction never throws a run-time exception.
             {
-                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
                 int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_frame->operand.type = _int;
                 new_frame->operand.value._int = _i1 - _i2;
                 new_frame->next_frame = NULL;
+
+                char buffer[80];
+                sprintf(buffer, "_i1: %i, _i2: %i, _i1-_i2: %i\n", _i1, _i2, new_frame->operand.value._int);
+                vm_error_log(buffer);
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
@@ -745,8 +761,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an lsub
             // instruction never throws a run-time exception.
             {
-                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
                 long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -773,8 +789,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // or loss of precision may occur, execution of an fsub instruction
             // never throws a run-time exception.
             {
-                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
                 float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -793,8 +809,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The double result is
             // value1' - value2'. The result is pushed onto the operand stack.
             {
-                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
                 double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -819,14 +835,18 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an imul
             // instruction never throws a run-time exception.
             {
-                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
                 int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_frame->operand.type = _int;
                 new_frame->operand.value._int = _i1 * _i2;
                 new_frame->next_frame = NULL;
+
+                char buffer[80];
+                sprintf(buffer, "_i1: %i, _i2: %i, _i1*_i2: %i\n", _i1, _i2, new_frame->operand.value._int);
+                vm_error_log(buffer);
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
@@ -845,8 +865,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an lmul
             // instruction never throws a run-time exception.
             {
-                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
                 long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -865,8 +885,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The float result is
             // value1' * value2'. The result is pushed onto the operand stack.
             {
-                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
                 float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -885,8 +905,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The double result is
             // value1' * value2'. The result is pushed onto the operand stack.
             {
-                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
                 double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -915,14 +935,18 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // result is equal to the dividend. Despite the overflow, no exception
             // is thrown in this case.
             {
-                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
                 int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_frame->operand.type = _int;
                 new_frame->operand.value._int = _i1 / _i2;
                 new_frame->next_frame = NULL;
+
+                char buffer[80];
+                sprintf(buffer, "_i1: %i, _i2: %i, _i1/_i2: %i\n", _i1, _i2, new_frame->operand.value._int);
+                vm_error_log(buffer);
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
@@ -945,8 +969,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // result is equal to the dividend; despite the overflow, no exception
             // is thrown in this case.
             {
-                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
                 long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -965,8 +989,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The float result is
             // value1' / value2'. The result is pushed onto the operand stack.
             {
-                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
                 float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -985,8 +1009,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The double result is
             // value1' / value2'. The result is pushed onto the operand stack.
             {
-                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
                 double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -1077,23 +1101,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     switch (popped_operand->operand.type)
                     {
                     case _int:
-                        printf("%i\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._int);
+                        printf("%i\n", popped_operand->operand.value._int);
                         break;
 
                     case _float:
-                        printf("%f\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._float);
+                        printf("%f\n", popped_operand->operand.value._float);
                         break;
 
                     case _long:
-                        printf("%li\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._long);
+                        printf("%li\n", popped_operand->operand.value._long);
                         break;
 
                     case _double:
-                        printf("%lf\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._double);
+                        printf("%lf\n", popped_operand->operand.value._double);
                         break;
 
                     case _string:
-                        printf("%s\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._string);
+                        printf("%s\n", popped_operand->operand.value._string);
                         break;
 
                     default:
@@ -1105,23 +1129,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     switch (popped_operand->operand.type)
                     {
                     case _int:
-                        printf("%i", pop_from_ostack(&(STACK->operand_stack))->operand.value._int);
+                        printf("%i", popped_operand->operand.value._int);
                         break;
 
                     case _float:
-                        printf("%f", pop_from_ostack(&(STACK->operand_stack))->operand.value._float);
+                        printf("%f", popped_operand->operand.value._float);
                         break;
 
                     case _long:
-                        printf("%li", pop_from_ostack(&(STACK->operand_stack))->operand.value._long);
+                        printf("%li", popped_operand->operand.value._long);
                         break;
 
                     case _double:
-                        printf("%lf", pop_from_ostack(&(STACK->operand_stack))->operand.value._double);
+                        printf("%lf", popped_operand->operand.value._double);
                         break;
 
                     case _string:
-                        printf("%s", pop_from_ostack(&(STACK->operand_stack))->operand.value._string);
+                        printf("%s", popped_operand->operand.value._string);
                         break;
 
                     default:
