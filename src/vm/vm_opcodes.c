@@ -330,6 +330,31 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 2;
             break;
 
+        case _lload:
+            break;
+
+        case _fload:
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The local variable at
+            // index must contain a float. The value of the local variable at index
+            // is pushed onto the operand stack.
+            {
+                uint8_t index = code[pc+1];
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = current_local_variables[index].value._float;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 2;
+            break;
+
+        case _dload:
+            break;
+
         case _iload_0:
         case _iload_1:
         case _iload_2:
@@ -352,23 +377,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
-        case _fload:
-            // The index is an unsigned byte that must be an index into the local
-            // variable array of the current frame (§2.6). The local variable at
-            // index must contain a float. The value of the local variable at index
-            // is pushed onto the operand stack.
-            {
-                uint8_t index = code[pc+1];
-
-                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
-
-                new_frame->operand.type = _float;
-                new_frame->operand.value._float = current_local_variables[index].value._float;
-                new_frame->next_frame = NULL;
-
-                push_into_ostack(&(STACK->operand_stack), &(new_frame));
-            }
-            pc += 2;
+        case _lload_0:
+        case _lload_1:
+        case _lload_2:
+        case _lload_3:
             break;
 
         case _fload_0:
@@ -392,6 +404,12 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _dload_0:
+        case _dload_1:
+        case _dload_2:
+        case _dload_3:
+            break;
+
         case _istore:
             // The index is an unsigned byte that must be an index into the local
             // variable array of the current frame (§2.6). The value on the top
@@ -405,6 +423,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 current_local_variables[index].value._int = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
             }
             pc += 2;
+            break;
+
+        case _lstore:
             break;
 
         case _fstore:
@@ -454,6 +475,12 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 current_local_variables[index].value._int = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
             }
             pc += 1;
+            break;
+
+        case _lstore_0:
+        case _lstore_1:
+        case _lstore_2:
+        case _lstore_3:
             break;
 
         case _fstore_0:
@@ -518,6 +545,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _ladd:
+            break;
+
         case _fadd:
             // Both value1 and value2 must be of type float. The values are
             // popped from the operand stack and undergo value set conversion
@@ -537,6 +567,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
+
+        case _dadd:
+            break;
+
         case _isub:
             // Both value1 and value2 must be of type int. The values are popped
             // from the operand stack. The int result is value1 - value2. The
@@ -565,6 +599,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _lsub:
+            break;
+
+        case _fsub:
+            break;
+
+        case _dsub:
+            break;
+
         case _imul:
             // Both value1 and value2 must be of type int. The values are popped
             // from the operand stack. The int result is value1 * value2. The
@@ -590,6 +633,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
+
+        case _lmul:
+            break;
+
+        case _fmul:
+            break;
+
+        case _dmul:
+            break;
+        
         case _idiv:
             // Both value1 and value2 must be of type int. The values are popped
             // from the operand stack. The int result is the value of the Java
@@ -619,6 +672,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 1;
             break;
+
+        case _ldiv:
+            break;
+
+        case _fdiv:
+            break;
+
+        case _ddiv:
+            break;
+
         case _return:
             // The current method must have return type void. If the
             // current method is a synchronized method, the monitor entered
