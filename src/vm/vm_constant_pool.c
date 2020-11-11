@@ -146,12 +146,14 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
             cf->constant_pool[i].tag = tag;
             cf->constant_pool[i].info.long_info.high_bytes = read_u4(file);
             cf->constant_pool[i].info.long_info.low_bytes = read_u4(file);
+            i++;
             break;
 
         case CONSTANT_Double:
             cf->constant_pool[i].tag = tag;
             cf->constant_pool[i].info.double_info.high_bytes = read_u4(file);
             cf->constant_pool[i].info.double_info.low_bytes = read_u4(file);
+            i++;
             break;
 
         case CONSTANT_NameAndType:

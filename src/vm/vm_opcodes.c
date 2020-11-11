@@ -265,27 +265,11 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _ldc:
             // The index is an unsigned byte that must be a valid index into the
-            // run-time constant pool of the current class (§2.6). The run-time
-            // constant pool entry at index either must be a run-time constant of
-            // type int or float, or a reference to a string literal, or a symbolic
-            // reference to a class, method type, or method handle (§5.1).
+            // run-time constant pool of the current class (§2.6).
             // If the run-time constant pool entry is a run-time constant of type
             // int or float, the numeric value of that run-time constant is pushed
             // onto the operand stack as an int or float, respectively.
-            // Otherwise, if the run-time constant pool entry is a reference to an
-            // instance of class String representing a string literal (§5.1), then
-            // a reference to that instance, value, is pushed onto the operand
-            // stack.
-            // Otherwise, if the run-time constant pool entry is a symbolic
-            // reference to a class (§5.1), then the named class is resolved
-            // (§5.4.3.1) and a reference to the Class object representing that
-            // class, value, is pushed onto the operand stack.
-            // Otherwise, the run-time constant pool entry must be a symbolic
-            // reference to a method type or a method handle (§5.1). The method
-            // type or method handle is resolved (§5.4.3.5) and a reference
-            // to the resulting instance of java.lang.invoke.MethodType or
-            // java.lang.invoke.MethodHandle, value, is pushed onto the
-            // operand stack.
+
             {
                 uint8_t index = code[pc+1];
 
@@ -323,6 +307,96 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 }
             }
             pc += 2;
+            break;
+
+        case _ldc_w:
+            // The unsigned indexbyte1 and indexbyte2 are assembled into an
+            // unsigned 16-bit index into the run-time constant pool of the
+            // current class (§2.6), where the value of the index is calculated as
+            // (indexbyte1 << 8) | indexbyte2.
+            // If the run-time constant pool entry is a run-time constant of type
+            // int or float, the numeric value of that run-time constant is pushed
+            // onto the operand stack as an int or float, respectively.
+        case _ldc2_w:
+            // The unsigned indexbyte1 and indexbyte2 are assembled into an
+            // unsigned 16-bit index into the run-time constant pool of the
+            // current class (§2.6), where the value of the index is calculated as
+            // (indexbyte1 << 8) | indexbyte2.
+            // The numeric value of that run-time constant is pushed onto the
+            // operand stack as a long or double, respectively.
+            {
+                uint8_t indexbyte1 = code[pc+1];
+                uint8_t indexbyte2 = code[pc+2];
+                uint16_t index = (indexbyte1 << 8) | indexbyte2;
+
+                switch (current_constant_pool[index].tag) {
+                case 3: // Integer
+                    {
+                        int _i = current_constant_pool[index].info.integer_info.bytes;
+
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                        new_frame->operand.type = _float;
+                        new_frame->operand.value._float = (float) _i;
+                        new_frame->next_frame = NULL;
+
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
+                    }
+                    break;
+
+                case 4: // Float
+                    {
+                        float _f = vm_itof(current_constant_pool[index].info.float_info.bytes);
+
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                        new_frame->operand.type = _float;
+                        new_frame->operand.value._float = _f;
+                        new_frame->next_frame = NULL;
+
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
+                    }
+                    break;
+
+                case 5: // Long
+                    {
+                        long _l = vm_itolf(
+                            current_constant_pool[index].info.long_info.low_bytes,
+                            current_constant_pool[index].info.long_info.high_bytes
+                        );
+
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                        new_frame->operand.type = _long;
+                        new_frame->operand.value._long = _l;
+                        new_frame->next_frame = NULL;
+
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
+                    }
+                    break;
+
+                case 6: // Double
+                    {
+                        double _d = vm_itod(
+                            current_constant_pool[index].info.double_info.low_bytes,
+                            current_constant_pool[index].info.double_info.high_bytes
+                        );
+
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                        new_frame->operand.type = _double;
+                        new_frame->operand.value._double = _d;
+                        new_frame->next_frame = NULL;
+
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+            pc += 3;
             break;
 
         case _iload:
