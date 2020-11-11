@@ -1161,7 +1161,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint32_t high = cf.constant_pool[i].info.long_info.high_bytes;
                 uint32_t low = cf.constant_pool[i].info.long_info.low_bytes;
 
-                long number = vm_itolf(low, high);
+                long number = vm_itol(low, high);
 
                 fprintf(VM_LOG_FILE, " | %ld (%4X) (%4X)\n", number, low, high);
             }
