@@ -230,7 +230,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
 
-                new_operand_frame->value._int = code[pc] - 0x03;
+                new_operand_frame->operand.type = _int;
+                new_operand_frame->operand.value._int = code[pc] - 0x03;
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 1;
@@ -269,7 +270,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                         vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                        new_frame->value._float = (float) _i;
+                        new_frame->operand.type = _float;
+                        new_frame->operand.value._float = (float) _i;
                         new_frame->next_frame = NULL;
 
                         push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -282,7 +284,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                         vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                        new_frame->value._float = _f;
+                        new_frame->operand.type = _float;
+                        new_frame->operand.value._float = _f;
                         new_frame->next_frame = NULL;
 
                         push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -306,7 +309,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->value._int = current_local_variables[index]._int;
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = current_local_variables[index].value._int;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -327,7 +331,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->value._int = current_local_variables[index]._int;
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = current_local_variables[index].value._int;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -345,7 +350,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->value._float = current_local_variables[index]._float;
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = current_local_variables[index].value._float;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -365,7 +371,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 uint16_t index = code[pc] - 0x22;
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->value._float = current_local_variables[index]._float;
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = current_local_variables[index].value._float;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -381,7 +388,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // to value.
             {
                 uint8_t index = code[pc+1];
-                current_local_variables[index]._int = pop_from_ostack(&(STACK->operand_stack))->value._int;
+
+                current_local_variables[index].type = _int;
+                current_local_variables[index].value._int = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
             }
             pc += 2;
             break;
@@ -395,7 +404,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // to value'.
             {
                 uint8_t index = code[pc+1];
-                current_local_variables[index]._float = pop_from_ostack(&(STACK->operand_stack))->value._float;
+
+                current_local_variables[index].type = _float;
+                current_local_variables[index].value._float = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
             }
             pc += 2;
             break;
@@ -409,7 +420,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // and index+1 are set to value'.
             {
                 uint8_t index = code[pc+1];
-                current_local_variables[index]._double = pop_from_ostack(&(STACK->operand_stack))->value._double;
+
+                current_local_variables[index].type = _double;
+                current_local_variables[index].value._double = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
             }
             pc += 2;
             break;
@@ -424,7 +437,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             //  value of the local variable at <n> is set to value.
             {
                 uint8_t index = code[pc] - 0x3b;
-                current_local_variables[index]._int = pop_from_ostack(&(STACK->operand_stack))->value._int;
+
+                current_local_variables[index].type = _int;
+                current_local_variables[index].value._int = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
             }
             pc += 1;
             break;
@@ -440,7 +455,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // value of the local variable at <n> is set to value'.
             {
                 uint8_t index = code[pc] - 0x43;
-                current_local_variables[index]._float = pop_from_ostack(&(STACK->operand_stack))->value._float;
+
+                current_local_variables[index].type = _float;
+                current_local_variables[index].value._float = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
             }
             pc += 1;
             break;
@@ -456,7 +473,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The local variables at <n> and <n>+1 are set to value'
             {
                 uint8_t index = code[pc] - 0x47;
-                current_local_variables[index]._double = pop_from_ostack(&(STACK->operand_stack))->value._double;
+
+                current_local_variables[index].type = _double;
+                current_local_variables[index].value._double = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
             }
             pc += 1;
             break;
@@ -473,12 +492,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Despite the fact that overflow may occur, execution of an iadd
             // instruction never throws a run-time exception.
             {
-                int _i1 = pop_from_ostack(&(STACK->operand_stack))->value._int;
-                int _i2 = pop_from_ostack(&(STACK->operand_stack))->value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->value._int = _i1 + _i2;
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 + _i2;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -492,12 +512,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // (§2.8.3), resulting in value1' and value2'. The float result is
             // value1' + value2'. The result is pushed onto the operand stack.
             {
-                float _f1 = pop_from_ostack(&(STACK->operand_stack))->value._float;
-                float _f2 = pop_from_ostack(&(STACK->operand_stack))->value._float;
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->value._float = _f1 + _f2;
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = _f1 + _f2;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -546,10 +567,11 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
 
-                new_operand_frame->value._string = calloc(10, sizeof (char));
+                new_operand_frame->operand.type = _string;
+                new_operand_frame->operand.value._string = calloc(10, sizeof (char));
                 new_operand_frame->next_frame = NULL;
 
-                sprintf(new_operand_frame->value._string, "getstatic");
+                sprintf(new_operand_frame->operand.value._string, "getstatic");
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 3;
@@ -577,7 +599,29 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 }
 
                 if (vm_strcmp(buffer, "println")) {
-                    printf("%f\n", pop_from_ostack(&(STACK->operand_stack))->value._float);
+                    vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
+
+                    switch (popped_operand->operand.type)
+                    {
+                    case _int:
+                        break;
+
+                    case _float:
+                        printf("%f\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._float);
+                        break;
+
+                    case _long:
+                        break;
+
+                    case _double:
+                        break;
+
+                    case _string:
+                        break;
+
+                    default:
+                        break;
+                    }
                 }
             }
             pc += 3;

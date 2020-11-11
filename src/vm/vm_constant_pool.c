@@ -60,7 +60,7 @@ enum attribute_types_enum {
     AnnotationDefault,
     BootstrapMethods,
     MethodParameters
-} attribute_types_enum;
+};
 
 /**
  * @brief An array containing the respective string correspondents of the

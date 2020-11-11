@@ -8,21 +8,32 @@
 typedef struct vm_ostack vm_ostack_t;
 typedef struct vm_stack vm_stack_t;
 
+enum local_variables_enum {
+    _int,
+    _float,
+    _long,
+    _double,
+    _string
+};
+
 /**
  * @brief
  */
-typedef union vm_local_variables {
-    int _int;
-    float _float;
-    double _double;
-    char *_string;
+typedef struct vm_local_variables {
+    int type;
+    union {
+        int _int;
+        float _float;
+        double _double;
+        char *_string;
+    } value;
 } vm_local_variables_t;
 
 /**
  * @brief
  */
 struct vm_ostack {
-    vm_local_variables_t value;
+    vm_local_variables_t operand;
     vm_ostack_t *next_frame;
 };
 
