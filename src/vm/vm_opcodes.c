@@ -660,6 +660,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
+            pc += 1;
             break;
 
         case _fadd:
@@ -759,6 +760,31 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _fsub:
+            // Both value1 and value2 must be of type float. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The float result is
+            // value1' - value2'. The result is pushed onto the operand stack.
+            // For float subtraction, it is always the case that a-b produces
+            // the same result as a+(-b). However, for the fsub instruction,
+            // subtraction from zero is not the same as negation, because if x is
+            // +0.0, then 0.0-x equals +0.0, but -x equals -0.0.
+            // The Java Virtual Machine requires support of gradual underflow
+            // as defined by IEEE 754. Despite the fact that overflow, underflow,
+            // or loss of precision may occur, execution of an fsub instruction
+            // never throws a run-time exception.
+            {
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = _f1 - _f2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _dsub:
@@ -816,6 +842,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _fmul:
+            // Both value1 and value2 must be of type float. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The float result is
+            // value1' * value2'. The result is pushed onto the operand stack.
+            {
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = _f1 * _f2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _dmul:
@@ -881,6 +924,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _fdiv:
+            // Both value1 and value2 must be of type float. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The float result is
+            // value1' / value2'. The result is pushed onto the operand stack.
+            {
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = _f1 / _f2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _ddiv:
