@@ -232,10 +232,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 new_operand_frame->operand.type = _int;
                 new_operand_frame->operand.value._int = code[pc] - 0x03;
+                new_operand_frame->next_frame = NULL;
+
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 1;
             break;
+
         case _bipush:
             // The immediate byte is sign-extended to an int value. That value
             // is pushed onto the operand stack.
@@ -245,10 +248,13 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 new_operand_frame->operand.type = _int;
                 new_operand_frame->operand.value._int = byte;
+                new_operand_frame->next_frame = NULL;
+
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 2;
             break;
+
         case _ldc:
             // The index is an unsigned byte that must be a valid index into the
             // run-time constant pool of the current class (§2.6). The run-time
@@ -331,6 +337,22 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _lload:
+            // The index is an unsigned byte. Both index and index+1 must be
+            // indices into the local variable array of the current frame (§2.6).
+            // The local variable at index must contain a long. The value of the
+            // local variable at index is pushed onto the operand stack.
+            {
+                uint8_t index = code[pc+1];
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = current_local_variables[index].value._long;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 2;
             break;
 
         case _fload:
@@ -353,6 +375,22 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _dload:
+            // The index is an unsigned byte. Both index and index+1 must be
+            // indices into the local variable array of the current frame (§2.6).
+            // The local variable at index must contain a double. The value of
+            // the local variable at index is pushed onto the operand stack.
+            {
+                uint8_t index = code[pc+1];
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = current_local_variables[index].value._double;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 2;
             break;
 
         case _iload_0:
@@ -381,6 +419,22 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         case _lload_1:
         case _lload_2:
         case _lload_3:
+            // Both <n> and <n>+1 must be indices into the local variable array
+            // of the current frame (§2.6). The local variable at <n> must contain
+            // a long. The value of the local variable at <n> is pushed onto the
+            // operand stack.
+            {
+                uint8_t index = code[pc] - 0x1a;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = current_local_variables[index].value._long;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _fload_0:
@@ -408,6 +462,21 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         case _dload_1:
         case _dload_2:
         case _dload_3:
+            // Both <n> and <n>+1 must be indices into the local variable array
+            // of the current frame (§2.6). The local variable at <n> must contain
+            // a double. The value of the local variable at <n> is pushed onto
+            // the operand stack.
+            {
+                uint16_t index = code[pc] - 0x22;
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = current_local_variables[index].value._double;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _istore:
@@ -426,6 +495,18 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _lstore:
+            // The index is an unsigned byte. Both index and index+1 must be
+            // indices into the local variable array of the current frame (§2.6).
+            // The value on the top of the operand stack must be of type long. It
+            // is popped from the operand stack, and the local variables at index
+            // and index+1 are set to value.
+            {
+                uint8_t index = code[pc+1];
+
+                current_local_variables[index].type = _long;
+                current_local_variables[index].value._long = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+            }
+            pc += 2;
             break;
 
         case _fstore:
@@ -481,6 +562,17 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         case _lstore_1:
         case _lstore_2:
         case _lstore_3:
+            // Both <n> and <n>+1 must be indices into the local variable array
+            // of the current frame (§2.6). The value on the top of the operand
+            // stack must be of type long. It is popped from the operand stack,
+            // and the local variables at <n> and <n>+1 are set to value.
+            {
+                uint8_t index = code[pc] - 0x3b;
+
+                current_local_variables[index].type = _long;
+                current_local_variables[index].value._long = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+            }
+            pc += 1;
             break;
 
         case _fstore_0:
@@ -546,6 +638,28 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _ladd:
+            // Both value1 and value2 must be of type long. The values are
+            // popped from the operand stack. The long result is value1 + value2.
+            // The result is pushed onto the operand stack.
+            // The result is the 64 low-order bits of the true mathematical result
+            // in a sufficiently wide two's-complement format, represented as a
+            // value of type long. If overflow occurs, the sign of the result may
+            // not be the same as the sign of the mathematical sum of the two
+            // values.
+            // Despite the fact that overflow may occur, execution of an ladd
+            // instruction never throws a run-time exception.
+            {
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 + _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
             break;
 
         case _fadd:
@@ -569,6 +683,23 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _dadd:
+            // Both value1 and value2 must be of type double. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The double result is
+            // value1' + value2'. The result is pushed onto the operand stack.
+            {
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = _d1 + _d2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _isub:
@@ -600,6 +731,31 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _lsub:
+            // Both value1 and value2 must be of type long. The values are
+            // popped from the operand stack. The long result is value1 - value2.
+            // The result is pushed onto the operand stack.
+            // For long subtraction, a-b produces the same result as a+(-b). For
+            // long values, subtraction from zero is the same as negation.
+            // The result is the 64 low-order bits of the true mathematical result
+            // in a sufficiently wide two's-complement format, represented as a
+            // value of type long. If overflow occurs, then the sign of the result
+            // may not be the same as the sign of the mathematical difference of
+            // the two values.
+            // Despite the fact that overflow may occur, execution of an lsub
+            // instruction never throws a run-time exception.
+            {
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 - _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
             break;
 
         case _fsub:
@@ -635,6 +791,28 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _lmul:
+            // Both value1 and value2 must be of type long. The values are
+            // popped from the operand stack. The long result is value1 * value2.
+            // The result is pushed onto the operand stack.
+            // The result is the 64 low-order bits of the true mathematical result
+            // in a sufficiently wide two's-complement format, represented as a
+            // value of type long. If overflow occurs, the sign of the result may
+            // not be the same as the sign of the mathematical multiplication of
+            // the two values.
+            // Despite the fact that overflow may occur, execution of an lmul
+            // instruction never throws a run-time exception.
+            {
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 * _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
             break;
 
         case _fmul:
@@ -642,7 +820,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _dmul:
             break;
-        
+
         case _idiv:
             // Both value1 and value2 must be of type int. The values are popped
             // from the operand stack. The int result is the value of the Java
@@ -674,6 +852,32 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _ldiv:
+            // Both value1 and value2 must be of type long. The values are
+            // popped from the operand stack. The long result is the value of
+            // the Java programming language expression value1 / value2. The
+            // result is pushed onto the operand stack.
+            // A long division rounds towards 0; that is, the quotient produced
+            // for long values in n / d is a long value q whose magnitude is
+            // as large as possible while satisfying |d ⋅ q| ≤ |n|. Moreover, q is
+            // positive when |n| ≥ |d| and n and d have the same sign, but q is
+            // negative when |n| ≥ |d| and n and d have opposite signs.
+            // There is one special case that does not satisfy this rule: if the
+            // dividend is the negative integer of largest possible magnitude for
+            // the long type and the divisor is -1, then overflow occurs and the
+            // result is equal to the dividend; despite the overflow, no exception
+            // is thrown in this case.
+            {
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 / _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
             break;
 
         case _fdiv:
