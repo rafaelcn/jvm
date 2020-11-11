@@ -604,6 +604,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     switch (popped_operand->operand.type)
                     {
                     case _int:
+                        printf("%i\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._int);
                         break;
 
                     case _float:
@@ -611,12 +612,43 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                         break;
 
                     case _long:
+                        printf("%li\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._long);
                         break;
 
                     case _double:
+                        printf("%lf\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._double);
                         break;
 
                     case _string:
+                        printf("%s\n", pop_from_ostack(&(STACK->operand_stack))->operand.value._string);
+                        break;
+
+                    default:
+                        break;
+                    }
+                } else if (vm_strcmp(buffer, "print")) {
+                    vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
+
+                    switch (popped_operand->operand.type)
+                    {
+                    case _int:
+                        printf("%i", pop_from_ostack(&(STACK->operand_stack))->operand.value._int);
+                        break;
+
+                    case _float:
+                        printf("%f", pop_from_ostack(&(STACK->operand_stack))->operand.value._float);
+                        break;
+
+                    case _long:
+                        printf("%li", pop_from_ostack(&(STACK->operand_stack))->operand.value._long);
+                        break;
+
+                    case _double:
+                        printf("%lf", pop_from_ostack(&(STACK->operand_stack))->operand.value._double);
+                        break;
+
+                    case _string:
+                        printf("%s", pop_from_ostack(&(STACK->operand_stack))->operand.value._string);
                         break;
 
                     default:
