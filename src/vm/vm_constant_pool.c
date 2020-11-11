@@ -29,11 +29,6 @@
 #define CONSTANT_InvokeDynamic      (0x12)
 
 /**
- * @brief
- */
-FILE * VM_LOG_FILE;
-
-/**
  * @brief Attribute Types tag mapping.
  */
 enum attribute_types_enum {
@@ -432,12 +427,11 @@ void element_value_parser(
         element_value_pt->value.array_value.values = calloc(
             element_value_pt->value.array_value.num_values,
             sizeof (vm_element_value_t));
-        for(uint16_t l = 0;( l < element_value_pt->value.array_value.num_values); l++)
-        {
+        for(uint16_t l = 0;( l < element_value_pt->value.array_value.num_values); l++) {
             element_value_parser(&(element_value_pt->value.array_value.values[l]), file);
         }
     } else {
-        printf("RuntimeVisibleAnnotations element pairs tag not found.");
+        // printf("RuntimeVisibleAnnotations element pairs tag not found.");
     }
 }
 
@@ -568,7 +562,7 @@ void type_annotations_parser(
             type_annotation_pt[j].target_info.type_argument_target.type_argument_index = read_u1(file);
         break;
         default:
-            printf("[ERROR] Invalid target type inside attribute type annotations!");
+            // printf("[ERROR] Invalid target type inside attribute type annotations!");
             break;
         }
         type_annotation_pt[j].target_path.path_length = read_u1(file);
@@ -1000,7 +994,7 @@ void utf8_helper(uint16_t length, uint8_t *bytes) {
     uint16_t *uint16_string = vm_utf8_to_uint16_t(length, bytes);
 
     for (uint16_t i = 0; i < length; i++) {
-        fprintf(VM_LOG_FILE, "%lc", uint16_string[i]);
+        printf("%lc", uint16_string[i]);
     }
 }
 
@@ -1012,36 +1006,34 @@ void utf8_helper(uint16_t length, uint8_t *bytes) {
 void class_file_reader(vm_class_file_t class_file, file_t *file) {
     uint16_t cp_size = class_file.constant_pool_count;
 
-    VM_LOG_FILE = fopen("output.txt", "w+");
-
     // gets the jvm execution target
     const char *java_version = vm_target(class_file.major_version);
 
-    fprintf(VM_LOG_FILE, "\n");
-    fprintf(VM_LOG_FILE, "%s\n\n", file->filename);
-    fprintf(VM_LOG_FILE, "%2sMAGIC:                %10X\n", "", class_file.magic);
-    fprintf(VM_LOG_FILE, "%2sMAJOR VERSION:        %10d\n", "", class_file.major_version);
-    fprintf(VM_LOG_FILE, "%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
-    fprintf(VM_LOG_FILE, "%2sJAVA TARGET:          %10s\n", "", java_version);
-    fprintf(VM_LOG_FILE, "%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
-    fprintf(VM_LOG_FILE, "\n");
+    printf("\n");
+    printf("%s\n\n", file->filename);
+    printf("%2sMAGIC:                %10X\n", "", class_file.magic);
+    printf("%2sMAJOR VERSION:        %10d\n", "", class_file.major_version);
+    printf("%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
+    printf("%2sJAVA TARGET:          %10s\n", "", java_version);
+    printf("%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
+    printf("\n");
 
-    fprintf(VM_LOG_FILE, "CONSTANT POOL\n");
-    fprintf(VM_LOG_FILE, "-------------\n\n");
+    printf("CONSTANT POOL\n");
+    printf("-------------\n\n");
 
     for (uint16_t i = 1; i < class_file.constant_pool_count; i++) {
 
         vm_cp_info_t cp_info = class_file.constant_pool[i];
 
-        fprintf(VM_LOG_FILE, "#% 03d | %-16s", i, tag_constants[cp_info.tag]);
+        printf("#% 03d | %-16s", i, tag_constants[cp_info.tag]);
 
         switch (class_file.constant_pool[i].tag) {
         case CONSTANT_Class:
-            fprintf(VM_LOG_FILE, " | Class Name: ");
+            printf(" | Class Name: ");
             utf8_helper(
                 class_file.constant_pool[cp_info.info.class_info.name_index].info.utf8_info.length,
                 class_file.constant_pool[cp_info.info.class_info.name_index].info.utf8_info.bytes);
-            fprintf(VM_LOG_FILE, "\n");
+            printf("\n");
             break;
 
         case CONSTANT_Fieldref:
@@ -1050,24 +1042,24 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
                 uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " | Class Name: ");
+                printf(" | Class Name: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, ",");
+                printf(",");
 
                 vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.fieldref_info.name_and_type_index].info.nameandtype_info;
                 length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
                 bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " Field Name: ");
+                printf(" Field Name: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, ",");
+                printf(",");
 
                 length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
                 bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " Field Descriptor: ");
+                printf(" Field Descriptor: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, "\n");
+                printf("\n");
             }
             break;
 
@@ -1077,24 +1069,24 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
                 uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " | Class Name: ");
+                printf(" | Class Name: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, ",");
+                printf(",");
 
                 vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.methodref_info.name_and_type_index].info.nameandtype_info;
                 length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
                 bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " Method Name: ");
+                printf(" Method Name: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, ",");
+                printf(",");
 
                 length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
                 bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " Method Descriptor: ");
+                printf(" Method Descriptor: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, "\n");
+                printf("\n");
             }
             break;
 
@@ -1104,24 +1096,24 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = class_file.constant_pool[class_info.name_index].info.utf8_info.length;
                 uint8_t *bytes = class_file.constant_pool[class_info.name_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " | Class Name: ");
+                printf(" | Class Name: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, ",");
+                printf(",");
 
                 vm_name_and_type_t name_and_type_info = class_file.constant_pool[cp_info.info.interfacemethodref_info.name_and_type_index].info.nameandtype_info;
                 length = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.length;
                 bytes = class_file.constant_pool[name_and_type_info.name_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " Interface Method Name: ");
+                printf(" Interface Method Name: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, ",");
+                printf(",");
 
                 length = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.length;
                 bytes = class_file.constant_pool[name_and_type_info.descriptor_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " Interface Method Descriptor: ");
+                printf(" Interface Method Descriptor: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, "\n");
+                printf("\n");
             }
             break;
 
@@ -1130,18 +1122,18 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.length;
                 uint8_t *bytes = class_file.constant_pool[cp_info.info.string_info.string_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " | String: ");
+                printf(" | String: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, "\n");
+                printf("\n");
             }
             break;
 
         case CONSTANT_Integer:
             {
                 uint32_t b = cp_info.info.integer_info.bytes;
-                int number = (int)b;
+                int number = (int) b;
 
-                fprintf(VM_LOG_FILE, " | %d (%04X)\n", number, b);
+                printf(" | %i\n", number);
             }
             break;
 
@@ -1150,7 +1142,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint32_t bytes = cp_info.info.float_info.bytes;
                 float number = vm_itof(bytes);
 
-                fprintf(VM_LOG_FILE, " | %f (%4X)\n", number, bytes);
+                printf(" | %f\n", number);
             }
             break;
 
@@ -1163,8 +1155,9 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
                 long number = vm_itol(low, high);
 
-                fprintf(VM_LOG_FILE, " | %ld (%4X) (%4X)\n", number, low, high);
+                printf(" | %li\n", number);
             }
+            i++;
             break;
 
         case CONSTANT_Double:
@@ -1176,8 +1169,9 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
 
                 double number = vm_itod(low, high);
 
-                fprintf(VM_LOG_FILE, " | %lf (%4X) (%4X)\n", number, low, high);
+                printf(" | %lf\n", number);
             }
+            i++;
             break;
 
         case CONSTANT_NameAndType:
@@ -1185,16 +1179,16 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = class_file.constant_pool[cp_info.info.nameandtype_info.name_index].info.utf8_info.length;
                 uint8_t *bytes = class_file.constant_pool[cp_info.info.nameandtype_info.name_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " | Name: ");
+                printf(" | Name: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, ",");
+                printf(",");
 
                 length = class_file.constant_pool[cp_info.info.nameandtype_info.descriptor_index].info.utf8_info.length;
                 bytes = class_file.constant_pool[cp_info.info.nameandtype_info.descriptor_index].info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " Descriptor: ");
+                printf(" Descriptor: ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, "\n");
+                printf("\n");
             }
             break;
 
@@ -1203,9 +1197,9 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
                 uint16_t length = cp_info.info.utf8_info.length;
                 uint8_t *bytes = cp_info.info.utf8_info.bytes;
 
-                fprintf(VM_LOG_FILE, " | ");
+                printf(" | ");
                 utf8_helper(length, bytes);
-                fprintf(VM_LOG_FILE, "\n");
+                printf("\n");
             }
             break;
 
@@ -1222,6 +1216,4 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
         }
     }
-
-    fclose(VM_LOG_FILE);
 }
