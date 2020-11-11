@@ -6,6 +6,8 @@ public class TypeFloat {
         float d = 452.13f;
 
         System.out.println(a+b);
-        System.out.println(c+d);
+        System.out.println(c-d);
+        System.out.println(c*a);
+        System.out.println(d/b);
     }
 }
