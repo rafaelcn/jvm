@@ -301,7 +301,30 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                         push_into_ostack(&(STACK->operand_stack), &(new_frame));
                     }
                     break;
+                case 8: //CONSTANT_String
+                    {
+                        uint16_t string_index = current_constant_pool[index].info.string_info.string_index;
+                        uint16_t * uint16_string = vm_utf8_to_uint16_t(
+                            current_constant_pool[string_index].info.utf8_info.length,
+                            current_constant_pool[string_index].info.utf8_info.bytes);
 
+                        char *buffer = (char*)calloc(
+                            current_constant_pool[string_index].info.utf8_info.length,
+                            sizeof (char));
+
+                        for (int j = 0; j < current_constant_pool[string_index].info.utf8_info.length; j++) {
+                            sprintf(&(buffer[j]), "%lc", uint16_string[j]);
+                        }
+
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                        new_frame->operand.type = _string;
+                        new_frame->operand.value._string = buffer;
+                        new_frame->next_frame = NULL;
+
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
+                        break;
+                    }
                 default:
                     break;
                 }
@@ -561,6 +584,50 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _aload_0:
+        case _aload_1:
+        case _aload_2:
+        case _aload_3:
+            // The <n> must be an index into the local variable array of the
+            // current frame (§2.6). The local variable at <n> must contain a
+            // reference. The objectref in the local variable at <n> is pushed
+            // onto the operand stack.
+            {
+                uint16_t index = code[pc] - _aload_0;
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _reference;
+                new_frame->operand.value._reference = current_local_variables[
+                    index].value._reference;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+        case _iaload:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type int. The index must be of type int.
+            // Both arrayref and index are popped from the operand stack. The
+            // int value in the component of the array at index is retrieved and
+            // pushed onto the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                vm_ostack_t* reference_frame = pop_from_ostack(
+                    &(STACK->operand_stack));
+                int* int_array;
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                int_array = (int*) reference_frame->operand.value._reference;
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = int_array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
         case _istore:
             // The index is an unsigned byte that must be an index into the local
             // variable array of the current frame (§2.6). The value on the top
@@ -653,6 +720,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     break;
                 case _reference:
                     break;
+                // TO DO: VALIDATE IF THIS IS RIGHT
                 }
             }
             pc += 1;
@@ -723,6 +791,44 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 current_local_variables[index].type = _double;
                 current_local_variables[index].value._double = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+            }
+            pc += 1;
+            break;
+
+        case _astore_0:
+        case _astore_1:
+        case _astore_2:
+        case _astore_3:
+            // The <n> must be an index into the local variable array of the
+            // current frame (§2.6). The objectref on the top of the operand stack
+            // must be of type returnAddress or of type reference. It is popped
+            // from the operand stack, and the value of the local variable at <n>
+            // is set to objectref.
+            {
+                uint8_t index = code[pc] - _astore_0;
+
+                current_local_variables[index].type = _reference;
+                current_local_variables[index].value._reference = pop_from_ostack(
+                    &(STACK->operand_stack))->operand.value._reference;
+            }
+            pc += 1;
+            break;
+
+        case _iastore:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type int. Both index and value must be
+            // of type int. The arrayref, index, and value are popped from the
+            // operand stack. The int value is stored as the component of the
+            // array indexed by index
+            {
+                vm_ostack_t* value_frame = pop_from_ostack(
+                    &(STACK->operand_stack));
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int* int_array;
+                int_array = (int*)pop_from_ostack(
+                    &(STACK->operand_stack))->operand.value._reference;
+                int_array[index] = value_frame->operand.value._int;
+                // TO DO: VALIDATE IF THIS IS RIGHT
             }
             pc += 1;
             break;
@@ -1247,6 +1353,42 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             }
             pc += 3;
             break;
+
+        case _invokedynamic:
+            // Each specific lexical occurrence of an invokedynamic instruction
+            // is called a dynamic call site.
+            // First, the unsigned indexbyte1 and indexbyte2 are used to construct
+            // an index into the run-time constant pool of the current class (§2.6),
+            // where the value of the index is (indexbyte1 << 8) | indexbyte2.
+            // The run-time constant pool item at that index must be a symbolic
+            // reference to a call site specifier (§5.1). The values of the third and
+            // fourth operand bytes must always be zero.
+            {
+                uint8_t indexbyte1 = code[pc+1];
+                uint8_t indexbyte2 = code[pc+2];
+                uint16_t index = (indexbyte1 << 8) | indexbyte2;
+
+                uint16_t name_and_type_index = current_constant_pool[index].info.methodref_info.name_and_type_index;
+
+                uint16_t name_index = current_constant_pool[name_and_type_index].info.nameandtype_info.name_index;
+
+                vm_utf8_t utf8_info = current_constant_pool[name_index].info.utf8_info;
+
+                uint16_t * uint16_string = vm_utf8_to_uint16_t(utf8_info.length, utf8_info.bytes);
+
+                char buffer[utf8_info.length];
+
+                for (int j = 0; j < utf8_info.length; j++) {
+                    sprintf(&(buffer[j]), "%lc", uint16_string[j]);
+                }
+
+                if (vm_strcmp(buffer, "makeConcatWithConstants")) {
+                    printf("Teu pai careca!\n");
+                }
+            }
+            pc += 5;
+            break;
+
         case _newarray:
             // The count must be of type int. It is popped off the operand stack.
             // The count represents the number of elements in the array to be
