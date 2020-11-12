@@ -13,7 +13,8 @@ enum local_variables_enum {
     _float,
     _long,
     _double,
-    _string
+    _string,
+    _reference
 };
 
 /**
@@ -27,6 +28,7 @@ typedef struct vm_local_variables {
         long _long;
         double _double;
         char *_string;
+        void* _reference;
     } value;
 } vm_local_variables_t;
 

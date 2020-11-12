@@ -623,6 +623,40 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 2;
             break;
 
+        case _astore:
+            // The arrayref must be of type reference and must refer to
+            // an array whose components are of type reference. The index
+            // must be of type int and value must be of type reference. The
+            // arrayref, index, and value are popped from the operand stack. The
+            // reference value is stored as the component of the array at index.
+            {
+                vm_ostack_t* value_frame = pop_from_ostack(&(STACK->operand_stack));
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int* int_array;
+                switch (value_frame->operand.type)
+                {
+                case _int:
+                    int_array = (int*)pop_from_ostack(
+                        &(STACK->operand_stack))->operand.value._reference;
+                    int_array[index] = value_frame->operand.value._int;
+                    break;
+                case _float:
+                    /* code */
+                    break;
+                case _long:
+                    /* code */
+                    break;
+                case _double:
+                    /* code */
+                    break;
+                case _string:
+                    break;
+                case _reference:
+                    break;
+                }
+            }
+            pc += 1;
+            break;
         case _istore_0:
         case _istore_1:
         case _istore_2:
@@ -1212,6 +1246,54 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 }
             }
             pc += 3;
+            break;
+        case _newarray:
+            // The count must be of type int. It is popped off the operand stack.
+            // The count represents the number of elements in the array to be
+            // created.
+            {
+                int count = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int atype = code[pc+1];
+                void *array_pointer;
+                switch (atype)
+                {
+                case T_BOOLEAN: 
+                    array_pointer = calloc(count, sizeof(char));
+                    break;
+                case T_CHAR:
+                    array_pointer = calloc(count, sizeof(char));
+                    break;
+                case T_FLOAT:
+                    array_pointer = calloc(count, sizeof(float));
+                    break;
+                case T_DOUBLE:
+                    array_pointer = calloc(count, sizeof(double));
+                    break;
+                case T_BYTE:
+                    array_pointer = calloc(count, sizeof(char));
+                    break;
+                case T_SHORT:
+                    array_pointer = calloc(count, sizeof(short));
+                    break;
+                case T_INT:
+                    array_pointer = calloc(count, sizeof(int));
+                    break;
+                case T_LONG:
+                    array_pointer = calloc(count, sizeof(long));
+                    break;
+                default:
+                    array_pointer = NULL;
+                    break;
+                }
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
+
+                new_operand_frame->operand.type = _reference;
+                new_operand_frame->operand.value._reference = array_pointer;
+                new_operand_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
+            pc += 2;
             break;
 
         case _wide:
