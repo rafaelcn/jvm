@@ -102,7 +102,8 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes);
 void verification_type_parser(vm_verification_type_info_t *stack, file_t *file);
 
 /**
- * @brief
+ * @brief A stack map frame specifies the bytecode offset at which it applies, 
+ * and the verification types of local variables and operand stack entries for that offset.
  */
 void stack_map_frame_parser(vm_stack_map_frame_t *entry, file_t *file);
 
