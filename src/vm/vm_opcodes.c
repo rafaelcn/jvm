@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "vm_opcodes.h"
 #include "lib/vm_string.h"
@@ -213,7 +214,7 @@
 FILE * error_log;
 
 void vm_error_log(char *s) {
-    error_log = fopen("error_log.txt", "a");
+    error_log = fopen("log.txt", "a+");
     fprintf(error_log, "%s", s);
     fclose(error_log);
 }
@@ -236,7 +237,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // Push the int constant <i> (-1, 0, 1, 2, 3, 4 or 5) onto the
             // operand stack.
             {
-                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_operand_frame->operand.type = _int;
                 new_operand_frame->operand.value._int = code[pc] - _iconst_0;
@@ -252,7 +253,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // is pushed onto the operand stack.
             {
                 signed char byte = code[pc+1];
-                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_operand_frame->operand.type = _int;
                 new_operand_frame->operand.value._int = byte;
@@ -301,16 +302,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                         push_into_ostack(&(STACK->operand_stack), &(new_frame));
                     }
                     break;
-                case 8: //CONSTANT_String
+
+                case 8: // String
                     {
                         uint16_t string_index = current_constant_pool[index].info.string_info.string_index;
-                        uint16_t * uint16_string = vm_utf8_to_uint16_t(
+                        uint16_t *uint16_string = vm_utf8_to_uint16_t(
                             current_constant_pool[string_index].info.utf8_info.length,
                             current_constant_pool[string_index].info.utf8_info.bytes);
 
-                        char *buffer = (char*)calloc(
-                            current_constant_pool[string_index].info.utf8_info.length,
-                            sizeof (char));
+
+                        char buffer[sizeof(uint16_string)];
 
                         for (int j = 0; j < current_constant_pool[string_index].info.utf8_info.length; j++) {
                             sprintf(&(buffer[j]), "%lc", uint16_string[j]);
@@ -323,8 +324,9 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                         new_frame->next_frame = NULL;
 
                         push_into_ostack(&(STACK->operand_stack), &(new_frame));
-                        break;
                     }
+                    break;
+
                 default:
                     break;
                 }
@@ -415,6 +417,29 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     }
                     break;
 
+                case 8: // String
+                    {
+                        uint16_t string_index = current_constant_pool[index].info.string_info.string_index;
+                        uint16_t *uint16_string = vm_utf8_to_uint16_t(
+                            current_constant_pool[string_index].info.utf8_info.length,
+                            current_constant_pool[string_index].info.utf8_info.bytes);
+
+                        char buffer[current_constant_pool[string_index].info.utf8_info.length];
+
+                        for (int j = 0; j < current_constant_pool[string_index].info.utf8_info.length; j++) {
+                            sprintf(&(buffer[j]), "%lc", uint16_string[j]);
+                        }
+
+                        vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                        new_frame->operand.type = _string;
+                        new_frame->operand.value._string = buffer;
+                        new_frame->next_frame = NULL;
+
+                        push_into_ostack(&(STACK->operand_stack), &(new_frame));
+                    }
+                    break;
+
                 default:
                     break;
                 }
@@ -491,6 +516,24 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 new_frame->operand.type = _double;
                 new_frame->operand.value._double = current_local_variables[index].value._double;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 2;
+            break;
+
+        case _aload:
+            // The index is an unsigned byte that must be an index into the local
+            // variable array of the current frame (§2.6). The local variable at
+            // index must contain a reference. The objectref in the local variable
+            // at index is pushed onto the operand stack.
+            {
+                uint8_t index = code[pc+1];
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _array;
+                new_frame->operand.value._array = current_local_variables[index].value._array;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -593,18 +636,18 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // reference. The objectref in the local variable at <n> is pushed
             // onto the operand stack.
             {
-                uint16_t index = code[pc] - _aload_0;
+                uint8_t index = code[pc] - _aload_0;
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->operand.type = _reference;
-                new_frame->operand.value._reference = current_local_variables[
-                    index].value._reference;
+                new_frame->operand.type = _array;
+                new_frame->operand.value._array = current_local_variables[index].value._array;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 1;
             break;
+
         case _iaload:
             // The arrayref must be of type reference and must refer to an array
             // whose components are of type int. The index must be of type int.
@@ -613,21 +656,21 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // pushed onto the operand stack.
             {
                 int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
-                vm_ostack_t* reference_frame = pop_from_ostack(
-                    &(STACK->operand_stack));
-                int* int_array;
+
+
+                int *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
+
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                int_array = (int*) reference_frame->operand.value._reference;
-
                 new_frame->operand.type = _int;
-                new_frame->operand.value._int = int_array[index];
+                new_frame->operand.value._int = array[index];
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 1;
             break;
+
         case _istore:
             // The index is an unsigned byte that must be an index into the local
             // variable array of the current frame (§2.6). The value on the top
@@ -697,34 +740,14 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // arrayref, index, and value are popped from the operand stack. The
             // reference value is stored as the component of the array at index.
             {
-                vm_ostack_t* value_frame = pop_from_ostack(&(STACK->operand_stack));
-                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
-                int* int_array;
-                switch (value_frame->operand.type)
-                {
-                case _int:
-                    int_array = (int*)pop_from_ostack(
-                        &(STACK->operand_stack))->operand.value._reference;
-                    int_array[index] = value_frame->operand.value._int;
-                    break;
-                case _float:
-                    /* code */
-                    break;
-                case _long:
-                    /* code */
-                    break;
-                case _double:
-                    /* code */
-                    break;
-                case _string:
-                    break;
-                case _reference:
-                    break;
-                // TO DO: VALIDATE IF THIS IS RIGHT
-                }
+                uint8_t index = code[pc+1];
+
+                current_local_variables[index].type = _array;
+                current_local_variables[index].value._array = pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
             }
-            pc += 1;
+            pc += 2;
             break;
+
         case _istore_0:
         case _istore_1:
         case _istore_2:
@@ -807,9 +830,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 uint8_t index = code[pc] - _astore_0;
 
-                current_local_variables[index].type = _reference;
-                current_local_variables[index].value._reference = pop_from_ostack(
-                    &(STACK->operand_stack))->operand.value._reference;
+                current_local_variables[index].type = _array;
+                current_local_variables[index].value._array = pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
             }
             pc += 1;
             break;
@@ -821,14 +843,26 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // operand stack. The int value is stored as the component of the
             // array indexed by index
             {
-                vm_ostack_t* value_frame = pop_from_ostack(
-                    &(STACK->operand_stack));
+                int value= pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
                 int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
-                int* int_array;
-                int_array = (int*)pop_from_ostack(
-                    &(STACK->operand_stack))->operand.value._reference;
-                int_array[index] = value_frame->operand.value._int;
-                // TO DO: VALIDATE IF THIS IS RIGHT
+
+                int *array = (int *) pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _dup:
+            // Duplicate the top value on the operand stack and push the
+            // duplicated value onto the operand stack.
+            // The dup instruction must not be used unless value is a value of a
+            // category 1 computational type (§2.11.1).
+            {
+                vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
+                push_into_ostack(&(STACK->operand_stack), &(popped_operand));
+                push_into_ostack(&(STACK->operand_stack), &(popped_operand));
             }
             pc += 1;
             break;
@@ -1260,10 +1294,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The value of the class or interface field is fetched and pushed onto
             // the operand stack.
             {
-                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_operand_frame->operand.type = _string;
-                new_operand_frame->operand.value._string = calloc(10, sizeof (char));
+                new_operand_frame->operand.value._string = calloc(10, sizeof(char));
                 new_operand_frame->next_frame = NULL;
 
                 sprintf(new_operand_frame->operand.value._string, "getstatic");
@@ -1273,83 +1307,139 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _invokevirtual:
+        case _invokespecial:
             // jesus tenha piedade da minha menção
             {
                 uint8_t indexbyte1 = code[pc+1];
                 uint8_t indexbyte2 = code[pc+2];
                 uint16_t index = (indexbyte1 << 8) | indexbyte2;
 
+                uint16_t class_index = current_constant_pool[index].info.methodref_info.class_index;
                 uint16_t name_and_type_index = current_constant_pool[index].info.methodref_info.name_and_type_index;
 
+                uint16_t class_name_index = current_constant_pool[class_index].info.class_info.name_index;
                 uint16_t name_index = current_constant_pool[name_and_type_index].info.nameandtype_info.name_index;
 
-                vm_utf8_t utf8_info = current_constant_pool[name_index].info.utf8_info;
+                vm_utf8_t class_name = current_constant_pool[class_name_index].info.utf8_info;
+                vm_utf8_t name = current_constant_pool[name_index].info.utf8_info;
 
-                uint16_t * uint16_string = vm_utf8_to_uint16_t(utf8_info.length, utf8_info.bytes);
+                uint16_t *class_name_string = vm_utf8_to_uint16_t(class_name.length, class_name.bytes);
+                uint16_t *name_string = vm_utf8_to_uint16_t(name.length, name.bytes);
 
-                char buffer[utf8_info.length];
+                char class_name_buffer[class_name.length];
+                char name_buffer[name.length];
 
-                for (int j = 0; j < utf8_info.length; j++) {
-                    sprintf(&(buffer[j]), "%lc", uint16_string[j]);
+                for (int j = 0; j < class_name.length; j++) {
+                    sprintf(&(class_name_buffer[j]), "%lc", class_name_string[j]);
                 }
 
-                if (vm_strcmp(buffer, "println")) {
-                    vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
+                for (int j = 0; j < name.length; j++) {
+                    sprintf(&(name_buffer[j]), "%lc", name_string[j]);
+                }
 
-                    switch (popped_operand->operand.type)
-                    {
-                    case _int:
-                        printf("%i\n", popped_operand->operand.value._int);
-                        break;
+                if (vm_strcmp(class_name_buffer, "java/io/PrintStream")) {
+                    if (vm_strcmp(name_buffer, "print") || vm_strcmp(name_buffer, "println")) {
+                        vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
 
-                    case _float:
-                        printf("%f\n", popped_operand->operand.value._float);
-                        break;
+                        char newline = vm_strcmp(name_buffer, "print") ? '\0' : '\n';
 
-                    case _long:
-                        printf("%li\n", popped_operand->operand.value._long);
-                        break;
+                        switch (popped_operand->operand.type) {
+                        case _int:
+                            printf("%i%c", popped_operand->operand.value._int, newline);
+                            break;
 
-                    case _double:
-                        printf("%lf\n", popped_operand->operand.value._double);
-                        break;
+                        case _float:
+                            printf("%f%c", popped_operand->operand.value._float, newline);
+                            break;
 
-                    case _string:
-                        printf("%s\n", popped_operand->operand.value._string);
-                        break;
+                        case _long:
+                            printf("%li%c", popped_operand->operand.value._long, newline);
+                            break;
 
-                    default:
-                        break;
+                        case _double:
+                            printf("%lf%c", popped_operand->operand.value._double, newline);
+                            break;
+
+                        case _string:
+                            printf("%s%c", popped_operand->operand.value._string, newline);
+                            break;
+
+                        default:
+                            break;
+                        }
                     }
-                } else if (vm_strcmp(buffer, "print")) {
-                    vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
+                } else if (vm_strcmp(class_name_buffer, "java/lang/StringBuilder")) {
+                    if (vm_strcmp(name_buffer, "<init>")) {
+                        STACK->StringBuilder = realloc(STACK->StringBuilder, sizeof(char));
+                        STACK->StringBuilder[0] = '\0';
+                    } else if (vm_strcmp(name_buffer, "append")) {
+                        vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
 
-                    switch (popped_operand->operand.type)
-                    {
-                    case _int:
-                        printf("%i", popped_operand->operand.value._int);
-                        break;
+                        int size;
+                        if (popped_operand->operand.type == _string) {
+                            size = strlen(popped_operand->operand.value._string) + 1;
+                        } else {
+                            size = 80;
+                        }
 
-                    case _float:
-                        printf("%f", popped_operand->operand.value._float);
-                        break;
+                        char buffer[size];
 
-                    case _long:
-                        printf("%li", popped_operand->operand.value._long);
-                        break;
+                        switch (popped_operand->operand.type) {
+                        case _int:
+                            size = sprintf(buffer, "%i", popped_operand->operand.value._int);
+                            break;
 
-                    case _double:
-                        printf("%lf", popped_operand->operand.value._double);
-                        break;
+                        case _float:
+                            size = sprintf(buffer, "%f", popped_operand->operand.value._float);
+                            break;
 
-                    case _string:
-                        printf("%s", popped_operand->operand.value._string);
-                        break;
+                        case _long:
+                            size = sprintf(buffer, "%li", popped_operand->operand.value._long);
+                            break;
 
-                    default:
-                        break;
+                        case _double:
+                            size = sprintf(buffer, "%lf", popped_operand->operand.value._double);
+                            break;
+
+                        case _string:
+                            size = sprintf(buffer, "%s", popped_operand->operand.value._string);
+                            break;
+
+                        default:
+                            break;
+                        }
+
+                        int offset = strlen(STACK->StringBuilder);
+
+                        STACK->StringBuilder = realloc(STACK->StringBuilder, (size + 1));
+
+                        for (int j = 0; j < (size + 1); j++) {
+                            STACK->StringBuilder[j + offset] = buffer[j];
+                        }
+                    } else if (vm_strcmp(name_buffer, "toString")) {
+                        vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                        new_operand_frame->operand.type = _string;
+                        new_operand_frame->operand.value._string = STACK->StringBuilder;
+                        new_operand_frame->next_frame = NULL;
+
+                        push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
                     }
                 }
+            }
+            pc += 3;
+            break;
+
+        case _new:
+            {
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _string;
+                new_operand_frame->operand.value._string = calloc(4, sizeof(char));
+                new_operand_frame->next_frame = NULL;
+
+                sprintf(new_operand_frame->operand.value._string, "new");
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 3;
             break;
@@ -1363,29 +1453,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The run-time constant pool item at that index must be a symbolic
             // reference to a call site specifier (§5.1). The values of the third and
             // fourth operand bytes must always be zero.
-            {
-                uint8_t indexbyte1 = code[pc+1];
-                uint8_t indexbyte2 = code[pc+2];
-                uint16_t index = (indexbyte1 << 8) | indexbyte2;
-
-                uint16_t name_and_type_index = current_constant_pool[index].info.methodref_info.name_and_type_index;
-
-                uint16_t name_index = current_constant_pool[name_and_type_index].info.nameandtype_info.name_index;
-
-                vm_utf8_t utf8_info = current_constant_pool[name_index].info.utf8_info;
-
-                uint16_t * uint16_string = vm_utf8_to_uint16_t(utf8_info.length, utf8_info.bytes);
-
-                char buffer[utf8_info.length];
-
-                for (int j = 0; j < utf8_info.length; j++) {
-                    sprintf(&(buffer[j]), "%lc", uint16_string[j]);
-                }
-
-                if (vm_strcmp(buffer, "makeConcatWithConstants")) {
-                    printf("Teu pai careca!\n");
-                }
-            }
             pc += 5;
             break;
 
@@ -1396,41 +1463,42 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 int count = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
                 int atype = code[pc+1];
-                void *array_pointer;
+                void *array;
                 switch (atype)
                 {
-                case T_BOOLEAN: 
-                    array_pointer = calloc(count, sizeof(char));
+                case T_BOOLEAN:
+                    array = calloc(count, sizeof(char));
                     break;
                 case T_CHAR:
-                    array_pointer = calloc(count, sizeof(char));
+                    array = calloc(count, sizeof(char));
                     break;
                 case T_FLOAT:
-                    array_pointer = calloc(count, sizeof(float));
+                    array = calloc(count, sizeof(float));
                     break;
                 case T_DOUBLE:
-                    array_pointer = calloc(count, sizeof(double));
+                    array = calloc(count, sizeof(double));
                     break;
                 case T_BYTE:
-                    array_pointer = calloc(count, sizeof(char));
+                    array = calloc(count, sizeof(char));
                     break;
                 case T_SHORT:
-                    array_pointer = calloc(count, sizeof(short));
+                    array = calloc(count, sizeof(short));
                     break;
                 case T_INT:
-                    array_pointer = calloc(count, sizeof(int));
+                    array = calloc(count, sizeof(int));
                     break;
                 case T_LONG:
-                    array_pointer = calloc(count, sizeof(long));
+                    array = calloc(count, sizeof(long));
                     break;
                 default:
-                    array_pointer = NULL;
+                    array = NULL;
                     break;
                 }
-                vm_ostack_t *new_operand_frame = calloc(1, sizeof (vm_ostack_t));
 
-                new_operand_frame->operand.type = _reference;
-                new_operand_frame->operand.value._reference = array_pointer;
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _array;
+                new_operand_frame->operand.value._array = array;
                 new_operand_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));

@@ -90,6 +90,7 @@ const char * vm_execute(file_t *file) {
 
     vm_stack_t *MAIN_FRAME = VM_STACK;
 
+    MAIN_FRAME->StringBuilder = NULL;
     MAIN_FRAME->local_variables = calloc(main_code->max_local, sizeof(vm_local_variables_t));
     MAIN_FRAME->operand_stack = calloc(1, sizeof(vm_ostack_t));
     MAIN_FRAME->constant_pool = class_file.constant_pool;

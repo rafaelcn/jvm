@@ -14,7 +14,7 @@ enum local_variables_enum {
     _long,
     _double,
     _string,
-    _reference
+    _array
 };
 
 /**
@@ -28,7 +28,7 @@ typedef struct vm_local_variables {
         long _long;
         double _double;
         char *_string;
-        void* _reference;
+        void *_array;
     } value;
 } vm_local_variables_t;
 
@@ -44,6 +44,8 @@ struct vm_ostack {
  * @brief
  */
 struct vm_stack {
+    char *StringBuilder;
+
     vm_local_variables_t *local_variables;
     vm_ostack_t *operand_stack;
     vm_cp_info_t *constant_pool;

@@ -13,7 +13,8 @@ enum array_type_enum {
     T_BYTE,
     T_SHORT,
     T_INT,
-    T_LONG}; 
+    T_LONG
+};
 
 /**
  * @brief
