@@ -18,14 +18,17 @@
 int vm_init(const char *filename, file_t *file);
 
 /**
- * @brief
- * @param file
+ * @brief This function is used only to read the classfile and show information
+ * about the constant pool.
+ * @param file A pointer to a file_t structure which holds data about the .class
+ * file.
  */
 void vm_inform(file_t *file);
 
 /**
- * @brief
- * @param file
+ * @brief This function is used to execute code from a .class file.
+ * @param file A pointer to a file_t structure which holds data about the .class
+ * file.
  */
 const char * vm_execute(file_t *file);
 
