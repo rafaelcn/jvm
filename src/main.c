@@ -8,7 +8,6 @@
 #include "vm/vm_entry.h"
 #include "vm/vm_settings.h"
 #include "vm/vm_file.h"
-#include "machine.h"
 
 #include "vm/lib/vm_string.h"
 
