@@ -2,10 +2,14 @@ CC  = $(shell (which gcc))
 CC_FLAGS = -std=c99
 CC_FLAGS_D = -std=c99 -g
 
+JAVAC = $(shell (which javac))
+
 # The entire source
 SRC  = $(shell (find src -name "*.c" -type f))
 # The source code files without main
 SRC2 = $(shell (find src \( -name "*.c" ! -name "main.c" \) -type f))
+
+JAVA_SRC = $(shell (find bin/java/ -name "*.java" -type f))
 
 BIN = njvm.exe
 
@@ -30,12 +34,16 @@ debug:
 
 test: $(TESTS_PRO)
 
+java:
+	$(JAVAC) $(JAVA_SRC)
+
 vars:
 	@echo "COMPILER:     $(CC)"
 	@echo "SOURCE FILES: $(SRC)"
 	@echo "TESTS FILES:  $(TESTS_SRC)"
 	@echo "MUNIT FILES:  $(MUNIT)"
 	@echo "TESTS UTILS FILES:  $(TESTS_UTI)"
+	@echo "JAVA FILES: $(JAVA_SRC)"
 
 
 .PHONY: clean
