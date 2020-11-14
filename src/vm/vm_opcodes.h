@@ -8,9 +8,9 @@
 /**
  * @brief The JVM instructions operations.
  * @param code the code of the instruction.
- * @param pc The previous PC position.
+ * @param pc The actual PC position.
  * @param STACK An operands stack.
- * @returns The actual PC position.
+ * @returns The PC position after the instruction.
  */
 uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK);
 
