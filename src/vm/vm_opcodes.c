@@ -227,6 +227,25 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
     for (uint8_t i = 0; i <= _WIDE; i++) {
         switch (code[pc]) {
+        case _nop:
+            // Do nothing.
+            pc += 1;
+            break;
+
+        case _aconst_null:
+            // Push the null object reference onto the operand stack.
+            {
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _reference;
+                new_operand_frame->operand.value._reference = NULL;
+                new_operand_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
+            pc += 1;
+            break;
+
         case _iconst_m1:
         case _iconst_0:
         case _iconst_1:
@@ -248,15 +267,85 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _lconst_0:
+        case _lconst_1:
+            // Push the long constant <l> (0 or 1) onto the operand stack.
+            {
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _long;
+                new_operand_frame->operand.value._long = (long) (code[pc] - _lconst_0);
+                new_operand_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
+            pc += 1;
+            break;
+
+        case _fconst_0:
+        case _fconst_1:
+        case _fconst_2:
+            // Push the float constant <f> (0.0, 1.0, or 2.0) onto the operand
+            // stack.
+            {
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _float;
+                new_operand_frame->operand.value._float = (float) (code[pc] - _fconst_0);
+                new_operand_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
+            pc += 1;
+            break;
+
+        case _dconst_0:
+        case _dconst_1:
+            // Push the double constant <d> (0.0 or 1.0) onto the operand stack.
+            {
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _double;
+                new_operand_frame->operand.value._double = (double) (code[pc] - _dconst_0);
+                new_operand_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
+            pc += 1;
+            break;
+
         case _bipush:
             // The immediate byte is sign-extended to an int value. That value
             // is pushed onto the operand stack.
             {
-                signed char byte = code[pc+1];
+                uint8_t byte = code[pc+1];
+
                 vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_operand_frame->operand.type = _int;
                 new_operand_frame->operand.value._int = byte;
+                new_operand_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
+            pc += 2;
+            break;
+
+        case _sipush:
+            // The immediate unsigned byte1 and byte2 values are assembled into
+            // an intermediate short, where the value of the short is (byte1 <<
+            // 8) | byte2. The intermediate value is then sign-extended to an int
+            // value. That value is pushed onto the operand stack.
+            {
+                uint8_t byte1 = code[pc+1];
+                uint8_t byte2 = code[pc+2];
+
+                short si = (byte1 << 8) | byte2;
+
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _int;
+                new_operand_frame->operand.value._int = si;
                 new_operand_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
@@ -532,8 +621,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 uint8_t index = code[pc+1];
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->operand.type = _array;
-                new_frame->operand.value._array = current_local_variables[index].value._array;
+                new_frame->operand.type = _reference;
+                new_frame->operand.value._reference = current_local_variables[index].value._reference;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -639,8 +728,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 uint8_t index = code[pc] - _aload_0;
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_frame->operand.type = _array;
-                new_frame->operand.value._array = current_local_variables[index].value._array;
+                new_frame->operand.type = _reference;
+                new_frame->operand.value._reference = current_local_variables[index].value._reference;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -657,13 +746,167 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
-
-                int *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
+                int *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_frame->operand.type = _int;
                 new_frame->operand.value._int = array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _laload:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type long. The index must be of type
+            // int. Both arrayref and index are popped from the operand stack.
+            // The long value in the component of the array at index is retrieved
+            // and pushed onto the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                long *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _faload:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type float. The index must be of type
+            // int. Both arrayref and index are popped from the operand stack.
+            // The float value in the component of the array at index is retrieved
+            // and pushed onto the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                float *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _daload:
+            // The arrayref must be of type reference and must refer to an
+            // array whose components are of type double. The index must be
+            // of type int. Both arrayref and index are popped from the operand
+            // stack. The double value in the component of the array at index is
+            // retrieved and pushed onto the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                double *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _aaload:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type reference. The index must be of
+            // type int. Both arrayref and index are popped from the operand
+            // stack. The reference value in the component of the array at index
+            // is retrieved and pushed onto the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                void **array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _reference;
+                new_frame->operand.value._reference = array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _baload:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type byte or of type boolean. The index
+            // must be of type int. Both arrayref and index are popped from the
+            // operand stack. The byte value in the component of the array at
+            // index is retrieved, sign-extended to an int value, and pushed onto
+            // the top of the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                uint8_t *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _byte_or_bool;
+                new_frame->operand.value._byte_or_bool = array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _caload:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type char. The index must be of type
+            // int. Both arrayref and index are popped from the operand stack.
+            // The component of the array at index is retrieved and zero-extended
+            // to an int value. That value is pushed onto the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                char *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _char;
+                new_frame->operand.value._char = array[index];
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _saload:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type short. The index must be of type
+            // int. Both arrayref and index are popped from the operand stack.
+            // The component of the array at index is retrieved and sign-extended
+            // to an int value. That value is pushed onto the operand stack.
+            {
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                short *array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _short;
+                new_frame->operand.value._short = array[index];
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
@@ -742,8 +985,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 uint8_t index = code[pc+1];
 
-                current_local_variables[index].type = _array;
-                current_local_variables[index].value._array = pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
+                current_local_variables[index].type = _reference;
+                current_local_variables[index].value._reference = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
             }
             pc += 2;
             break;
@@ -830,8 +1073,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             {
                 uint8_t index = code[pc] - _astore_0;
 
-                current_local_variables[index].type = _array;
-                current_local_variables[index].value._array = pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
+                current_local_variables[index].type = _reference;
+                current_local_variables[index].value._reference = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
             }
             pc += 1;
             break;
@@ -847,7 +1090,136 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
 
-                int *array = (int *) pop_from_ostack(&(STACK->operand_stack))->operand.value._array;
+                int *array = (int *) pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _lastore:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type long. The index must be of type
+            // int, and value must be of type long. The arrayref, index, and value
+            // are popped from the operand stack. The long value is stored as the
+            // component of the array indexed by index.
+            {
+                int value= pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                long *array = (long *) pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _fastore:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type float. The index must be of type
+            // int, and the value must be of type float. The arrayref, index,
+            // and value are popped from the operand stack. The float value
+            // undergoes value set conversion (§2.8.3), resulting in value', and
+            // value' is stored as the component of the array indexed by index.
+            {
+                float value= pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                float *array = (float *) pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _dastore:
+            // The arrayref must be of type reference and must refer to an
+            // array whose components are of type double. The index must be of
+            // type int, and value must be of type double. The arrayref, index,
+            // and value are popped from the operand stack. The double value
+            // undergoes value set conversion (§2.8.3), resulting in value', which
+            // is stored as the component of the array indexed by index.
+            {
+                double value= pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                double *array = (double *) pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _aastore:
+            // The arrayref must be of type reference and must refer to
+            // an array whose components are of type reference. The index
+            // must be of type int and value must be of type reference. The
+            // arrayref, index, and value are popped from the operand stack. The
+            // reference value is stored as the component of the array at index.
+            {
+                void *value= pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                void **array = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _bastore:
+            // The arrayref must be of type reference and must refer to an
+            // array whose components are of type byte or of type boolean.
+            // The index and the value must both be of type int. The arrayref,
+            // index, and value are popped from the operand stack. The int value
+            // is truncated to a byte and stored as the component of the array
+            // indexed by index.
+            {
+                uint8_t value= pop_from_ostack(&(STACK->operand_stack))->operand.value._byte_or_bool;
+
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                uint8_t *array = (uint8_t *) pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _castore:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type char. The index and the value must
+            // both be of type int. The arrayref, index, and value are popped
+            // from the operand stack. The int value is truncated to a char and
+            // stored as the component of the array indexed by index.
+            {
+                char value= pop_from_ostack(&(STACK->operand_stack))->operand.value._char;
+
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                char *array = (char *) pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                array[index] = value;
+            }
+            pc += 1;
+            break;
+
+        case _sastore:
+            // The arrayref must be of type reference and must refer to an array
+            // whose components are of type short. Both index and value must
+            // be of type int. The arrayref, index, and value are popped from the
+            // operand stack. The int value is truncated to a short and stored as
+            // the component of the array indexed by index.
+            {
+                short value= pop_from_ostack(&(STACK->operand_stack))->operand.value._short;
+
+                int index = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                short *array = (short *) pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
 
                 array[index] = value;
             }
@@ -1497,8 +1869,8 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
 
-                new_operand_frame->operand.type = _array;
-                new_operand_frame->operand.value._array = array;
+                new_operand_frame->operand.type = _reference;
+                new_operand_frame->operand.value._reference = array;
                 new_operand_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));

@@ -9,12 +9,15 @@ typedef struct vm_ostack vm_ostack_t;
 typedef struct vm_stack vm_stack_t;
 
 enum local_variables_enum {
+    _short,
     _int,
-    _float,
     _long,
+    _float,
     _double,
+    _char,
     _string,
-    _array
+    _byte_or_bool,
+    _reference
 };
 
 /**
@@ -23,12 +26,15 @@ enum local_variables_enum {
 typedef struct vm_local_variables {
     int type;
     union {
+        short _short;
         int _int;
-        float _float;
         long _long;
+        float _float;
         double _double;
+        char _char;
         char *_string;
-        void *_array;
+        uint8_t _byte_or_bool;
+        void *_reference;
     } value;
 } vm_local_variables_t;
 
