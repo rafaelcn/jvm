@@ -19,6 +19,6 @@ enum array_type_enum {
 /**
  * @brief
  */
-uint32_t vm_opcodes(uint8_t *bytes, uint32_t pc, vm_stack_t *STACK);
+uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK);
 
 #endif /* VM_OPCODES_H */
