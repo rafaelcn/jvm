@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "vm_opcodes.h"
 #include "lib/vm_string.h"
@@ -1620,6 +1621,158 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 new_frame->operand.type = _double;
                 new_frame->operand.value._double = _d1 / _d2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _irem:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. The int result is value1 - (value1 / value2)
+            // * value2. The result is pushed onto the operand stack.
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 - (_i1/_i2) * _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _lrem:
+            // Both value1 and value2 must be of type long. The values are
+            // popped from the operand stack. The long result is value1 - (value1
+            // / value2) * value2. The result is pushed onto the operand stack.
+            {
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 - (_l1/_l2) * _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _frem:
+            // Both value1 and value2 must be of type float. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The result is calculated
+            // and pushed onto the operand stack as a float.
+            {
+                float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = _f1 - ((int) floor((_f1/_f2))) * _f2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _drem:
+            // Both value1 and value2 must be of type double. The values are
+            // popped from the operand stack and undergo value set conversion
+            // (§2.8.3), resulting in value1' and value2'. The result is calculated
+            // and pushed onto the operand stack as a double.
+            {
+                double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = _d1 - ((int) floor((_d1/_d2))) * _d2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _ineg:
+            // The value must be of type int. It is popped from the operand
+            // stack. The int result is the arithmetic negation of value, -value.
+            // The result is pushed onto the operand stack.
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = 0 - _i;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _lneg:
+            // The value must be of type long. It is popped from the operand
+            // stack. The long result is the arithmetic negation of value, -value.
+            // The result is pushed onto the operand stack.
+            {
+                long _l = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = 0 - _l;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _fneg:
+            // The value must be of type float. It is popped from the operand
+            // stack and undergoes value set conversion (§2.8.3), resulting in
+            // value'. The float result is the arithmetic negation of value'. This
+            // result is pushed onto the operand stack.
+            {
+                float _f = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = ((float) 0) - _f;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _dneg:
+            // The value must be of type double. It is popped from the operand
+            // stack and undergoes value set conversion (§2.8.3), resulting in
+            // value'. The double result is the arithmetic negation of value'. The
+            // result is pushed onto the operand stack.
+            {
+                double _d = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = ((double) 0) - _d;
                 new_frame->next_frame = NULL;
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
