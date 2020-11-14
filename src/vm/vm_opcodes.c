@@ -2031,6 +2031,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 2;
             break;
 
+        case _iinc:
+            {
+                uint8_t index = code[pc+1];
+                int8_t const_value = code[pc+2];
+
+                current_local_variables[index].value._int += const_value;
+            }
+            pc += 3;
+            break;
+
         case _wide:
             // The wide instruction modifies the behavior of another instruction.
             // It takes one of two formats, depending on the instruction being
@@ -2056,6 +2066,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The widened bytecode operates as normal, except for the use of
             // the wider index and, in the case of the second form, the larger
             // increment range.
+
             _WIDE = 1;
             pc += 1;
             break;
