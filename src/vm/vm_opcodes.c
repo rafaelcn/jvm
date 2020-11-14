@@ -1780,6 +1780,140 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _ishl:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. An int result is calculated by shifting
+            // value1 left by s bit positions, where s is the value of the low 5 bits
+            // of value2. The result is pushed onto the operand stack.
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                int s = (_i2 & 0x0000001F);
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (_i1 << s);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _lshl:
+            // The value1 must be of type long, and value2 must be of type int.
+            // The values are popped from the operand stack. A long result is
+            // calculated by shifting value1 left by s bit positions, where s is the
+            // low 6 bits of value2. The result is pushed onto the operand stack.
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                long _l = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                int s = (_i & 0x0000003F);
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (_l << s);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _ishr:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. An int result is calculated by shifting
+            // value1 right by s bit positions, where s is the value of the low 5 bits
+            // of value2. The result is pushed onto the operand stack.
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                int s = (_i2 & 0x0000001F);
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (_i1 >> s);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _lshr:
+            // The value1 must be of type long, and value2 must be of type int.
+            // The values are popped from the operand stack. A long result is
+            // calculated by shifting value1 right by s bit positions, where s is the
+            // low 6 bits of value2. The result is pushed onto the operand stack.
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                long _l = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                int s = (_i & 0x0000003F);
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = (_l >> s);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _iushr:
+            // Both value1 and value2 must be of type int. The values are popped
+            // from the operand stack. An int result is calculated by shifting
+            // value1 right by s bit positions, with zero extension, where s is the
+            // value of the low 5 bits of value2. The result is pushed onto the
+            // operand stack.
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                int s = (_i2 & 0x0000001F);
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (int) (((unsigned int) _i1) << s);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _lushr:
+            // The value1 must be of type long, and value2 must be of type int.
+            // The values are popped from the operand stack. A long result is
+            // calculated by shifting value1 right logically by s bit positions, with
+            // zero extension, where s is the value of the low 6 bits of value2.
+            // The result is pushed onto the operand stack.
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                long _l = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                int s = (_i & 0x0000003F);
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = (((unsigned long) _l) << s);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
         case _return:
             // The current method must have return type void. If the
             // current method is a synchronized method, the monitor entered
@@ -1956,6 +2090,17 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _new:
+            // The unsigned indexbyte1 and indexbyte2 are used to construct an
+            // index into the run-time constant pool of the current class (§2.6),
+            // where the value of the index is (indexbyte1 << 8) | indexbyte2.
+            // The run-time constant pool item at the index must be a symbolic
+            // reference to a class or interface type. The named class or interface
+            // type is resolved (§5.4.3.1) and should result in a class type.
+            // Memory for a new instance of that class is allocated from the
+            // garbage-collected heap, and the instance variables of the new
+            // object are initialized to their default initial values (§2.3, §2.4). The
+            // objectref, a reference to the instance, is pushed onto the operand
+            // stack.
             {
                 vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -1978,6 +2123,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             // The run-time constant pool item at that index must be a symbolic
             // reference to a call site specifier (§5.1). The values of the third and
             // fourth operand bytes must always be zero.
+            {
+                vm_ostack_t *new_operand_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_operand_frame->operand.type = _string;
+                new_operand_frame->operand.value._string = calloc(14, sizeof(char));
+                new_operand_frame->next_frame = NULL;
+
+                sprintf(new_operand_frame->operand.value._string, "invokedynamic");
+                push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
+            }
             pc += 5;
             break;
 
