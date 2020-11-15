@@ -51,8 +51,7 @@ int vm_init(const char* filename, file_t *file) {
             file->read++;
         }
 
-        printf("\n\n%ld in bytes size, %ld bytes read.\n", file->size,
-               file->read);
+        printf("\n\n%ld in bytes size, %ld bytes read.\n", file->size, file->read);
     }
 
     // reset read information to future use
@@ -72,6 +71,7 @@ void vm_inform(file_t *file) {
 
     // inform
     class_file_reader(class_file, file);
+    vm_print_opcodes(class_file);
 }
 
 const char * vm_execute(file_t *file) {

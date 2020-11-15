@@ -1016,7 +1016,7 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
     printf("%2sMINOR VERSION:        %10d\n", "", class_file.minor_version);
     printf("%2sJAVA TARGET:          %10s\n", "", java_version);
     printf("%2sCONSTANT POOL COUNT:  %10d\n", "", cp_size);
-    printf("\n");
+    printf("\n\n");
 
     printf("CONSTANT POOL\n");
     printf("-------------\n\n");
@@ -1216,4 +1216,6 @@ void class_file_reader(vm_class_file_t class_file, file_t *file) {
             break;
         }
     }
+
+    printf("\n\n");
 }

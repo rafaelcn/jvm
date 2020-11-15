@@ -6,6 +6,7 @@
 #include "vm_file.h"
 #include "vm_opcodes.h"
 #include "vm_constant_pool.h"
+#include "vm_print_opcodes.h"
 
 
 /**
