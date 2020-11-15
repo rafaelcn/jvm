@@ -1970,6 +1970,263 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _ifeq:
+            {
+                int value = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (value == 0) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _ifne:
+            {
+                int value = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (value != 0) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _iflt:
+            {
+                int value = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (value < 0) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _ifge:
+            {
+                int value = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (value >= 0) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _ifgt:
+            {
+                int value = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (value > 0) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _ifle:
+            {
+                int value = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (value <= 0) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_icmpeq:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (_i1 == _i2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_icmpne:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (_i1 != _i2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_icmplt:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (_i1 < _i2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_icmpge:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (_i1 >= _i2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_icmpgt:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (_i1 > _i2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_icmple:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                if (_i1 <= _i2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_acmpeq:
+            {
+                void *_a2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+                void *_a1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                if (_a1 == _a2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _if_acmpne:
+            {
+                void *_a2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+                void *_a1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
+
+                if (_a1 != _a2) {
+                    uint8_t branchbyte1 = code[pc+1];
+                    uint8_t branchbyte2 = code[pc+2];
+
+                    int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _goto:
+            {
+                uint8_t branchbyte1 = code[pc+1];
+                uint8_t branchbyte2 = code[pc+2];
+
+                int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                pc += offset;
+            }
+            break;
+
         case _return:
             {
                 vm_ostack_t *stack_frame = pop_from_ostack(&(STACK->operand_stack));
