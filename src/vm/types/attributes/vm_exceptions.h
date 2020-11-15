@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A exceptions structure.
  */
 typedef struct vm_exceptions {
     uint16_t number_of_exceptions;
