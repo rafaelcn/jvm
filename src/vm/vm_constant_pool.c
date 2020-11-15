@@ -391,7 +391,7 @@ void element_value_parser(vm_element_value_t *element_value_pt, file_t *file) {
         uint16_t _array_values = element_value_pt->value.array_value.num_values;
 
         for(uint16_t l = 0; l < _array_values; l++) {
-            element_value_parser(&(_array_value.values[l]), file);
+            element_value_parser(&(element_value_pt->value.array_value.values[l]), file);
         }
     } else {
         // printf("RuntimeVisibleAnnotations element pairs tag not found.");
