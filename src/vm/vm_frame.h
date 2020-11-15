@@ -17,7 +17,8 @@ enum local_variables_enum {
     _char,
     _string,
     _byte_or_bool,
-    _reference
+    _reference,
+    _returnAddress
 };
 
 /**
@@ -25,7 +26,7 @@ enum local_variables_enum {
  */
 typedef struct vm_local_variables {
     int type;
-    union {
+    union value {
         short _short;
         int _int;
         long _long;
@@ -35,6 +36,7 @@ typedef struct vm_local_variables {
         char *_string;
         uint8_t _byte_or_bool;
         void *_reference;
+        uint32_t _returnAddress;
     } value;
 } vm_local_variables_t;
 

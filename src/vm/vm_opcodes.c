@@ -2228,9 +2228,45 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _jsr:
+            {
+                uint8_t branchbyte1 = code[pc+1];
+                uint8_t branchbyte2 = code[pc+2];
+
+                int16_t offset = (branchbyte1 << 8) | branchbyte2;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _returnAddress;
+                new_frame->operand.value._returnAddress = pc + ((uint32_t) 3);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+
+                pc += offset;
+            }
+            break;
+
         case _ret:
+            {
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
+
+                pc = current_local_variables[index].value._returnAddress;
+            }
+            break;
+
         case _tableswitch:
         case _lookupswitch:
+            break;
+
         case _ireturn:
             {
                 int value = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
