@@ -5,6 +5,9 @@
 
 #include "vm_frame.h"
 
+/**
+ * A 
+ */
 enum array_type_enum {
     T_BOOLEAN = 4,
     T_CHAR,
@@ -17,10 +20,10 @@ enum array_type_enum {
 };
 
 /**
- * @brief A function that executes a OpCode of the JVM.
+ * @brief A function that executes an opcode of the JVM.
  * @param code The code field of a Code Attribute of a Method.
  * @param pc The PC of the current instruction of the method.
- * @returns Returns the PC of the next instruction.
+ * @returns The PC of the next instruction.
  */
 uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK);
 
