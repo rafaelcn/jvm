@@ -212,14 +212,6 @@
 #define _goto_w          (0xc8)
 #define _jsr_w           (0xc9)
 
-FILE * error_log;
-
-void vm_error_log(char *s) {
-    error_log = fopen("log.txt", "a+");
-    fprintf(error_log, "%s", s);
-    fclose(error_log);
-}
-
 uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
     uint8_t _WIDE = 0;
 

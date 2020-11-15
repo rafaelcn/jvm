@@ -63,10 +63,32 @@ struct vm_stack {
     vm_stack_t *next_frame;
 };
 
+/**
+ * @brief Pushes a stack_frame into the JVM Stack.
+ * @param stack A pointer to the JVM Stack.
+ * @param new_frame A pointer to the a new frame.
+ */
 void push_into_stack(vm_stack_t **stack, vm_stack_t **new_frame);
+
+/**
+ * @brief Pops the frame at the top of the JVM Stack.
+ * @param stack A pointer to the JVM Stack.
+ * @returns A pointer to the popped frame.
+ */
 vm_stack_t * pop_from_stack(vm_stack_t **stack);
 
+/**
+ * @brief Pushes a operand_stack_frame into the Operands Stack.
+ * @param stack A pointer to the Operands Stack.
+ * @param new_frame A pointer to the a new frame.
+ */
 void push_into_ostack(vm_ostack_t **stack, vm_ostack_t **new_frame);
+
+/**
+ * @brief Pops the frame at the top of the Operands Stack.
+ * @param stack A pointer to the Operands Stack.
+ * @returns A pointer to the popped frame.
+ */
 vm_ostack_t * pop_from_ostack(vm_ostack_t **stack);
 
 #endif /* VM_FRAME_H */
