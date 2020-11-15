@@ -1556,6 +1556,337 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _iand:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 & _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _land:
+            {
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 & _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _ior:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 | _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _lor:
+            {
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 | _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _ixor:
+            {
+                int _i2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+                int _i1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = _i1 ^ _i2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _lxor:
+            {
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = _l1 ^ _l2;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _iinc:
+            {
+                uint8_t index = code[pc+1];
+                int8_t const_value = code[pc+2];
+
+                current_local_variables[index].value._int += const_value;
+            }
+            pc += 3;
+            break;
+
+        case _i2l:
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = (long) _i;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _i2f:
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = (float) _i;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _i2d:
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = (double) _i;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _l2i:
+            {
+                long _l = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (int) _l;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _l2f:
+            {
+                long _l = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = (float) _l;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _l2d:
+            {
+                long _l = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = (double) _l;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _f2i:
+            {
+                float _f = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (int) _f;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _f2l:
+            {
+                float _f = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = (long) _f;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _f2d:
+            {
+                float _f = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _double;
+                new_frame->operand.value._double = (double) _f;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _d2i:
+            {
+                double _d = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (int) _d;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _d2l:
+            {
+                double _d = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _long;
+                new_frame->operand.value._long = (long) _d;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _d2f:
+            {
+                double _d = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _float;
+                new_frame->operand.value._float = (float) _d;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _i2b:
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (int8_t) _i;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _i2c:
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (unsigned int) ((char) _i);
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _i2s:
+            {
+                int _i = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->operand.value._int = (short) _i;
+                new_frame->next_frame = NULL;
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
         case _return:
             {
                 vm_ostack_t *stack_frame = pop_from_ostack(&(STACK->operand_stack));
@@ -1779,16 +2110,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 push_into_ostack(&(STACK->operand_stack), &(new_operand_frame));
             }
             pc += 2;
-            break;
-
-        case _iinc:
-            {
-                uint8_t index = code[pc+1];
-                int8_t const_value = code[pc+2];
-
-                current_local_variables[index].value._int += const_value;
-            }
-            pc += 3;
             break;
 
         case _wide:
