@@ -87,12 +87,12 @@ const char * vm_execute(file_t *file) {
     vm_method_info_t *main_method = calloc(1, sizeof (vm_method_info_t));
     vm_utf8_t method_name;
 
-    vm_uint16_string_t *uint16_string;
+    vm_uint32_string_t *uint16_string;
     char *buffer = NULL;
 
     for (uint16_t i = 0; i < class_file.methods_count; i++) {
         method_name = class_file.constant_pool[class_file.methods[i].name_index].info.utf8_info;
-        uint16_string = vm_utf8_to_uint16_t(method_name.length, method_name.bytes);
+        uint16_string = vm_utf8_to_uint32_t(method_name.length, method_name.bytes);
 
         buffer = realloc(buffer, ((uint16_string->length) * sizeof(char)));
 
@@ -125,7 +125,7 @@ const char * vm_execute(file_t *file) {
 
     for (uint16_t i = 0; i < main_method->attributes_count; i++) {
         attribute_name = class_file.constant_pool[main_method->attributes[i].attribute_name_index].info.utf8_info;
-        uint16_string = vm_utf8_to_uint16_t(attribute_name.length, attribute_name.bytes);
+        uint16_string = vm_utf8_to_uint32_t(attribute_name.length, attribute_name.bytes);
 
         buffer = realloc(buffer, ((uint16_string->length) * sizeof(char)));
 

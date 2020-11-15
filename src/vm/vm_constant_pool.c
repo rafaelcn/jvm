@@ -192,7 +192,7 @@ void interfaces_parser(file_t *file, vm_class_file_t *cf) {
 }
 
 int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
-    vm_uint16_string_t *uint16_string = vm_utf8_to_uint16_t(length, bytes);
+    vm_uint32_string_t *uint16_string = vm_utf8_to_uint32_t(length, bytes);
     char *buffer = calloc(uint16_string->length, sizeof(char));
 
     for (int j = 0; j < uint16_string->length; j++) {
@@ -905,7 +905,7 @@ void class_file_parser(file_t *file, vm_class_file_t *cf) {
 }
 
 void utf8_helper(uint16_t length, uint8_t *bytes) {
-    vm_uint16_string_t *uint16_string = vm_utf8_to_uint16_t(length, bytes);
+    vm_uint32_string_t *uint16_string = vm_utf8_to_uint32_t(length, bytes);
 
     for (uint16_t i = 0; i < uint16_string->length; i++) {
         printf("%lc", uint16_string->string[i]);
