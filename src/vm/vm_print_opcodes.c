@@ -996,8 +996,19 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
             break;
 
         case _putstatic:
+            printf("putstatic\n");
+            pc += 3;
+            break;
+
         case _getfield:
+            printf("getfield\n");
+            pc += 3;
+            break;
+
         case _putfield:
+            printf("putfield\n");
+            pc += 3;
+            break;
 
         case _invokevirtual:
             printf("invokevirtual\n");
@@ -1009,9 +1020,14 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
             pc += 3;
             break;
 
-        case _new:
-            printf("new\n");
+        case _invokestatic:
+            printf("invokestatic\n");
             pc += 3;
+            break;
+
+        case _invokeinterface:
+            printf("invokeinterface\n");
+            pc += 5;
             break;
 
         case _invokedynamic:
@@ -1019,8 +1035,48 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
             pc += 5;
             break;
 
+        case _new:
+            printf("new\n");
+            pc += 3;
+            break;
+
         case _newarray:
             printf("newarray\n");
+            pc += 2;
+            break;
+
+        case _anewarray:
+            printf("anewarray\n");
+            pc += 3;
+            break;
+
+        case _arraylength:
+            printf("arraylength\n");
+            pc += 1;
+            break;
+
+        case _athrow:
+            printf("athrow\n");
+            pc += 1;
+            break;
+
+        case _checkcast:
+            printf("checkcast\n");
+            pc += 3;
+            break;
+
+        case _instanceof:
+            printf("instanceof\n");
+            pc += 3;
+            break;
+
+        case _monitorenter:
+            printf("monitorenter\n");
+            pc += 1;
+            break;
+
+        case _monitorexit:
+            printf("monitorexit\n");
             pc += 2;
             break;
 
@@ -1028,6 +1084,31 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
             _WIDE = 1;
             printf("wide\n");
             pc += 1;
+            break;
+
+        case _multianewarray:
+            printf("multianewarray\n");
+            pc += 4;
+            break;
+
+        case _ifnull:
+            printf("ifnull\n");
+            pc += 3;
+            break;
+
+        case _ifnonnull:
+            printf("ifnonnull\n");
+            pc += 3;
+            break;
+
+        case _goto_w:
+            printf("goto_w\n");
+            pc += 5;
+            break;
+
+        case _jsr_w:
+            printf("jsr_w\n");
+            pc += 5;
             break;
 
         default:
