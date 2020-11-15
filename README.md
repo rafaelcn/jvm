@@ -14,6 +14,7 @@ You have following options when using the nJVM:
 |---------|----------|-------------|
 | help    |  - | show the help message |
 | version | - | show the version information |
+| debug   | - | shows more information on the output |
 | execute | class filename | execute the given .class file |
 | information | class filename | shows information about the .class file |
 
@@ -37,6 +38,7 @@ usage:
 available commands:
 
 	--help			- show this information
-	--version			- show the version of the nJVM
+	--version		- show the version of the nJVM
+    --debug 		- enables the debug mode that shows more information
 	--execute <class file>	- executes a class file
 	--inform  <class file>	- shows information about the class file
