@@ -461,8 +461,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
@@ -473,7 +475,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
-            pc += 2;
             break;
 
         case _lload:
@@ -485,8 +486,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
@@ -497,7 +500,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
-            pc += 2;
             break;
 
         case _fload:
@@ -509,8 +511,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
@@ -521,7 +525,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
-            pc += 2;
             break;
 
         case _dload:
@@ -533,8 +536,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
@@ -545,7 +550,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
-            pc += 2;
             break;
 
         case _aload:
@@ -557,8 +561,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
@@ -569,7 +575,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
-            pc += 2;
             break;
 
         case _iload_0:
@@ -804,14 +809,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 current_local_variables[index].type = _int;
                 current_local_variables[index].value._int = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
             }
-            pc += 2;
             break;
 
         case _lstore:
@@ -823,14 +829,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 current_local_variables[index].type = _long;
                 current_local_variables[index].value._long = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
             }
-            pc += 2;
             break;
 
         case _fstore:
@@ -842,14 +849,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 current_local_variables[index].type = _float;
                 current_local_variables[index].value._float = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
             }
-            pc += 2;
             break;
 
         case _dstore:
@@ -861,14 +869,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 current_local_variables[index].type = _double;
                 current_local_variables[index].value._double = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
             }
-            pc += 2;
             break;
 
         case _astore:
@@ -880,14 +889,15 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 current_local_variables[index].type = _reference;
                 current_local_variables[index].value._reference = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
             }
-            pc += 2;
             break;
 
         case _istore_0:
@@ -1924,12 +1934,21 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _iinc:
             {
-                uint8_t index = code[pc+1];
-                int8_t const_value = code[pc+2];
+                uint16_t index;
+                int16_t const_value;
+
+                if (_WIDE) {
+                    index = (code[pc+1] << 8) | code[pc+2];
+                    const_value = (code[pc+3] << 8) | code[pc+4];
+                    pc += 5;
+                } else {
+                    index = code[pc+1];
+                    const_value = code[pc+2];
+                    pc += 3;
+                }
 
                 current_local_variables[index].value._int += const_value;
             }
-            pc += 3;
             break;
 
         case _i2l:
@@ -2525,8 +2544,10 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                     uint8_t indexbyte2 = code[pc+2];
                     index = (indexbyte1 << 8) | indexbyte2;
                     _WIDE = 0;
+                    pc += 3;
                 } else {
                     index = code[pc+1];
+                    pc += 2;
                 }
 
                 pc = current_local_variables[index].value._returnAddress;

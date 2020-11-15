@@ -285,27 +285,47 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
 
         case _iload:
             printf("iload\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _lload:
             printf("lload\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _fload:
             printf("fload\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _dload:
             printf("dload\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _aload:
             printf("aload\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _iload_0:
@@ -390,27 +410,47 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
 
         case _istore:
             printf("istore\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _lstore:
             printf("lstore\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _fstore:
             printf("fstore\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _dstore:
             printf("dstore\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _astore:
             printf("astore\n");
-            pc += 2;
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
             break;
 
         case _istore_0:
@@ -493,8 +533,48 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
             pc += 1;
             break;
 
+        case _pop:
+            printf("pop\n");
+            pc += 1;
+            break;
+
+        case _pop2:
+            printf("pop2\n");
+            pc += 1;
+            break;
+
         case _dup:
             printf("dup\n");
+            pc += 1;
+            break;
+
+        case _dup_x1:
+            printf("dup_x1\n");
+            pc += 1;
+            break;
+
+        case _dup_x2:
+            printf("dup_x2\n");
+            pc += 1;
+            break;
+
+        case _dup2:
+            printf("dup2\n");
+            pc += 1;
+            break;
+
+        case _dup2_x1:
+            printf("dup2_x1\n");
+            pc += 1;
+            break;
+
+        case _dup2_x2:
+            printf("dup2_x2\n");
+            pc += 1;
+            break;
+
+        case _swap:
+            printf("swap\n");
             pc += 1;
             break;
 
@@ -648,15 +728,276 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
             pc += 1;
             break;
 
+        case _iand:
+            printf("iand\n");
+            pc += 1;
+            break;
+
+        case _land:
+            printf("land\n");
+            pc += 1;
+            break;
+
+        case _ior:
+            printf("ior\n");
+            pc += 1;
+            break;
+
+        case _lor:
+            printf("lor\n");
+            pc += 1;
+            break;
+
+        case _ixor:
+            printf("ixor\n");
+            pc += 1;
+            break;
+
+        case _lxor:
+            printf("lxor\n");
+            pc += 1;
+            break;
+
+        case _iinc:
+            printf("iinc\n");
+            pc += 3;
+            break;
+
+        case _i2l:
+            printf("i2l\n");
+            pc += 1;
+            break;
+
+        case _i2f:
+            printf("i2f\n");
+            pc += 1;
+            break;
+
+        case _i2d:
+            printf("i2d\n");
+            pc += 1;
+            break;
+
+        case _l2i:
+            printf("l2i\n");
+            pc += 1;
+            break;
+
+        case _l2f:
+            printf("l2f\n");
+            pc += 1;
+            break;
+
+        case _l2d:
+            printf("l2d\n");
+            pc += 1;
+            break;
+
+        case _f2i:
+            printf("f2i\n");
+            pc += 1;
+            break;
+
+        case _f2l:
+            printf("f2l\n");
+            pc += 1;
+            break;
+
+        case _f2d:
+            printf("f2d\n");
+            pc += 1;
+            break;
+
+        case _d2i:
+            printf("d2i\n");
+            pc += 1;
+            break;
+
+        case _d2l:
+            printf("d2l\n");
+            pc += 1;
+            break;
+
+        case _d2f:
+            printf("d2f\n");
+            pc += 1;
+            break;
+
+        case _i2b:
+            printf("i2b\n");
+            pc += 1;
+            break;
+
+        case _i2c:
+            printf("i2c\n");
+            pc += 1;
+            break;
+
+        case _i2s:
+            printf("i2s\n");
+            pc += 1;
+            break;
+
+        case _lcmp:
+            printf("lcmp\n");
+            pc += 1;
+            break;
+
+        case _fcmpl:
+            printf("fcmpl\n");
+            pc += 1;
+            break;
+
+        case _fcmpg:
+            printf("fcmpg\n");
+            pc += 1;
+            break;
+
+        case _dcmpl:
+            printf("dcmpl\n");
+            pc += 1;
+            break;
+
+        case _dcmpg:
+            printf("dcmpg\n");
+            pc += 1;
+            break;
+
+        case _ifeq:
+            printf("ifeq\n");
+            pc += 3;
+            break;
+
+        case _ifne:
+            printf("ifne\n");
+            pc += 3;
+            break;
+
+        case _iflt:
+            printf("iflt\n");
+            pc += 3;
+            break;
+
+        case _ifge:
+            printf("ifge\n");
+            pc += 3;
+            break;
+
+        case _ifgt:
+            printf("ifgt\n");
+            pc += 3;
+            break;
+
+        case _ifle:
+            printf("ifle\n");
+            pc += 3;
+            break;
+
+        case _if_icmpeq:
+            printf("if_icmpeq\n");
+            pc += 3;
+            break;
+
+        case _if_icmpne:
+            printf("if_icmpne\n");
+            pc += 3;
+            break;
+
+        case _if_icmplt:
+            printf("if_icmplt\n");
+            pc += 3;
+            break;
+
+        case _if_icmpge:
+            printf("if_icmpge\n");
+            pc += 3;
+            break;
+
+        case _if_icmpgt:
+            printf("if_icmpgt\n");
+            pc += 3;
+            break;
+
+        case _if_icmple:
+            printf("if_icmple\n");
+            pc += 3;
+            break;
+
+        case _if_acmpeq:
+            printf("if_acmpeq\n");
+            pc += 3;
+            break;
+
+        case _if_acmpne:
+            printf("if_acmpne\n");
+            pc += 3;
+            break;
+
+        case _goto:
+            printf("goto\n");
+            pc += 3;
+            break;
+
+        case _jsr:
+            printf("jsr\n");
+            pc += 3;
+            break;
+
+        case _ret:
+            printf("ret\n");
+            if (_WIDE) {
+                pc += 3;
+            } else {
+                pc += 2;
+            }
+            break;
+
+        case _tableswitch:
+            printf("tableswitch\n");
+            break;
+
+        case _lookupswitch:
+            printf("lookupswitch\n");
+            break;
+
+        case _ireturn:
+            printf("ireturn\n");
+            pc = 0xFFFFFFFF;
+            break;
+
+        case _lreturn:
+            printf("lreturn\n");
+            pc = 0xFFFFFFFF;
+            break;
+
+        case _freturn:
+            printf("freturn\n");
+            pc = 0xFFFFFFFF;
+            break;
+
+        case _dreturn:
+            printf("dreturn\n");
+            pc = 0xFFFFFFFF;
+            break;
+
+        case _areturn:
+            printf("areturn\n");
+            pc = 0xFFFFFFFF;
+            break;
+
         case _return:
             printf("return\n");
-            pc += 1;
+            pc = 0xFFFFFFFF;
             break;
 
         case _getstatic:
             printf("getstatic\n");
             pc += 3;
             break;
+
+        case _putstatic:
+        case _getfield:
+        case _putfield:
 
         case _invokevirtual:
             printf("invokevirtual\n");
@@ -683,12 +1024,8 @@ uint32_t vm_print_opcodes_helper(uint8_t *code, uint32_t pc) {
             pc += 2;
             break;
 
-        case _iinc:
-            printf("iinc\n");
-            pc += 3;
-            break;
-
         case _wide:
+            _WIDE = 1;
             printf("wide\n");
             pc += 1;
             break;
