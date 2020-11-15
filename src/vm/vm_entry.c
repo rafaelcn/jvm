@@ -158,7 +158,7 @@ const char * vm_execute(file_t *file) {
     MAIN_FRAME->next_frame = NULL;
 
     for (uint32_t pc = 0; pc < main_code->code_length;) {
-        vm_opcodes(main_code->code, &pc, VM_STACK);
+        pc = vm_opcodes(main_code->code, pc, VM_STACK);
     }
 
     return "";
