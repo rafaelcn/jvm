@@ -1062,9 +1062,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
         case _pop:
         case _pop2:
             {
-                // if the bytecode number is a _pop2 instruction then the
-                // subtraction of these two values will be > 0 and therefore
-                // enter the if, popping the value twice.
                 if (code[pc] - _pop) {
                     pop_from_ostack(&(STACK->operand_stack));
                 }
@@ -1075,12 +1072,270 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             break;
 
         case _dup:
+        case _dup_x1:
+        case _dup_x2:
             {
-                vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
-                push_into_ostack(&(STACK->operand_stack), &(popped_operand));
-                push_into_ostack(&(STACK->operand_stack), &(popped_operand));
+                vm_ostack_t *value1 = pop_from_ostack(&(STACK->operand_stack));
+                vm_ostack_t *value1_cp = calloc(1, sizeof(vm_ostack_t));
+                value1_cp->operand.type = value1->operand.type;
+                value1_cp->next_frame = NULL;
+
+                switch (value1_cp->operand.type) {
+                case _short:
+                    value1_cp->operand.value._short = value1->operand.value._short;
+                    break;
+                case _int:
+                    value1_cp->operand.value._int = value1->operand.value._int;
+                    break;
+                case _long:
+                    value1_cp->operand.value._long = value1->operand.value._long;
+                    break;
+                case _float:
+                    value1_cp->operand.value._float = value1->operand.value._float;
+                    break;
+                case _double:
+                    value1_cp->operand.value._double = value1->operand.value._double;
+                    break;
+                case _char:
+                    value1_cp->operand.value._char = value1->operand.value._char;
+                    break;
+                case _string:
+                    value1_cp->operand.value._string = value1->operand.value._string;
+                    break;
+                case _byte_or_bool:
+                    value1_cp->operand.value._byte_or_bool = value1->operand.value._byte_or_bool;
+                    break;
+                case _reference:
+                    value1_cp->operand.value._reference = value1->operand.value._reference;
+                    break;
+                case _returnAddress:
+                    value1_cp->operand.value._returnAddress = value1->operand.value._returnAddress;
+                    break;
+                default:
+                    break;
+                }
+
+                switch (code[pc]) {
+                case _dup:
+                    push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                    push_into_ostack(&(STACK->operand_stack), &(value1));
+                    break;
+
+                case _dup_x1:
+                    {
+                        vm_ostack_t *value2 = pop_from_ostack(&(STACK->operand_stack));
+
+                        push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                        push_into_ostack(&(STACK->operand_stack), &(value2));
+                        push_into_ostack(&(STACK->operand_stack), &(value1));
+                    }
+                    break;
+
+                case _dup_x2:
+                    {
+                        vm_ostack_t *value2 = pop_from_ostack(&(STACK->operand_stack));
+
+                        if ((value2->operand.type == _long) || (value2->operand.type == _double)) {
+                            push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                            push_into_ostack(&(STACK->operand_stack), &(value2));
+                            push_into_ostack(&(STACK->operand_stack), &(value1));
+                        } else {
+                            vm_ostack_t *value3 = pop_from_ostack(&(STACK->operand_stack));
+
+                            push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                            push_into_ostack(&(STACK->operand_stack), &(value3));
+                            push_into_ostack(&(STACK->operand_stack), &(value2));
+                            push_into_ostack(&(STACK->operand_stack), &(value1));
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
             }
             pc += 1;
+            break;
+
+        case _dup2:
+        case _dup2_x1:
+        case _dup2_x2:
+            {
+                vm_ostack_t *value1 = pop_from_ostack(&(STACK->operand_stack));
+                vm_ostack_t *value1_cp = calloc(1, sizeof(vm_ostack_t));
+                value1_cp->operand.type = value1->operand.type;
+                value1_cp->next_frame = NULL;
+
+                switch (value1_cp->operand.type) {
+                case _short:
+                    value1_cp->operand.value._short = value1->operand.value._short;
+                    break;
+                case _int:
+                    value1_cp->operand.value._int = value1->operand.value._int;
+                    break;
+                case _long:
+                    value1_cp->operand.value._long = value1->operand.value._long;
+                    break;
+                case _float:
+                    value1_cp->operand.value._float = value1->operand.value._float;
+                    break;
+                case _double:
+                    value1_cp->operand.value._double = value1->operand.value._double;
+                    break;
+                case _char:
+                    value1_cp->operand.value._char = value1->operand.value._char;
+                    break;
+                case _string:
+                    value1_cp->operand.value._string = value1->operand.value._string;
+                    break;
+                case _byte_or_bool:
+                    value1_cp->operand.value._byte_or_bool = value1->operand.value._byte_or_bool;
+                    break;
+                case _reference:
+                    value1_cp->operand.value._reference = value1->operand.value._reference;
+                    break;
+                case _returnAddress:
+                    value1_cp->operand.value._returnAddress = value1->operand.value._returnAddress;
+                    break;
+                default:
+                    break;
+                }
+
+                if ((value1_cp->operand.type != _long) && (value1_cp->operand.type != _double)) {
+                    vm_ostack_t *value2 = pop_from_ostack(&(STACK->operand_stack));
+                    vm_ostack_t *value2_cp = calloc(1, sizeof(vm_ostack_t));
+                    value2_cp->operand.type = value2->operand.type;
+                    value2_cp->next_frame = NULL;
+
+                    switch (value2_cp->operand.type) {
+                    case _short:
+                        value2_cp->operand.value._short = value2->operand.value._short;
+                        break;
+                    case _int:
+                        value2_cp->operand.value._int = value2->operand.value._int;
+                        break;
+                    case _long:
+                        value2_cp->operand.value._long = value2->operand.value._long;
+                        break;
+                    case _float:
+                        value2_cp->operand.value._float = value2->operand.value._float;
+                        break;
+                    case _double:
+                        value2_cp->operand.value._double = value2->operand.value._double;
+                        break;
+                    case _char:
+                        value2_cp->operand.value._char = value2->operand.value._char;
+                        break;
+                    case _string:
+                        value2_cp->operand.value._string = value2->operand.value._string;
+                        break;
+                    case _byte_or_bool:
+                        value2_cp->operand.value._byte_or_bool = value2->operand.value._byte_or_bool;
+                        break;
+                    case _reference:
+                        value2_cp->operand.value._reference = value2->operand.value._reference;
+                        break;
+                    case _returnAddress:
+                        value2_cp->operand.value._returnAddress = value2->operand.value._returnAddress;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    switch (code[pc]) {
+                    case _dup2:
+                        push_into_ostack(&(STACK->operand_stack), &(value2_cp));
+                        push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                        push_into_ostack(&(STACK->operand_stack), &(value2));
+                        push_into_ostack(&(STACK->operand_stack), &(value1));
+                        break;
+
+                    case _dup2_x1:
+                        {
+                            vm_ostack_t *value3 = pop_from_ostack(&(STACK->operand_stack));
+
+                            push_into_ostack(&(STACK->operand_stack), &(value2_cp));
+                            push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                            push_into_ostack(&(STACK->operand_stack), &(value3));
+                            push_into_ostack(&(STACK->operand_stack), &(value2));
+                            push_into_ostack(&(STACK->operand_stack), &(value1));
+                        }
+                        break;
+
+                    case _dup2_x2:
+                        {
+                            vm_ostack_t *value3 = pop_from_ostack(&(STACK->operand_stack));
+
+                            if ((value3->operand.type == _long) || (value3->operand.type == _double)) {
+                                push_into_ostack(&(STACK->operand_stack), &(value2_cp));
+                                push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                                push_into_ostack(&(STACK->operand_stack), &(value3));
+                                push_into_ostack(&(STACK->operand_stack), &(value2));
+                                push_into_ostack(&(STACK->operand_stack), &(value1));
+                            } else {
+                                vm_ostack_t *value4 = pop_from_ostack(&(STACK->operand_stack));
+
+                                push_into_ostack(&(STACK->operand_stack), &(value2_cp));
+                                push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                                push_into_ostack(&(STACK->operand_stack), &(value4));
+                                push_into_ostack(&(STACK->operand_stack), &(value3));
+                                push_into_ostack(&(STACK->operand_stack), &(value2));
+                                push_into_ostack(&(STACK->operand_stack), &(value1));
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+                } else {
+                    switch (code[pc]) {
+                    case _dup2:
+                        push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                        push_into_ostack(&(STACK->operand_stack), &(value1));
+                        break;
+
+                    case _dup2_x1:
+                        {
+                            vm_ostack_t *value2 = pop_from_ostack(&(STACK->operand_stack));
+
+                            push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                            push_into_ostack(&(STACK->operand_stack), &(value2));
+                            push_into_ostack(&(STACK->operand_stack), &(value1));
+                        }
+                        break;
+
+                    case _dup2_x2:
+                        {
+                            vm_ostack_t *value2 = pop_from_ostack(&(STACK->operand_stack));
+
+                            if ((value2->operand.type == _long) || (value2->operand.type == _double)) {
+                                push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                                push_into_ostack(&(STACK->operand_stack), &(value2));
+                                push_into_ostack(&(STACK->operand_stack), &(value1));
+                            } else {
+                                vm_ostack_t *value3 = pop_from_ostack(&(STACK->operand_stack));
+
+                                push_into_ostack(&(STACK->operand_stack), &(value1_cp));
+                                push_into_ostack(&(STACK->operand_stack), &(value3));
+                                push_into_ostack(&(STACK->operand_stack), &(value2));
+                                push_into_ostack(&(STACK->operand_stack), &(value1));
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+            pc += 1;
+            break;
+
+        case _swap:
+            {
+                vm_ostack_t *value1 = pop_from_ostack(&(STACK->operand_stack));
+                vm_ostack_t *value2 = pop_from_ostack(&(STACK->operand_stack));
+                push_into_ostack(&(STACK->operand_stack), &(value1));
+                push_into_ostack(&(STACK->operand_stack), &(value2));
+            }
             break;
 
         case _iadd:
@@ -2569,20 +2824,6 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 3;
             break;
 
-        case _new:
-            {
-                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
-
-                new_frame->operand.type = _string;
-                new_frame->operand.value._string = calloc(4, sizeof(char));
-                new_frame->next_frame = NULL;
-
-                sprintf(new_frame->operand.value._string, "new");
-                push_into_ostack(&(STACK->operand_stack), &(new_frame));
-            }
-            pc += 3;
-            break;
-
         case _invokedynamic:
             {
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
@@ -2595,6 +2836,20 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 push_into_ostack(&(STACK->operand_stack), &(new_frame));
             }
             pc += 5;
+            break;
+
+        case _new:
+            {
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _string;
+                new_frame->operand.value._string = calloc(4, sizeof(char));
+                new_frame->next_frame = NULL;
+
+                sprintf(new_frame->operand.value._string, "new");
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 3;
             break;
 
         case _newarray:
