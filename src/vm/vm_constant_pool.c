@@ -352,23 +352,20 @@ void element_value_parser(vm_element_value_t *element_value_pt, file_t *file) {
     element_value_pt->tag = read_u1(file);
     uint8_t tag = element_value_pt->tag;
 
-    // As the same behavior shall happen with different tags, let's compare the tag
-    // with those characters
+    // As the same behavior shall happen with different tags, let's compare the
+    // tag with those characters
     uint8_t is_constant_value_index_tag = strchr("BCDFIJSZs", tag) != NULL;
-    if(is_constant_value_index_tag)
-    {
+
+    if (is_constant_value_index_tag) {
         element_value_pt->value.const_value_index = read_u2(file);
-    } else if (tag == 'e')
-    {
+    } else if (tag == 'e') {
         // Enum type
         element_value_pt->value.enum_const_value.type_name_index = read_u2(file);
         element_value_pt->value.enum_const_value.const_name_index = read_u2(file);
-    } else if (tag == 'c')
-    {
+    } else if (tag == 'c') {
         // Class
         element_value_pt->value.class_info_index = read_u2(file);
-    } else if (tag == '@')
-    {
+    } else if (tag == '@') {
         // Annotation type(This one seems messy)
         element_value_pt->value.annotation_value.type_index = read_u2(file);
         element_value_pt->value.annotation_value.num_element_value_pairs = read_u2(file);
@@ -384,16 +381,17 @@ void element_value_parser(vm_element_value_t *element_value_pt, file_t *file) {
             element_value_pt->value.annotation_value.num_element_value_pairs,
             temporary_pair,
             file);
-    } else if (tag == '[')
-    {
-        // Array type(Also messy, what were those guys
-        // thinking?)
+    } else if (tag == '[') {
+        // Array type (also messy, what were those guys thinking?)
         element_value_pt->value.array_value.num_values = read_u2(file);
         element_value_pt->value.array_value.values = calloc(
             element_value_pt->value.array_value.num_values,
             sizeof (vm_element_value_t));
-        for(uint16_t l = 0;( l < element_value_pt->value.array_value.num_values); l++) {
-            element_value_parser(&(element_value_pt->value.array_value.values[l]), file);
+
+        uint16_t _array_values = element_value_pt->value.array_value.num_values;
+
+        for(uint16_t l = 0; l < _array_values; l++) {
+            element_value_parser(&(_array_value.values[l]), file);
         }
     } else {
         // printf("RuntimeVisibleAnnotations element pairs tag not found.");
