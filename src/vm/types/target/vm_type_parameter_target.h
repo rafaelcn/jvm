@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A type_parameter_target structure.
  */
 typedef struct vm_type_parameter_target {
     uint8_t type_parameter_index;

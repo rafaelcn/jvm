@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A throws_target structure.
  */
 typedef struct vm_throws_target {
     uint16_t throws_type_index;

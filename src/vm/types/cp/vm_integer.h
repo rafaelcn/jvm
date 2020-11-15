@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A integer structure.
  */
 typedef struct vm_integer_t {
     uint32_t bytes;

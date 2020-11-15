@@ -20,7 +20,7 @@
 #include "vm_invoke_dynamic.h"
 
 /**
- * @brief
+ * @brief A union with all the constant_pool entry types.
  */
 typedef union vm_cp_types {
     vm_class_t class_info;

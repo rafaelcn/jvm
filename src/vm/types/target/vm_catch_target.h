@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A catch_target structure.
  */
 typedef struct vm_catch_target {
     uint16_t exception_table_index;

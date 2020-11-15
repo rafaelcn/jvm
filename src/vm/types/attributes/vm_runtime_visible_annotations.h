@@ -3,8 +3,14 @@
 
 #include <stdint.h>
 
+/**
+ * @brief A element_value_pairs structure.
+ */
 typedef struct vm_element_value_pairs vm_element_value_pairs_t;
 
+/**
+ * @brief A element_value structure.
+ */
 typedef struct vm_element_value {
     uint8_t tag;
     union {
@@ -32,7 +38,7 @@ typedef struct vm_element_value {
 } vm_element_value_t;
 
 /**
- * @brief
+ * @brief A element_value_pairs structure.
  */
 struct vm_element_value_pairs {
     uint16_t element_name_index;
@@ -40,7 +46,7 @@ struct vm_element_value_pairs {
 };
 
 /**
- * @brief
+ * @brief A annotation structure.
  */
 typedef struct vm_annotation {
     uint16_t type_index;
@@ -51,7 +57,7 @@ typedef struct vm_annotation {
 
 
 /**
- * @brief
+ * @brief A runtime_visible_annotations structure.
  */
 typedef struct vm_runtime_visible_annotations {
     uint16_t num_annotations;

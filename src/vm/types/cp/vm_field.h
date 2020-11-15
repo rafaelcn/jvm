@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A field_ref structure.
  */
 typedef struct vm_field_ref_t
 {

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A string structure.
  */
 typedef struct vm_string_t
 {

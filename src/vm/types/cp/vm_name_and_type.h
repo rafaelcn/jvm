@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A name_and_type structure.
  */
 typedef struct vm_name_and_type_t
 {

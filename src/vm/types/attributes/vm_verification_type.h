@@ -4,57 +4,57 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A top_variable structure.
  */
 typedef struct vm_top_variable {
 } vm_top_variable_t;
 
 /**
- * @brief
+ * @brief A integer_variable structure.
  */
 typedef vm_top_variable_t vm_integer_variable_t;
 
 /**
- * @brief
+ * @brief A float_variable structure.
  */
 typedef vm_top_variable_t vm_float_variable_t;
 
 /**
- * @brief
+ * @brief A long_variable structure.
  */
 typedef vm_top_variable_t vm_long_variable_t;
 
 /**
- * @brief
+ * @brief A double_variable structure.
  */
 typedef vm_top_variable_t vm_double_variable_t;
 
 /**
- * @brief
+ * @brief A null_variable structure.
  */
 typedef vm_top_variable_t vm_null_variable_t;
 
 /**
- * @brief
+ * @brief A uninitialized_this_variable structure.
  */
 typedef vm_top_variable_t vm_uninitialized_this_variable_t;
 
 /**
- * @brief
+ * @brief A bject_variable structure.
  */
 typedef struct vm_object_variable {
     uint16_t cpool_index;
 } vm_object_variable_t;
 
 /**
- * @brief
+ * @brief A uninitialized_variable structure.
  */
 typedef struct vm_uninitialized_variable {
     uint16_t offset;
 } vm_uninitialized_variable_t;
 
 /**
- * @brief
+ * @brief A verification_type_info structure.
  */
 typedef struct vm_verification_type_info {
     uint8_t tag;

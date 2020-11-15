@@ -6,7 +6,7 @@
 #include "vm_stack_map_frame.h"
 
 /**
- * @brief
+ * @brief A stack_map_table structure.
  */
 typedef struct vm_stack_map_table {
     uint16_t number_of_entries;

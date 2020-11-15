@@ -4,7 +4,7 @@
 #include "vm_field.h"
 
 /**
- * @brief
+ * @brief A interface_method_ref structure.
  */
 typedef vm_field_ref_t vm_interface_method_ref_t;
 

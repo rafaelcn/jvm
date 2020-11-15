@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A supertype_target structure.
  */
 typedef struct vm_supertype_target {
     uint16_t supertype_index;

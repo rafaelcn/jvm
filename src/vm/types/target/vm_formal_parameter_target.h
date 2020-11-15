@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A formal_parameter_target structure.
  */
 typedef struct vm_formal_parameter_target {
     uint8_t formal_parameter_index;

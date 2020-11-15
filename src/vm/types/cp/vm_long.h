@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A long structure.
  */
 typedef struct vm_long_t {
     uint32_t high_bytes;
