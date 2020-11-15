@@ -454,7 +454,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _iload:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -469,7 +478,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _lload:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -484,7 +502,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _fload:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -499,7 +526,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _dload:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
@@ -514,7 +550,17 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _aload:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
+
                 vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
 
                 new_frame->operand.type = _reference;
@@ -751,7 +797,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _istore:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 current_local_variables[index].type = _int;
                 current_local_variables[index].value._int = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
@@ -761,7 +816,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _lstore:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 current_local_variables[index].type = _long;
                 current_local_variables[index].value._long = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
@@ -771,7 +835,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _fstore:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 current_local_variables[index].type = _float;
                 current_local_variables[index].value._float = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
@@ -781,7 +854,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _dstore:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 current_local_variables[index].type = _double;
                 current_local_variables[index].value._double = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
@@ -791,7 +873,16 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _astore:
             {
-                uint8_t index = code[pc+1];
+                uint16_t index = 0;
+
+                if (_WIDE) {
+                    uint8_t indexbyte1 = code[pc+1];
+                    uint8_t indexbyte2 = code[pc+2];
+                    index = (indexbyte1 << 8) | indexbyte2;
+                    _WIDE = 0;
+                } else {
+                    index = code[pc+1];
+                }
 
                 current_local_variables[index].type = _reference;
                 current_local_variables[index].value._reference = pop_from_ostack(&(STACK->operand_stack))->operand.value._reference;
