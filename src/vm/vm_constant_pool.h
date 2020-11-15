@@ -10,7 +10,7 @@
 
 
 /**
- * @brief
+ * @brief Constant Pool entry strcuture.
  */
 typedef struct vm_cp_info {
     uint8_t tag;
@@ -18,7 +18,7 @@ typedef struct vm_cp_info {
 } vm_cp_info_t;
 
 /**
- * @brief
+ * @brief A Field_info structure.
  */
 typedef struct vm_field_info {
     uint16_t access_flags;
@@ -29,12 +29,12 @@ typedef struct vm_field_info {
 } vm_field_info_t;
 
 /**
- * @brief
+ * @brief A Method_info structure.
  */
 typedef vm_field_info_t vm_method_info_t;
 
 /**
- * @brief
+ * @brief A ClassFile structure.
  */
 typedef struct vm_class_file {
     uint32_t magic;
