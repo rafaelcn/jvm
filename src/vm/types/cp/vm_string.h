@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief A string structure.
+ * @brief Encode a string index.
  */
 typedef struct vm_string_t
 {
