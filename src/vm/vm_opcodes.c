@@ -2878,8 +2878,7 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
                 int count = pop_from_ostack(&(STACK->operand_stack))->operand.value._int;
                 int atype = code[pc+1];
                 void *array;
-                switch (atype)
-                {
+                switch (atype) {
                 case T_BOOLEAN:
                     array = calloc(count, sizeof(char));
                     break;
