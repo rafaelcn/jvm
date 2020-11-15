@@ -89,16 +89,19 @@ const char * vm_execute(file_t *file) {
     // finding the main
     vm_method_info_t *main_method = calloc(1, sizeof (vm_method_info_t));
     vm_utf8_t method_name;
-    uint16_t *uint16_string;
-    char buffer[80];
+
+    vm_uint16_string_t *uint16_string;
+    char *buffer = NULL;
 
     for (uint16_t i = 0; i < class_file.methods_count; i++) {
         method_name = class_file.constant_pool[class_file.methods[i].name_index].info.utf8_info;
         uint16_string = vm_utf8_to_uint16_t(method_name.length, method_name.bytes);
 
+        buffer = realloc(buffer, ((uint16_string->length) * sizeof(char)));
+
         // first we print the name of the method to a buffer
-        for (int j = 0; j < method_name.length; j++) {
-            sprintf(&buffer[j], "%lc", uint16_string[j]);
+        for (int j = 0; j < uint16_string->length; j++) {
+            sprintf(&buffer[j], "%lc", uint16_string->string[j]);
         }
 
         // after that we check if the name is 'main'
@@ -127,9 +130,11 @@ const char * vm_execute(file_t *file) {
         attribute_name = class_file.constant_pool[main_method->attributes[i].attribute_name_index].info.utf8_info;
         uint16_string = vm_utf8_to_uint16_t(attribute_name.length, attribute_name.bytes);
 
+        buffer = realloc(buffer, ((uint16_string->length) * sizeof(char)));
+
         // first we print the name of the method to a buffer
-        for (int j = 0; j < method_name.length; j++) {
-            sprintf(&buffer[j], "%lc", uint16_string[j]);
+        for (int j = 0; j < uint16_string->length; j++) {
+            sprintf(&buffer[j], "%lc", uint16_string->string[j]);
         }
 
         if (vm_strcmp(buffer, "Code")) {
@@ -153,7 +158,7 @@ const char * vm_execute(file_t *file) {
     MAIN_FRAME->next_frame = NULL;
 
     for (uint32_t pc = 0; pc < main_code->code_length;) {
-        pc = vm_opcodes(main_code->code, pc, VM_STACK);
+        vm_opcodes(main_code->code, &pc, VM_STACK);
     }
 
     return "";
