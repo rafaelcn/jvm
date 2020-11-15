@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A constant_value structure.
  */
 typedef struct vm_constant_value {
     uint16_t constantvalue_index;

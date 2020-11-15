@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A signature struct.
  */
 typedef struct vm_signature {
     uint16_t signature_index;

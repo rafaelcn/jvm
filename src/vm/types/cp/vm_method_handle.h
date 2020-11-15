@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A method_handle structure.
  */
 typedef struct vm_method_handle {
     uint8_t reference_kind;

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A invoke_dynamic structure.
  */
 typedef struct vm_invoke_dynamic {
     uint16_t bootstrap_method_attr_index;

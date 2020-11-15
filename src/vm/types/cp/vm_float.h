@@ -6,7 +6,7 @@
 #include "vm_integer.h"
 
 /**
- * @brief
+ * @brief A float structure.
  */
 typedef vm_integer_t vm_float_t;
 

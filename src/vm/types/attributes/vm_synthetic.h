@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A synthetic structure.
  */
 typedef struct vm_synthetic {
 } vm_synthetic_t;

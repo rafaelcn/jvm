@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A offset_target structure.
  */
 typedef struct vm_offset_target {
     uint16_t offset;

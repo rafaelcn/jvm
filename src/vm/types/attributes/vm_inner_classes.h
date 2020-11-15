@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A classes structure.
  */
 typedef struct vm_classes {
     uint16_t inner_class_info_index;
@@ -14,7 +14,7 @@ typedef struct vm_classes {
 } vm_classes_t;
 
 /**
- * @brief
+ * @brief A inner_classes structure.
  */
 typedef struct vm_inner_classes {
     uint16_t number_of_classes;

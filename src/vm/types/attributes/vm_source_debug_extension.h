@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A source_debug_extension structure.
  */
 typedef struct vm_source_debug_extension {
     uint8_t *debug_extension;

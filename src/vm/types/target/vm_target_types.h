@@ -16,7 +16,7 @@
 #include "vm_type_argument_target.h"
 
 /**
- * @brief
+ * @brief A union with all the target types.
  */
 typedef union vm_target {
     vm_type_parameter_target_t type_parameter_target;

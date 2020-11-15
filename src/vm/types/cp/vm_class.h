@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A class structure.
  */
 typedef struct vm_class_t
 {

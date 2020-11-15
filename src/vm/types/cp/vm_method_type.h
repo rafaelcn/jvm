@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A method_type structure.
  */
 typedef struct vm_method_type {
     uint16_t desciptor_index;

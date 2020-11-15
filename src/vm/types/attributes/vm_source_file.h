@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A source_file structure.
  */
 typedef struct vm_source_file {
     uint16_t sourcefile_index;

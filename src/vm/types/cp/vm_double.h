@@ -4,7 +4,7 @@
 #include "vm_long.h"
 
 /**
- * @brief
+ * @brief A vm_double structure.
  */
 typedef vm_long_t vm_double_t;
 

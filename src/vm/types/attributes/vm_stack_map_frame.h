@@ -6,20 +6,20 @@
 #include "vm_verification_type.h"
 
 /**
- * @brief
+ * @brief A same_frame structure.
  */
 typedef struct vm_same_frame {
 } vm_same_frame_t;
 
 /**
- * @brief
+ * @brief A same_locals_1_stack_item_frame structure.
  */
 typedef struct vm_same_locals_1_stack_item_frame {
     vm_verification_type_info_t stack;
 } vm_same_locals_1_stack_item_frame_t;
 
 /**
- * @brief
+ * @brief A same_locals_1_stack_item_frame_extended structure.
  */
 typedef struct vm_same_locals_1_stack_item_frame_extended {
     uint16_t offset_delta;
@@ -27,19 +27,19 @@ typedef struct vm_same_locals_1_stack_item_frame_extended {
 } vm_same_locals_1_stack_item_frame_extended_t;
 
 /**
- * @brief
+ * @brief A chop_frame structure.
  */
 typedef struct vm_chop_frame {
     uint16_t offset_delta;
 } vm_chop_frame_t;
 
 /**
- * @brief
+ * @brief A same_frame_extended structure.
  */
 typedef vm_chop_frame_t vm_same_frame_extended_t;
 
 /**
- * @brief
+ * @brief A append_frame structure.
  */
 typedef struct vm_append_frame {
     uint16_t offset_delta;
@@ -47,7 +47,7 @@ typedef struct vm_append_frame {
 } vm_append_frame_t;
 
 /**
- * @brief
+ * @brief A full_frame structure.
  */
 typedef struct vm_full_frame {
     uint16_t offset_delta;
@@ -60,12 +60,12 @@ typedef struct vm_full_frame {
 } vm_full_frame_t;
 
 /**
- * @brief
+ * @brief A stack_map_frame structure.
  */
 typedef struct vm_stack_map_frame {
     uint8_t frame_type;
 
-    union {
+    union frame {
         vm_same_frame_t same_frame;
         vm_same_locals_1_stack_item_frame_t same_locals_1_stack_item_frame;
         vm_same_locals_1_stack_item_frame_extended_t same_locals_1_stack_item_frame_extended;

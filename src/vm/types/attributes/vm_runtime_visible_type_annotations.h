@@ -6,7 +6,7 @@
 
 
 /**
- * @brief
+ * @brief A type_path_table structure.
  */
 typedef struct vm_type_path_table {
         uint8_t type_path_kind;
@@ -15,7 +15,7 @@ typedef struct vm_type_path_table {
 
 
 /**
- * @brief
+ * @brief A type_path structure.
  */
 typedef struct vm_type_path {
     uint8_t path_length;
@@ -23,7 +23,7 @@ typedef struct vm_type_path {
 } vm_type_path_t;
 
 /**
- * @brief
+ * @brief A type_annotation structure.
  */
 typedef struct vm_type_annotation {
     uint8_t target_type;
@@ -39,7 +39,7 @@ typedef struct vm_type_annotation {
 } vm_type_annotation_t;
 
 /**
- * @brief
+ * @brief Aruntime_visible_type_annotations structure.
  */
 typedef struct vm_runtime_visible_type_annotations {
     uint16_t num_annotations;

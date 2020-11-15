@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A local_variable (attribute) structure.
  */
 typedef struct vm_local_variable {
     uint16_t start_pc;
@@ -15,7 +15,7 @@ typedef struct vm_local_variable {
 } vm_local_variable_t;
 
 /**
- * @brief
+ * @brief A local_variable_table (attribute) structure.
  */
 typedef struct vm_local_variable_table {
     uint16_t local_variable_table_length;

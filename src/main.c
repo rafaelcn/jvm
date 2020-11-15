@@ -8,7 +8,6 @@
 #include "vm/vm_entry.h"
 #include "vm/vm_settings.h"
 #include "vm/vm_file.h"
-#include "machine.h"
 
 #include "vm/lib/vm_string.h"
 
@@ -58,8 +57,10 @@ int main(int argc, char** argv) {
                     file_t *file = (file_t *) malloc(sizeof(file_t));
                     // initializes execution of the nJVM (?)
                     int ret = vm_init(filename, file);
-                    // TODO: Pass the information for the interpreter of java bytecode
-                    vm_execute(file);
+
+                    if (ret == 0) {
+                        vm_execute(file);
+                    }
                 }
 
                 break;
@@ -76,8 +77,10 @@ int main(int argc, char** argv) {
                     file_t *file = (file_t *) malloc(sizeof(file_t));
                     // initializes the execution of nJVM (?)
                     int ret = vm_init(filename, file);
-                    // TODO: Pass the information for the interpreter of java bytecode
-                    vm_inform(file);
+
+                    if (ret == 0) {
+                        vm_inform(file);
+                    }
                 }
 
                 break;
@@ -97,8 +100,6 @@ int main(int argc, char** argv) {
                 }
             }
         }
-
-
     }
 
     return ret;

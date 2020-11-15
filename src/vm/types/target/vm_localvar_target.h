@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A vm_localvar_table structure.
  */
 typedef struct vm_localvar_table {
         uint16_t start_pc;
@@ -13,7 +13,7 @@ typedef struct vm_localvar_table {
     } vm_localvar_table_t;
 
 /**
- * @brief
+ * @brief A localvar_target structure.
  */
 typedef struct vm_localvar_target {
     uint16_t table_length;

@@ -2,7 +2,7 @@
 #define VM_EMPTY_TARGET_H
 
 /**
- * @brief
+ * @brief A empty_target structure.
  */
 typedef struct vm_empty_target {
 } vm_empty_target_t;

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A enclosing_method strcuture.
  */
 typedef struct vm_enclosing_method {
     uint16_t class_index;
