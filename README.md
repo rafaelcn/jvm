@@ -42,3 +42,11 @@ available commands:
     --debug 		- enables the debug mode that shows more information
 	--execute <class file>	- executes a class file
 	--inform  <class file>	- shows information about the class file
+
+
+# documentation
+
+We use doxygen to generate our documentation and you can do it by using the
+following command:
+
+`doxygen documentation.conf`
