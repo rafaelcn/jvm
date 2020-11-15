@@ -14,7 +14,8 @@
  * initializes the java virtual machine internal structures
  * @param filename Is a filepath string pointing to a filename that contains a
  * valid .class file.
- * @param file
+ * @param file A file_t structure to hold the file.
+ * @returns Returns 0 if no error occurred.
  */
 int vm_init(const char *filename, file_t *file);
 
