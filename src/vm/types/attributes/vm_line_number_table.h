@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A line_number_table entry structure.
  */
 typedef struct vm_line_number {
     uint16_t start_pc;
@@ -12,7 +12,7 @@ typedef struct vm_line_number {
 } vm_line_number_t;
 
 /**
- * @brief
+ * @brief A line_number_table structure.
  */
 typedef struct vm_line_number_table {
     uint16_t line_number_table_length;

@@ -31,7 +31,7 @@
 typedef struct vm_attribute_info vm_attribute_info_t;
 
 /**
- * @brief
+ * @brief A exception table structure.
  */
 typedef struct vm_exception_table {
     uint16_t start_pc;
@@ -41,7 +41,7 @@ typedef struct vm_exception_table {
 } vm_exception_table_t;
 
 /**
- * @brief
+ * @brief A structure representing the Code Attribute of a Method.
  */
 typedef struct vm_code {
     uint16_t max_stack;
@@ -58,7 +58,7 @@ typedef struct vm_code {
 } vm_code_t;
 
 /**
- * @brief
+ * @brief A union of all attribute types of the JVM.
  */
 typedef union vm_attribute_types {
     vm_constant_value_t constantvalue_attribute;
@@ -87,7 +87,8 @@ typedef union vm_attribute_types {
 } vm_attribute_types_t;
 
 /**
- * @brief
+ * @brief The common fields of a Attribute_info structures and a
+ * union with all the values of all types.
  */
 struct vm_attribute_info {
     uint16_t attribute_name_index;

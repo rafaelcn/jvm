@@ -86,12 +86,6 @@ void vm_init_tag_map() {
     strcpy(tag_constants[0x12], "Invoke Dynamic");
 }
 
-/**
- * @brief A function dedicated to filling the constant_pool field of the
- * vm_class_file_t structure.
- * @param file A file_t pointer that has the .class loaded.
- * @param cf A pointer to a vm_class_file_t structure.
- */
 void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
     uint8_t tag;
 
@@ -191,22 +185,12 @@ void constant_pool_parser(file_t *file, vm_class_file_t *cf) {
     }
 }
 
-/**
- * @brief A function dedicated to filling the interfaces field of the
- * vm_class_file_t structure.
- * @param file A file_t pointer that has the .class loaded.
- * @param cf A pointer to a vm_class_file_t structure.
- */
 void interfaces_parser(file_t *file, vm_class_file_t *cf) {
     for (int i = 0; i < (cf->interfaces_count); i++) {
         cf->interfaces[i] = read_u2(file);
     }
 }
 
-/**
- * @brief A function dedicated to converting a Utf8 entry at the constant pool
- * to a int that can be used at a switch case.
- */
 int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
     vm_uint16_string_t *uint16_string = vm_utf8_to_uint16_t(length, bytes);
     char *buffer = calloc(uint16_string->length, sizeof(char));
@@ -265,9 +249,6 @@ int attribute_name_to_int(uint16_t length, uint8_t *bytes) {
     return -1;
 }
 
-/**
- * @brief
- */
 void verification_type_parser(vm_verification_type_info_t *stack, file_t *file) {
     switch (stack->tag) {
     case 0: // ITEM_Top
@@ -304,9 +285,6 @@ void verification_type_parser(vm_verification_type_info_t *stack, file_t *file) 
     }
 }
 
-/**
- * @brief
- */
 void stack_map_frame_parser(vm_stack_map_frame_t *entry, file_t *file) {
     if (entry->frame_type >= 0 && entry->frame_type <= 63) {
         // SAME FRAME
@@ -363,9 +341,6 @@ void stack_map_frame_parser(vm_stack_map_frame_t *entry, file_t *file) {
     }
 }
 
-/**
- * @brief
- */
 void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file) {
     for (int i = 0; i < (stack_map_table->number_of_entries); i++) {
         stack_map_table->entries[i].frame_type = read_u1(file);
@@ -373,14 +348,6 @@ void stack_map_table_parser(vm_stack_map_table_t *stack_map_table, file_t *file)
     }
 }
 
-void element_value_pairs_parser(uint16_t, vm_element_value_pairs_t *, file_t *);
-
-/**
- * @brief A function dedicated to filling the attributes field of the
- * vm_class_file_t structure.
- * @param element_value_pt
- * @param file A file_t pointer that has the .class loaded.
- */
 void element_value_parser(vm_element_value_t *element_value_pt, file_t *file) {
     element_value_pt->tag = read_u1(file);
     uint8_t tag = element_value_pt->tag;
@@ -431,17 +398,7 @@ void element_value_parser(vm_element_value_t *element_value_pt, file_t *file) {
     }
 }
 
-/**
- * @brief A function dedicated to filling the attributes field of the
- * vm_class_file_t structure.
- * @param element_value_pairs_count
- * @param element_value_pairs_pt
- * @param file A file_t pointer that has the .class loaded.
- */
-void element_value_pairs_parser(
-    uint16_t element_value_pairs_count,
-    vm_element_value_pairs_t *element_value_pairs_pt, file_t *file)
-{
+void element_value_pairs_parser(uint16_t element_value_pairs_count, vm_element_value_pairs_t *element_value_pairs_pt, file_t *file) {
     for(int k = 0; k < (element_value_pairs_count); k++)
     {
         element_value_pairs_pt[k].element_name_index = read_u2(file);
@@ -449,17 +406,7 @@ void element_value_pairs_parser(
     }
 }
 
-/**
- * @brief A function dedicated to filling the attributes field of the
- * vm_class_file_t structure.
- * @param type_annotation_count
- * @param type_annotation_pt
- * @param file A file_t pointer that has the .class loaded.
- */
-void type_annotations_parser(
-    uint16_t type_annotation_count,
-    vm_type_annotation_t *type_annotation_pt, file_t *file)
-{
+void type_annotations_parser(uint16_t type_annotation_count, vm_type_annotation_t *type_annotation_pt, file_t *file) {
     for(uint16_t j = 0; j < (type_annotation_count); j++)
     {
         type_annotation_pt[j].target_type = read_u1(file);
@@ -574,14 +521,6 @@ void type_annotations_parser(
     }
 }
 
-/**
- * @brief A function dedicated to filling the attributes field of the
- * vm_class_file_t structure.
- * @param attributes_count
- * @param attributes
- * @param constant_pool
- * @param file A file_t pointer that has the .class loaded.
- */
 void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attributes, vm_cp_info_t *constant_pool, file_t *file) {
     vm_utf8_t utf8;
 
@@ -903,12 +842,6 @@ void attributes_parser(uint16_t attributes_count, vm_attribute_info_t *attribute
     }
 }
 
-/**
- * @brief A function dedicated to filling the fields field of the
- * vm_class_file_t structure.
- * @param file A file_t pointer that has the .class loaded.
- * @param cf A pointer to a vm_class_file_t structure.
- */
 void fields_parser(file_t *file, vm_class_file_t *cf) {
     char buffer[80];
 
@@ -924,12 +857,6 @@ void fields_parser(file_t *file, vm_class_file_t *cf) {
     }
 }
 
-/**
- * @brief A function dedicated to filling the fields field of the
- * vm_class_file_t structure.
- * @param file A file_t pointer that has the .class loaded.
- * @param cf A pointer to a vm_class_file_t structure.
- */
 void methods_parser(file_t *file, vm_class_file_t *cf) {
     char buffer[80];
 
@@ -945,13 +872,7 @@ void methods_parser(file_t *file, vm_class_file_t *cf) {
     }
 }
 
-/**
- * @brief Parses the .class bytecode to a ClassFile structure.
- * @param file A FILE (from stdio, in rb mode) pointer to a .class file.
- * @param cf A pointer to a ClassFile structure.
- * @returns A ClassFile structure containing the .class information.
- */
-const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
+void class_file_parser(file_t *file, vm_class_file_t *cf) {
     char buffer[80];
 
     cf->magic = read_u4(file);
@@ -983,9 +904,6 @@ const char * class_file_parser(file_t *file, vm_class_file_t *cf) {
     attributes_parser(cf->attributes_count, cf->attributes, cf->constant_pool, file);
 }
 
-/**
- * @brief
- */
 void utf8_helper(uint16_t length, uint8_t *bytes) {
     vm_uint16_string_t *uint16_string = vm_utf8_to_uint16_t(length, bytes);
 
@@ -994,11 +912,6 @@ void utf8_helper(uint16_t length, uint8_t *bytes) {
     }
 }
 
-/**
- * @brief Prints the information contained in the ClassFile structure in a
- * formatted manner.
- * @param class_file A ClassFile structure to be printed.
- */
 void class_file_reader(vm_class_file_t class_file, file_t *file) {
     uint16_t cp_size = class_file.constant_pool_count;
 

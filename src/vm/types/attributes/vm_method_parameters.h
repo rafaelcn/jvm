@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A parameters_array structure.
  */
 typedef struct vm_parameters_array {
         uint16_t name_index;
@@ -12,7 +12,7 @@ typedef struct vm_parameters_array {
     } vm_parameters_array_t;
 
 /**
- * @brief
+ * @brief A method_parametes structure.
  */
 typedef struct vm_method_parameters {
     uint8_t parameters_count;

@@ -4,7 +4,7 @@
 #include "vm_runtime_visible_annotations.h"
 
 /**
- * @brief
+ * @brief A annotation_default structure.
  */
 typedef struct vm_annotation_default {
     vm_element_value_t default_value;

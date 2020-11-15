@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief
+ * @brief A deprecated structure.
  */
 typedef struct vm_deprecated {
 } vm_deprecated_t;

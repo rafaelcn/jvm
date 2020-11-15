@@ -4,7 +4,7 @@
 #include "vm_runtime_visible_type_annotations.h"
 
 /**
- * @brief
+ * @brief A runtime_invisible_type_annotations structure.
  */
 typedef vm_runtime_visible_type_annotations_t vm_runtime_invisible_type_annotations_t;
 

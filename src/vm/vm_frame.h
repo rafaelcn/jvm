@@ -22,7 +22,8 @@ enum local_variables_enum {
 };
 
 /**
- * @brief
+ * @brief The value and type of the local_variables of the current STACK.
+ * Also used to indicate the OperandStack operand value and type.
  */
 typedef struct vm_local_variables {
     int type;
@@ -41,7 +42,7 @@ typedef struct vm_local_variables {
 } vm_local_variables_t;
 
 /**
- * @brief
+ * @brief A frame of the OperandStack;
  */
 struct vm_ostack {
     vm_local_variables_t operand;
@@ -49,7 +50,7 @@ struct vm_ostack {
 };
 
 /**
- * @brief
+ * @brief A frame of the Stack.
  */
 struct vm_stack {
     char *StringBuilder;
