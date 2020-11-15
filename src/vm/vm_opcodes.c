@@ -1059,6 +1059,21 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _pop:
+        case _pop2:
+            {
+                // if the bytecode number is a _pop2 instruction then the
+                // subtraction of these two values will be > 0 and therefore
+                // enter the if, popping the value twice.
+                if (code[pc] - _pop) {
+                    pop_from_ostack(&(STACK->operand_stack));
+                }
+
+                pop_from_ostack(&(STACK->operand_stack));
+            }
+            pc += 1;
+            break;
+
         case _dup:
             {
                 vm_ostack_t *popped_operand = pop_from_ostack(&(STACK->operand_stack));
