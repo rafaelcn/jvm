@@ -2919,6 +2919,48 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 2;
             break;
 
+        case _ifnull:
+            {
+                void *ref = NULL;
+
+                vm_ostack_t *frame = pop_from_ostack(&(STACK->operand_stack));
+
+                ref = frame->operand.value._reference;
+
+                if (ref == NULL) {
+                    uint8_t branch1 = code[pc+1];
+                    uint8_t branch2 = code[pc+2];
+
+                    uint16_t offset = (branch1 << 8) | branch2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
+        case _ifnonnull:
+            {
+                void *ref = NULL;
+
+                vm_ostack_t *frame = pop_from_ostack(&(STACK->operand_stack));
+
+                ref = frame->operand.value._reference;
+
+                if (ref != NULL) {
+                    uint8_t branch1 = code[pc+1];
+                    uint8_t branch2 = code[pc+2];
+
+                    uint16_t offset = (branch1 << 8) | branch2;
+
+                    pc += offset;
+                } else {
+                    pc += 3;
+                }
+            }
+            break;
+
         case _wide:
             _WIDE = 1;
             pc += 1;
