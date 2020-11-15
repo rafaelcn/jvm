@@ -1887,6 +1887,89 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
             pc += 1;
             break;
 
+        case _lcmp:
+            {
+                long _l2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+                long _l1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._long;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->next_frame = NULL;
+
+                if (_l1 > _l2) {
+                    new_frame->operand.value._int = 1;
+                } else if (_l1 == _l2) {
+                    new_frame->operand.value._int = 0;
+                } else {
+                    new_frame->operand.value._int = -1;
+                }
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _fcmpl:
+        case _fcmpg:
+            {
+                float _f2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+                float _f1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._float;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->next_frame = NULL;
+
+                if (_f1 == NAN || _f2 == NAN) {
+                    if (code[pc] - _fcmpl) {
+                        new_frame->operand.value._int = 1;
+                    } else {
+                        new_frame->operand.value._int = -1;
+                    }
+                } else if (_f1 > _f2) {
+                    new_frame->operand.value._int = 1;
+                } else if (_f1 == _f2) {
+                    new_frame->operand.value._int = 0;
+                } else {
+                    new_frame->operand.value._int = -1;
+                }
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
+        case _dcmpl:
+        case _dcmpg:
+            {
+                double _d2 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+                double _d1 = pop_from_ostack(&(STACK->operand_stack))->operand.value._double;
+
+                vm_ostack_t *new_frame = calloc(1, sizeof(vm_ostack_t));
+
+                new_frame->operand.type = _int;
+                new_frame->next_frame = NULL;
+
+                if (_d1 == NAN || _d2 == NAN) {
+                    if (code[pc] - _dcmpl) {
+                        new_frame->operand.value._int = 1;
+                    } else {
+                        new_frame->operand.value._int = -1;
+                    }
+                } else if (_d1 > _d2) {
+                    new_frame->operand.value._int = 1;
+                } else if (_d1 == _d2) {
+                    new_frame->operand.value._int = 0;
+                } else {
+                    new_frame->operand.value._int = -1;
+                }
+
+                push_into_ostack(&(STACK->operand_stack), &(new_frame));
+            }
+            pc += 1;
+            break;
+
         case _return:
             {
                 vm_ostack_t *stack_frame = pop_from_ostack(&(STACK->operand_stack));
