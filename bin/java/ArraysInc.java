@@ -8,6 +8,6 @@ public class ArraysInc {
 
         a[0] = 3+3;
 
-        System.out.print("A[0]: " + a[0]);
+        System.out.print(", A[0]: " + a[0]);
     }
 }

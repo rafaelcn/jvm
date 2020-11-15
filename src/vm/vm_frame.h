@@ -52,6 +52,8 @@ struct vm_ostack {
 struct vm_stack {
     char *StringBuilder;
 
+    uint32_t pc;
+
     vm_local_variables_t *local_variables;
     vm_ostack_t *operand_stack;
     vm_cp_info_t *constant_pool;

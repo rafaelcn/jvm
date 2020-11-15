@@ -2229,17 +2229,19 @@ uint32_t vm_opcodes(uint8_t *code, uint32_t pc, vm_stack_t *STACK) {
 
         case _return:
             {
-                vm_ostack_t *stack_frame = pop_from_ostack(&(STACK->operand_stack));
-                vm_ostack_t *temp_stack;
+                vm_stack_t *old_frame = STACK;
+                old_frame->next_frame = NULL;
 
-                while(stack_frame != NULL)
-                {
-                    temp_stack = stack_frame;
-                    stack_frame = stack_frame->next_frame;
-                    free(temp_stack);
+                STACK = STACK->next_frame;
+
+                free(old_frame);
+
+                if (STACK != NULL) {
+                    pc = STACK->pc;
+                } else {
+                    pc = 0xFFFFFFFF;
                 }
             }
-            pc += 1;
             break;
 
         case _getstatic:
